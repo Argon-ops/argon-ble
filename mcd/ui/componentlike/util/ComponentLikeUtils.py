@@ -1,0 +1,83 @@
+import bpy
+# from bpy.mathutils import Vector
+
+from mcd.util import ObjectLookupHelper
+from mcd.ui.componentlike import AbstractDefaultSetter
+
+def getValueFromKey(key_name):
+    # CONSIDER: possibly we should show a consensus value of all selected objects?
+    return ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
+
+def getStringFromKey(key_name, default=""):
+    str = getValueFromKey(key_name)
+    return str if str is not None else default
+
+def getBoolFromKey(key_name, default=False):
+    isTrigger = getValueFromKey(key_name) 
+    return isTrigger if isTrigger is not None else default
+
+def getFloatFromKey(key, default=0.0):
+    f = getValueFromKey(key)
+    return f if f is not None else default
+
+def getIntFromKey(key, default=0):
+    i = getValueFromKey(key)
+    return i if i is not None else default
+
+def getBoolArrayFromKey(key):
+    bray = getValueFromKey(key)
+    return bray if bray is not None else (False, False, False)
+
+def getFloatArrayFromKey(key):
+    fray = getValueFromKey(key)
+    return fray if fray is not None else (0.0, 0.0, 0.0)
+
+
+def getFloatBackedBooleanVector(key):
+    fff = getValueFromKey(key)
+    if len(fff) < 3:
+        return (False, False, False)
+    def truth(f : float):
+        return True if f > 0.00001 else False
+    return (truth(fff[0]), truth(fff[1]), truth(fff[2]))
+
+def setFloatBackedBooleanVector(key, boolVector):
+    def zeroOne(b : bool):
+        return 1.0 if b else 0.0
+    setValueAtKey(key, [zeroOne(boolVector[0]), zeroOne(boolVector[1]), zeroOne(boolVector[2])])
+
+def setValueAtKey(key_name, value):
+    AbstractDefaultSetter._SetKeyValOnTargets(key_name, value, bpy.context.selected_objects)
+
+def setObjectPathStrangeAtKey(key_name, pointerObject):
+    if pointerObject is None:
+        setValueAtKey(key_name, "")
+        return
+    strangePath = ObjectLookupHelper._hierarchyToStringStrange(pointerObject)
+    setValueAtKey(key_name, strangePath)
+
+# playables as enum callback
+def playablesItemCallback(context):
+    playables = context.scene.as_custom
+    return [(p.name, p.name, p.name) for p in playables]
+
+def playableEnumGetter(playableKey, suffix="_playable"):
+    playableName = getStringFromKey(playableKey) 
+    playables = bpy.context.scene.as_custom
+    # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. (see below if curious)
+    for i in range(len(playables)):
+        if playables[i].name == playableName:
+            return i
+    return -1
+    
+
+# @staticmethod
+# def updatePathFromPointer(collectionSelf, pathKey, pointerObject):
+#     if pointerObject is None:
+#         _ASJson.setValueAt(collectionSelf, pathKey, "")
+#         return
+#     parents = ObjectLookupHelper._hierarchyToString(pointerObject)
+#     _ASJson.setValueAt(collectionSelf, pathKey, parents)
+
+
+

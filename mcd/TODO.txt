@@ -1,0 +1,27 @@
+BUGS:
+--Rename-playable-breaks-things: Make a 'playable' > assign a blender action. > rename the blender action
+    The new name isn't reflected in the json data for that playable's entry in the shared obj.
+    APPROACH: option A: have there be a function that's called before we hit the export button.
+                (downside: they need to use that button/operator not their own choice of fbx exporter.)
+               option B: if possible, hook a callback onto the renaming of the action -- seems exotic?
+
+--Just in blender: actions seem to attach themselves to objects in a way that we don't understand
+    Without knowing what we did: an action that should only apply to one object seems to be associated with
+     a number of them. 
+
+--Related: single actions in Blender become multiple anims-per-object in Unity when the action associates with multiple objs.
+    Decide: is this our problem. Can we know which object the client meant? Can we get them to specify which obj they meant.    
+
+
+# Still trouble where: the json isn't perfectly mirroring the state of the 
+#   playable (action starter).  Seems better if we ... just do a 
+#    onBeforeExport sweep of the playables to make sure that they are written
+#     which means that the user must use our export button...
+#   Not sure how the asymmetry gets in there.
+
+# TODO: not here: if there's an empty playable (on the CSharp side)
+#   handle it a little gracefully...at least issue a helpful warning
+
+#  Or would it be clever to provide a nothing playable that just sends notifications...
+#   a nothing playable that you just use as a delay notification. maybe we'd want to offer that
+#    but let's not use it to paper over an empty playable
