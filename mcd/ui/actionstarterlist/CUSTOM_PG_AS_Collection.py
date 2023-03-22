@@ -301,7 +301,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     )
 
     customInfo : StringProperty(
-        name="Custom Info",
+        name="Custom Info2",
         description="Optional. Use any way you want in a CommandEvent handler. The contents of this field will be copied to the 'CustomInfo' field in each CommandEvent sent from this playable",
         get=lambda self : _ASJson.getStringAt(self, "custom_info"),
         set=lambda self, value : _ASJson.setValueAt(self, "custom_info", value)
