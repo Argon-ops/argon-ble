@@ -1,6 +1,21 @@
 import bpy
 
-def RefreshHandlerCallbacks(handlerss, callbackAndNames):
+def RefreshHandlerCallbacks(handlerss, callbacks):
+    for handlers in handlerss:
+        for callback in callbacks:
+            [handlers.remove(h) for h in handlers if h.__name__ == callback.__name__] # TODO: purge the and name from func below
+            handlers.append(callback)
+
+def RefreshLoadPostHandler(callback):
+    RefreshHandlerCallbacks([bpy.app.handlers.load_post], [callback])
+
+# Debug
+def ClearAllLoadPostHandlers():
+    handlers = bpy.app.handlers.load_post
+    [handlers.remove(h) for h in handlers]
+
+
+# REMINDER: how to depsgraph
     # h = bpy.app.handlers
     # handlers = [
     #     h.depsgraph_update_pre,         # handler for any click on the uilist
@@ -13,10 +28,3 @@ def RefreshHandlerCallbacks(handlerss, callbackAndNames):
     # for handlers in handlers:
     #     [handlers.remove(h) for h in handlers if h.__name__ == "handleSelectionChanged"]
     #     handlers.append(handleSelectionChanged)
-    for handlers in handlerss:
-        for callbackAndName in callbackAndNames:
-            [handlers.remove(h) for h in handlers if h.__name__ == callbackAndName[1]]
-            handlers.append(callbackAndName[0])
-
-def RefreshLoadPostHandlers(callbackAndName):
-    RefreshHandlerCallbacks([bpy.app.handlers.load_post], [callbackAndName])

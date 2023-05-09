@@ -22,6 +22,9 @@ from mcd.ui.actionstarterlist import OT_TarAnimsList
 from mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
 from mcd.util import DisplayHelper
 
+from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+
+
 
 class AS_OT_AddToTargets(Operator):
     """Edit targets per playable """
@@ -95,9 +98,11 @@ def getPlayableTypes():
         ('0', 'Event Only', 'Nothing to play. Just generate an event'),
         ('1', 'Animation', 'Animation and/or audio'),
         ('2', 'Looping Animation', 'Looping animation and/or audio'),
-        ('3', 'Message', 'Send a signal to a target object'),
+        ('3', 'Send Signal', 'Send a signal to target objects'),
         ('4', 'Camera Shake', 'Trigger a camera shake'),
         ('5', 'Screen Overlay', 'Screen overlay'),
+        ('6', 'Send Sleep/Wake-up Signal', 'Send a sleep or wake-up signal to targets'),
+        ('7', 'Display Headline', 'Display text in the center of the screen'),
     )
 
 class _ASJson:
@@ -218,7 +223,7 @@ class _ASJson:
     
     @staticmethod
     def updateAllPlayableExtraTargets(context):
-        print(F"update all ex targs")
+        # print(F"update all ex targs")
         for playable in context.scene.as_custom:
             _ASJson.updateExtraTargets(playable)
 
@@ -294,7 +299,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         items=(
             ('RestartForwards', 'RestartForwards', 'Just restart play from the beginning.'),
             ('ToggleAndRestart', 'ToggleAndRestart', 'If the playback cursor is closer to the end, play backwards starting from the end. Else play forwards from the beginning.'),
-            ('FlipDirections', 'FlipDirections', 'Switch between forward and reverse with each invocation. Don\'t do anything to the playback position.'),
+            ('FlipDirections', 'FlipDirections', 'Switch between forward and reverse with each invocation. Just change directions and don\'t set the playback position (to either start or end) before hand.'),
         ),
         get=lambda self : _ASJson.getIntAt(self, "command_behaviour_type", 0), # CLU.getIntFromKey(_Append("_command_behaviour_type")),
         set=lambda self, value : _ASJson.setValueAt(self, "command_behaviour_type", value) # CLU.setValueAtKey(_Append("_command_behaviour_type"), value)
@@ -318,6 +323,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     #   The targets will never get deleted but they won't be visible, editable either.
     #  Best if: we force the user to specify they pType on creation and they can't change it after. (Could show the type in the row view to reinforce 
     #    how much it is stuck to being that type.)
+    # CONSIDER: we could add an update function to the playableType that lets us handle the switch...
+
     targets : CollectionProperty(
         name="Targets",
         type=PG_AS_TargetsPropGroup,
@@ -349,6 +356,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         get=lambda self : _ASJson.getBoolAt(self, "audio_always_forwards"),
         set=lambda self, value : _ASJson.setValueAt(self, "audio_always_forwards", value)
     )
+
     autoAddEnableReceiver : BoolProperty(
         name="Add Enable Receiver",
         description="Add an Enable Receiver component on the target objects. Enable Receivers enable/disable their IEnablable targets based on their interpretation of the signal",
@@ -375,6 +383,12 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         get=lambda self : _ASJson.getIntAt(self, "set_initial_state" ),
         set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state", value)
     )
+    # enableSignalFilter : EnumProperty(
+    #     items=(
+    #         ('Greater than half', 'Greater than half', 'Signal values greater than .5 will be considered true/enable. Otherwise false/disable'),
+    #         ('Less than half')
+    #     )
+    # )
 
     autoAddScalarReceiver : BoolProperty(
         name="Add Scalar Receiver",
@@ -413,11 +427,73 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         set=lambda self, value : _ASJson.setValueAt(self, "shake_duration", value)
     )
 
+    signalFilters : EnumProperty(
+        items=(
+            ('DontFilter', 'Don\'t Filter', 'DF'),
+            ('ConstantValue', 'Constant Value', 'CV'),
+            ('OneMinusSignal', 'One Minus Signal', 'OMS'),
+        ),
+        get=lambda self : _ASJson.getIntAt(self, "signal_filters", 0),
+        set=lambda self, value : _ASJson.setValueAt(self, "signal_filters", value)
+    )
+
+    signalConstantValue : FloatProperty(
+        get=lambda self : _ASJson.getFloatAt(self, "signal_constant_value"),
+        set=lambda self, value : _ASJson.setValueAt(self, "signal_constant_value", value)
+    )
+    #  WAIT Commands already have modifiers! but how do we add them from the ble side?
+    #  You don't , yet.  They get auto added for a certain animation play behavior type. 
+    #   So, this could be one way to add them.
+
+    shouldPlayAfter : BoolProperty(
+        description="Should this command invoke another command after it finishes",
+        get=lambda self : _ASJson.getBoolAt(self, "should_play_after"),
+        set=lambda self, value : _ASJson.setValueAt(self, "should_play_after", value)
+    )
+
+    playAfter : EnumProperty(
+        items=lambda self, context : CLU.playablesItemCallback(context),
+        get=lambda self : CLU.playableEnumIndexFromName(_ASJson.getStringAt(self, "play_after")), 
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after", CLU.playableFromIndex(value).name) # TODO: is internalId not really used any where ?
+    )
+
+    # headline
+    headlineText : StringProperty(
+        get=lambda self : _ASJson.getStringAt(self, "headline_text"),
+        set=lambda self, value : _ASJson.setValueAt(self, "headline_text", value)
+    )
+
+    headlineDisplaySeconds : FloatProperty(
+        get=lambda self : _ASJson.getFloatAt(self, "headline_display_seconds"),
+        set=lambda self, value : _ASJson.setValueAt(self, "headline_display_seconds", value)
+    )
+
     def draw(self, layout):
         # Row view
         split = layout.row().split(factor=.65)
         split.label(text=self.name)
         split.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = self.internalId
+
+class CU_OT_Select(bpy.types.Operator):
+    """Select"""
+    bl_idname = "view3d.select_target"
+    bl_label = "Select"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    target : bpy.props.StringProperty() 
+
+    @classmethod
+    def poll(cls, context):
+        return True
+    
+    def execute(self, context):
+        if len(self.target) == 0:
+            return {'FINISHED'}
+        ObjectLookupHelper._selectInScene(self.target)
+        # bpy.ops.object.select_all(action='DESELECT')
+        # bpy.data.objects[self.target].select_set(True)
+        # bpy.context.view_layer.objects.active = bpy.data.objects[self.target] # also make it the active object 
+        return {'FINISHED'}
 
 
 class CU_OT_PlayablePickPopup(bpy.types.Operator):
@@ -451,26 +527,36 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         return None
 
     def drawTargetsList(self, playable, box):
-        # box = self.layout.box()  
+        from mcd.ui.InspectorPopup import CU_OT_InspectorPopup
         rowb = box.row()
         rowb.label(text="Targets") 
         
         for targ in playable.targets:
             rowb = box.row()
             rowb.prop(targ, "object", text='target')
-            rowb.operator(AS_OT_RemoveFromTargets.bl_idname, icon='X', text="").playableNameConcatTargetName = F"{playable.name},,,{targ.name}"
+            # TODO: operator to select the target
+            rowb.operator(CU_OT_Select.bl_idname, icon='RESTRICT_SELECT_OFF', text="").target=targ.object.name if targ.object else ""
+            rowb.operator(AS_OT_RemoveFromTargets.bl_idname, icon='X', text="").playableNameConcatTargetName=F"{playable.name},,,{targ.name}"
+            if targ.object:
+                rowb.operator(CU_OT_InspectorPopup.bl_idname, text="Edit", icon="KEYTYPE_JITTER_VEC").objectName=targ.object.name if targ.object else ""
+
         rowb=box.row()
         rowb.operator(AS_OT_AddToTargets.bl_idname, icon='ADD', text="ADD" ).playableName = playable.name # self.playableName
         # TODO WARNING IF extra targets len is zero or no non None targets
 
-
     def draw(self, context):
         scn = context.scene
-        # TODO: internalId / playableId is more flexible i guess, but we're not using. only added it to facilitate
+
+        print(F"playableId is {self.playableId} ***")
+        # TODO: internalId / playableId is more flexible, but we're not using. only added it to facilitate
         #   changing playableNames. it worked but there were other problems and in the end we decided to ban renaming playables
         #  so, we could go back to just owning a 'playableName' and looking up with this: "scn.as_custom[self.playableName]"
         playable = self._findPlayable(scn.as_custom) # scn.as_custom[self.playableIdx] # scn.as_custom[self.playableName]
 
+        if playable is None:
+            print(F"Something went wrong in Playable popup draw function. with playableId: [{self.playableId}]")
+            return
+        
         row = self.layout.row()
         row.label(text=F"{getPlayableTypes()[int(playable.playableType)][1]} > {playable.name} ")
 
@@ -512,8 +598,8 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             row.prop(playable, "autoAddScalarReceiver", text="Add Scalar Receiver")
             if playable.autoAddScalarReceiver:
                 row = self.layout.row()
-                row.prop(playable, "applyToChildrenScalar", text="Appy to Children Scalar")
-                row.prop(playable, "setInitialStateScalar", text="Set Initial State Scalar")
+                row.prop(playable, "applyToChildrenScalar", text="Appy to Children")
+                row.prop(playable, "setInitialStateScalar", text="Set Initial State")
                 row.prop(playable, "scalarInitialState", text="Scalar Initial State")
             
         elif playableType == 4: # camera shake
@@ -522,7 +608,21 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         elif playableType == 5: # camera overlay
             self.layout.row().prop(playable, "overlayName", text="Overlay Name")
 
-        
+        elif playableType == 6: # sleep signal
+            self.drawTargetsList(playable, self.layout.box())
+
+        elif playableType == 7: # headline
+            self.layout.row().prop(playable, "headlineText", text="Text")
+            self.layout.row().prop(playable, "headlineDisplaySeconds", text="Display Time Seconds")
+           
+        self.layout.row().prop(playable, "signalFilters", text="Signal Filter ")
+        if playable.signalFilters == "ConstantValue":
+            self.layout.row().prop(playable, "signalConstantValue", text="Signal Constant Value")
+
+        self.layout.row().prop(playable, "shouldPlayAfter", text="Play A Command After")
+        if playable.shouldPlayAfter:
+            self.layout.row().prop(playable, "playAfter", text="Play After")
+
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
         
 
@@ -600,14 +700,15 @@ def syncPlayables():
 from bpy.app.handlers import persistent
 
 @persistent
-def syncPlayablesOnLoadPost():
+def syncPlayablesOnLoadPost(dummy):
+    print(F"LOAD POST for CUSTOM PG_AS")
     syncPlayables()
 
 @persistent
 def onActionNameMsgbus(*arsg):
     """callback on the user changing the name of an action.
         ensure that the json data is in sync with the new name"""
-    syncPlayablesOnLoadPost()
+    syncPlayables()
 
 @persistent
 def onObjectNameMsgbus(*args):
@@ -615,8 +716,8 @@ def onObjectNameMsgbus(*args):
         ensure the json data is in sync with any name change"""
     # Complaint: this will get called in many cases where it's not needed.
     # Also interesting: gets called about 20 times per rename
-    print(F"**onObjectNameMSGBUS")
-    syncPlayablesOnLoadPost()
+    # print(F"**onObjectNameMSGBUS")
+    syncPlayables()
     _ASJson.updateAllPlayableExtraTargets(bpy.context)
 
 def setupActionMsgBusSubscription():
@@ -639,11 +740,12 @@ def setupActionMsgBusSubscription():
 
 def setupSyncPostLoad():
     from mcd.util import AppHandlerHelper
-    AppHandlerHelper.RefreshLoadPostHandlers([syncPlayablesOnLoadPost, "syncPlayablesOnLoadPost"])
+    AppHandlerHelper.RefreshLoadPostHandler(syncPlayablesOnLoadPost) 
 
 classes = (
     PG_AS_TargetsPropGroup,
     CUSTOM_PG_AS_Collection,
+    CU_OT_Select,
     CU_OT_PlayablePickPopup,
     AS_OT_AddToTargets,
     AS_OT_RemoveFromTargets,

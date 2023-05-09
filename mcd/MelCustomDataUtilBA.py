@@ -75,7 +75,7 @@ class CDU_OT_actions(Operator):
         else:
             if self.action == 'REMOVE':
                 from mcd.ui.componentlike import StorageRouter
-                StorageRouter.handleRemoveKey(item.key, context.selected_objects)
+                StorageRouter.handleRemoveKey(item.key, context) #.selected_objects)
                 scn.custom_index = ObjectLookupHelper._nextRelevantIndex(context, scn.custom_index)                
               
         return {"FINISHED"}
@@ -142,6 +142,47 @@ class CDU_UL_PerObjectItems(UIList):
         if index == context.scene.custom_index:
             split.operator(CDU_OT_actions.bl_idname, icon='X', text="").action = 'REMOVE'
 
+def DrawInspectorListAndDetails(layout, context):
+    scn = bpy.context.scene
+    box = layout.box()
+    row = box.row() # layout.row()
+    # draw the key select uilist
+    row.template_list("CDU_UL_PerObjectItems", "custom_def_list", scn, "custom", 
+        scn, "custom_index", rows=5)
+
+    row = box.row() # layout.row()
+    prefs_items = ObjectLookupHelper._getPrefItems(context)
+
+    # no config file? 
+    if len(prefs_items.values()) == 0:
+        row.label(text="you need to add some key-value pairs", icon="QUESTION")
+        row = layout.row()
+        row.label(text="see the preferences for this add-on", icon="ERROR")
+        return
+    
+    Inspector.drawCurrentItemDetails(row, context)
+
+
+def drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=True):
+    box = layout.box()
+    row = box.row()
+
+    if wantShowInspectorToggle:
+        DisplayHelper._drawShowHideTriangle(row, context.scene, "show_inspector", context.scene.show_inspector)
+        row.label(text=F"Inspector: {ObjectLookupHelper._selectedObjectNames(context) }")
+        if not context.scene.show_inspector:
+            return
+
+    box = box.box()
+    row = box.row()
+    row.menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
+    if wantSelByKey:
+        row = box.row()
+        row.menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
+
+    DrawInspectorListAndDetails(layout, context)
+  
+
 class CDU_PT_CustomPropHelper(Panel):
     """Main panel: interact with custom properties on selected objects."""
     bl_idname = 'TEXT_PT_argon_panel'
@@ -156,42 +197,9 @@ class CDU_PT_CustomPropHelper(Panel):
 
     def draw(self, context):
         layout = self.layout
-        scn = bpy.context.scene
+        # scn = bpy.context.scene
 
-
-        def drawInspector(layout):
-            box = layout.box()
-            row = box.row()
-            DisplayHelper._drawShowHideTriangle(row, context.scene, "show_inspector", context.scene.show_inspector)
-            row.label(text=F"Inspector: {ObjectLookupHelper._selectedObjectNames(context) }")
-            if not context.scene.show_inspector:
-                return
-
-            box = box.box()
-            row = box.row()
-            row.menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
-            row = box.row()
-            row.menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
-
-            row = box.row() # layout.row()
-            # draw the key select uilist
-            row.template_list("CDU_UL_PerObjectItems", "custom_def_list", scn, "custom", 
-                scn, "custom_index", rows=5)
-
-            row = box.row() # layout.row()
-            prefs_items = ObjectLookupHelper._getPrefItems(context)
-
-            # no config file? 
-            if len(prefs_items.values()) == 0:
-                row.label(text="you need to add some key-value pairs", icon="QUESTION")
-                row = layout.row()
-                row.label(text="see the preferences for this add-on", icon="ERROR")
-                return
-            
-            Inspector.drawCurrentItemDetails(row, context)
-
-
-        drawInspector(layout)
+        drawInspector(layout, context)
         
         # export box
         box = layout.box()

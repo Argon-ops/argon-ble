@@ -30,22 +30,22 @@ config = """
     "mel_destroy" : {
         "hint" : "PRIMITIVE",
         "default" : 0,
-        "help" : "Destroy this game object and its children during post-processing. "
+        "help" : "Destroy this game object and its children during post-processing"
     },
     "mel_tag" : {
         "default" : "",
         "hint" : "PRIMITIVE",
-        "help" : "Set this game object's tag. Case sensitive"
+        "help" : "Set this game object's tag. Case-insensitive"
     },
     "mel_layer" : {
-        "default" : 0,
+        "default" : "",
         "hint" : "PRIMITIVE",
-        "help" : "Set this game object's layer"
+        "help" : "Set this game object's layer. Case-insensitive"
     },
     "mel_replace_with_prefab" : {
         "default" : "prefab-name",
         "hint" : "PRIMITIVE",
-        "help" : "Replace this mesh with the prefab with this name"
+        "help" : "Replace this mesh with a prefab"
     },
     "mel_off_mesh_link" : {
         "default" : { "meaningless-key" : 42 },
@@ -55,7 +55,7 @@ config = """
     "mel_box_collider" : {
         "default" : { "isTrigger" : false },
         "hint" : "CUSTOM_INSPECTOR",
-        "help" : "Add a box collider component to this game object that is sized to match its bounds"
+        "help" : "Add a box collider component to this game object. Size will match the object's bounds"
     },
     "mel_interaction_handler" : {
         "default" : {
@@ -70,7 +70,7 @@ config = """
     "mel_interaction_highlighter" : {
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
-        "help" : "Adds a (crude, meant-for-prototyping) object highlighter."
+        "help" : "Adds an object highlighter."
     },
     "mel_enable_receiver" : {
         "default" : {},
@@ -80,7 +80,7 @@ config = """
     "mel_object_enable" : {
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
-        "help" : "Adds an object swap component"
+        "help" : "Adds an object enable component"
     },
     "mel_screen_overlay_enable" : {
         "default" : {},
@@ -102,7 +102,27 @@ config = """
             "default_name" : ""
         },
         "hint" : "CUSTOM_INSPECTOR",
-        "help" : "Adds a particle system component during import"
+        "help" : "Add a particle system component during import"
+    },
+    "mel_spawner" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a prefab spawner"
+    },
+    "mel_component_by_name" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add the specified component during import"
+    },
+    "mel_cam_lock_session_enable" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a CamLockSessionEnable component"
+    },
+    "mel_disable_component" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Disable the specified component(s) attached to this object during import. Separate component names with commas."
     }
 
 }

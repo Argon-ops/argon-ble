@@ -11,6 +11,8 @@ from bpy.types import (PropertyGroup,)
 from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from mcd.ui.componentlike import AbstractDefaultSetter
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+
 
 class AudioEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -42,7 +44,7 @@ def _Append(suffix : str) -> str:
     return F"{AudioEnableLike.GetTargetKey()}{suffix}"
 
 
-class AudioEnableLike(PropertyGroup, AbstractComponentLike):
+class AudioEnableLike(EnableFilterSettings, AbstractComponentLike):
     @staticmethod
     def GetTargetKey() -> str:
         return "mel_audio_enable"

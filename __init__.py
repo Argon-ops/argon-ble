@@ -21,6 +21,7 @@ modulesNames = [
     'mcd.util.AppHandlerHelper',    
     'mcd.ui.KeyValItem',
     'mcd.ui.Inspector',
+    'mcd.ui.InspectorPopup',
     'mcd.ui.componentlike.StaticFlags',
     'mcd.MelCustomDataUtilBA',
     'mcd.cduoperator.SelectByKey',
@@ -39,6 +40,10 @@ modulesNames = [
     'mcd.ui.SelectByKeyMenu',
     'mcd.ui.AddKeyMenu',
     'mcd.ui.componentlike.util.ComponentLikeUtils',
+    'mcd.ui.componentlike.enablefilter.EnableFilterSettings',
+    'mcd.ui.componentlike.enablefilter.SleepStateSettings',
+    'mcd.ui.componentlike.util.ObjectPointerMsgbusUtils',
+    'mcd.ui.componentlike.AbstractPerObjectData',
     'mcd.ui.componentlike.AbstractComponentLike',
     'mcd.ui.componentlike.StorageRouter',
     'mcd.ui.componentlike.AbstractDefaultSetter',
@@ -59,6 +64,10 @@ modulesNames = [
     'mcd.ui.componentlike.AudioEnableLike',
     'mcd.ui.componentlike.ObjectEnableLike',
     'mcd.ui.componentlike.SliderColliderLike',
+    'mcd.ui.componentlike.ComponentByNameLike',
+    'mcd.ui.componentlike.SpawnerLike',
+    'mcd.ui.componentlike.CamLockSessionEnableLike',
+    'mcd.ui.componentlike.DisableComponentLike',
     'mcd.ui.materiallist.MaterialListPanel',
     'mcd.shareddataobject.SharedDataObject',
     'mcd.ui.materiallist.MaterialListExporter',
@@ -68,6 +77,7 @@ modulesNames = [
     'mcd.objectinfo.ObjectInfo',
     'mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
     ]
+
 
 
 

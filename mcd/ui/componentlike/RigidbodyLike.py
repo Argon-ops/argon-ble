@@ -15,6 +15,7 @@ from mcd.util import ObjectLookupHelper
 from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from mcd.ui.componentlike import AbstractDefaultSetter
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter)
 
 _baseKey="mel_rigidbody"
 
@@ -47,16 +48,27 @@ class RigidbodyDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
+        EnableFilterDefaultSetter.OnAddKey(RigidbodyLike, key, targets)
         for suffix, defaultVal in _suffixes.items():
             AbstractDefaultSetter._SetKeyValOnTargets(_getSuffixKey(suffix), defaultVal, targets)
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
+        EnableFilterDefaultSetter.OnRemoveKey(RigidbodyLike, targets)
         for suffix in _suffixes.keys():
-            AbstractDefaultSetter._RemoveKey(_getSuffixKey(suffix), targets=targets)
+            AbstractDefaultSetter._RemoveKey(_getSuffixKey(suffix), targets)
 
 
-class RigidbodyLike(PropertyGroup, AbstractComponentLike):
+
+class RigidbodyLike(EnableFilterSettings, AbstractComponentLike):
+
+    # @classmethod # TODO: wait this doesn't need to be a class method??
+    # def _append(cls, suffix: str = "") -> str:
+    #     return F"{RigidbodyLike.GetTargetKey()}{suffix}"
+
+    @staticmethod
+    def GetTargetKey() -> str:
+        return _baseKey 
 
     @staticmethod
     def AcceptsKey(key : str):
@@ -84,9 +96,8 @@ class RigidbodyLike(PropertyGroup, AbstractComponentLike):
         row = box.row()
         row.prop(rbl, "freezeRotation", text="freeze rotation")
 
-    @staticmethod
-    def GetTargetKey() -> str:
-        return _baseKey 
+        # rbl.displayEnableSettings(box)
+
 
     mass : FloatProperty(
         default=2.7,

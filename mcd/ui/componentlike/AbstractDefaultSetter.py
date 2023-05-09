@@ -15,6 +15,9 @@ def _SetKeyValOnTargets(key : str, val, targets):
     for target in targets:
         target[key] = val
 
+def SetVal(key : str, val, target):
+    target[key] = val
+
 def _IsEqual(key : str, a : object, b : object) -> bool:
     if key in a and key in b:
         return a[key] == b[key]
@@ -37,3 +40,7 @@ class AbstractDefaultSetter():
     @staticmethod
     def OnRemoveKey(key : str, targets) -> None:
         raise "override me"
+    
+    @staticmethod 
+    def IsMultiSelectAllowed() -> bool:
+        return True

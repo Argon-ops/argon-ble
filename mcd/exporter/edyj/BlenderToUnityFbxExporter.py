@@ -196,6 +196,18 @@ def export_unity_fbx(context, filepath, active_collection, selected_objects, def
 
 	selection = bpy.context.selected_objects
 
+	def recreateMissingActiveObjectBug():
+		bpy.context.view_layer.objects.active = None
+
+	recreateMissingActiveObjectBug()
+
+	def guardAgainstMissingActiveObject():
+		# ops.object.mode_set() errors if the active object is None
+		if bpy.context.view_layer.objects.active is None:
+			bpy.context.view_layer.objects.active = bpy.context.scene.objects[0]
+	
+	guardAgainstMissingActiveObject()
+
 	# Object mode
 	bpy.ops.object.mode_set(mode="OBJECT")
 

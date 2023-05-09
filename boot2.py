@@ -2,14 +2,22 @@ import os
 import sys
 
 def get_project_dir():
-    """get our particular directory which must be next to this .blend"""
+    """get the directory path containing this boot script"""
+    # NO LONGER needs to next to """get our particular directory which must be next to this .blend"""
     import bpy
     import pathlib
-    path = pathlib.Path(bpy.data.filepath)
-    path_containing_blend = path.parent.resolve()
-    path_containing_blend = str(path_containing_blend) #very important, otherwise it will be a Path-object and unusable for sys.path
-    project_folder_name = 'bb'
-    return F"{path_containing_blend}\\{project_folder_name}"  
+
+    # TEST
+    DcurDir = bpy.context.space_data.text.filepath # $ os.path.dirname(os.path.realpath(__file__))
+    print(F"cur dir type: {type(DcurDir)} ::  {os.path.dirname(DcurDir)}")
+    return os.path.dirname(DcurDir)
+
+    # PREV
+    # path = pathlib.Path(bpy.data.filepath)
+    # path_containing_blend = path.parent.resolve()
+    # path_containing_blend = str(path_containing_blend) #very important, otherwise it will be a Path-object and unusable for sys.path
+    # project_folder_name = 'bb'
+    # return F"{path_containing_blend}\\{project_folder_name}"  
 
 filesDir = get_project_dir() 
 

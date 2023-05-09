@@ -32,7 +32,6 @@ def getFloatArrayFromKey(key):
     fray = getValueFromKey(key)
     return fray if fray is not None else (0.0, 0.0, 0.0)
 
-
 def getFloatBackedBooleanVector(key):
     fff = getValueFromKey(key)
     if len(fff) < 3:
@@ -61,15 +60,31 @@ def playablesItemCallback(context):
     playables = context.scene.as_custom
     return [(p.name, p.name, p.name) for p in playables]
 
-def playableEnumGetter(playableKey, suffix="_playable"):
-    playableName = getStringFromKey(playableKey) 
+def playableEnumIndexFromName(playableName : str):
     playables = bpy.context.scene.as_custom
     # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. (see below if curious)
     for i in range(len(playables)):
         if playables[i].name == playableName:
             return i
-    return -1
-    
+    return 0 # returning -1 spams warnings -1
+
+def playableEnumIndex(playableKey):
+    return  playableEnumIndexFromName(getStringFromKey(playableKey))
+    # playableName = getStringFromKey(playableKey) 
+    # playables = bpy.context.scene.as_custom
+    # # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. (see below if curious)
+    # for i in range(len(playables)):
+    #     if playables[i].name == playableName:
+    #         return i
+    # return 0 # returning -1 spams warnings -1
+
+def playableFromIndex(idx : int) -> str:
+    playables = bpy.context.scene.as_custom
+    if len(playables) <= idx:
+        return ""
+    result = playables[idx]
+    # print(F"got playable: {result}")
+    return result
 
 # @staticmethod
 # def updatePathFromPointer(collectionSelf, pathKey, pointerObject):
@@ -80,4 +95,17 @@ def playableEnumGetter(playableKey, suffix="_playable"):
 #     _ASJson.setValueAt(collectionSelf, pathKey, parents)
 
 
+
+class GenericDefaultSetter(object):
+    @staticmethod 
+    def OnAddKey(settingsClass, targets):
+        # assume a class property Suffixes. which should be a dictionary of key values
+        for suffix, val in settingsClass.Suffixes.items():
+            AbstractDefaultSetter._SetKeyValOnTargets(settingsClass.Append(suffix), val, targets)
+
+    @staticmethod
+    def OnRemoveKey(settingsClass, targets):
+        for suffix in settingsClass.Suffixes.keys():
+            print(F"Generc. will rm key: {settingsClass.Append(suffix)}")
+            AbstractDefaultSetter._RemoveKey(settingsClass.Append(suffix), targets)
 

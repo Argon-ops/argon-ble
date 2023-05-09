@@ -54,7 +54,8 @@ def drawCurrentItemDetails(layout, context):
         return
     
     if ObjectLookupHelper._isMixedValues(key, context):
-        _drawMixed(box, key)
+        if StorageRouter._isMultiSelectAllowed(key):
+            _drawMixed(box, key)
 
     if ObjectLookupHelper._isKeyInActiveOject(key, context) == False:
         _displayEmptyBox(box)
@@ -63,7 +64,7 @@ def drawCurrentItemDetails(layout, context):
     _drawHeader(box, key, context)
     _drawHelp(KeyValDefault.getHelp(key), box, context = context)
 
-    # nothing to inspect for tags. they're just present or absent.
+    # nothing to display for tags. they're just present or absent.
     if KeyValDefault.getHandlingHint(key) == KeyValDefault.EHandlingHint.TAG:
         _displayEmptyBox(box)
         return
@@ -74,6 +75,9 @@ def drawCurrentItemDetails(layout, context):
 
     # this must be a primitive
     _displayPrimitive(box, key, item)
+
+
+
 
 
 def register():

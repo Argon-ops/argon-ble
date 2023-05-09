@@ -44,11 +44,11 @@ class CUSTOM_OT_AddKeyToSelected(Operator):
         print(F"invoke for addKeyToSel")
         return self.execute(context)
     
-    def DtestObjects(self, context):
-        print(F"will try to add test prop group...")
-        ob = context.selected_objects[0]
-        ob['testkey'] =  IntProperty(name='hi') # bpy.types.PointerProperty(type=DDemoType)
-        print(F" ob test key.n {ob['testkey'].n}")
+    # def DtestObjects(self, context):
+    #     print(F"will try to add test prop group...")
+    #     ob = context.selected_objects[0]
+    #     ob['testkey'] =  IntProperty(name='hi') # bpy.types.PointerProperty(type=DDemoType)
+    #     print(F" ob test key.n {ob['testkey'].n}")
 
     @classmethod
     def poll(cls, context):
@@ -58,15 +58,17 @@ class CUSTOM_OT_AddKeyToSelected(Operator):
         if len(self.target_key) == 0:
             return {'FINISHED'}
  
+        print(F"add key to selected: active ob: {context.active_object.name}")
+
         default = KeyValDefault.getDefaultValue(self.target_key)
-        StorageRouter.handleSetDefaultValue(self.target_key, default, context.selected_objects)
+        StorageRouter.handleSetDefaultValue(self.target_key, default, context)
         
         # set this as the highlighted key
         ObjectLookupHelper._setSelectedIndex(context, self.target_key)
 
         self.target_key = ""
 
-        self.DtestObjects(context)
+        # self.DtestObjects(context)
         return {'FINISHED'}
 
 classes = (

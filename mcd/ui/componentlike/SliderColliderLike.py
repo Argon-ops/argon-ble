@@ -63,7 +63,7 @@ class SliderColliderLike(PropertyGroup, AbstractComponentLike):
     playable : EnumProperty(
         description="The playable whose position should be set according to the slide distance",
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self: CLU.playableEnumGetter(_Append("_playable")),
+        get=lambda self: CLU.playableEnumIndex(_Append("_playable")),
         set=lambda self, value: CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].name)
     )
 

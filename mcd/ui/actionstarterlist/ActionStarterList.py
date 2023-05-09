@@ -140,12 +140,8 @@ class CUSTOM_OT_AS_actions(Operator):
 class CUSTOM_UL_AS_items(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row()
-        item.draw(row) #.box())
-        # split = layout.split(factor=0.3)
-        # split.label(text=F"{item.name}")
-        # split.prop(mat, "name", text="", emboss=False, icon_value=layout.icon(mat))
-        # split.prop(item, "unityMaterial", text="Unity Material")
-
+        item.draw(row) 
+        
     def invoke(self, context, event):
         pass
 

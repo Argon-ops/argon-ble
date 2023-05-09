@@ -14,7 +14,7 @@ class DefaultValueInfo(object):
     default : any
     # serializableDefault : any # TODO this shouldn't exist?
     handlingHint : str
-    help :str
+    help : str
 
 _storage : typing.Dict[str, DefaultValueInfo] = {}
 

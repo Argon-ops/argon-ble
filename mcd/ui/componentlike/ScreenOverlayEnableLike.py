@@ -40,8 +40,9 @@ class ScreenOverlayEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSett
 def _Append(suffix : str) -> str:
     return F"{ScreenOverlayEnableLike.GetTargetKey()}{suffix}"
 
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 
-class ScreenOverlayEnableLike(PropertyGroup, AbstractComponentLike):
+class ScreenOverlayEnableLike(EnableFilterSettings, AbstractComponentLike):
     @staticmethod
     def GetTargetKey() -> str:
         return "mel_screen_overlay_enable"

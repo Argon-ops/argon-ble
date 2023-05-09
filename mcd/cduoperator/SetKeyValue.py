@@ -16,7 +16,7 @@ class CUSTOM_OT_SetDefaultValue(Operator):
     def invoke(self, context, event):
         default = ObjectLookupHelper._guessReasonableValue(self.target_key, context) 
         from mcd.ui.componentlike import StorageRouter
-        StorageRouter.handleSetDefaultValue(self.target_key, default, context.selected_objects)
+        StorageRouter.handleSetDefaultValue(self.target_key, default, context)
 
         # ObjectLookupHelper._setValForKeyOnSelected(self.target_key, context, default)
         # no need to update the state of our display list. it reads from the objects themselves

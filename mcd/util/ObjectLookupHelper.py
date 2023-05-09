@@ -1,3 +1,4 @@
+import bpy
 from mcd.lookup import KeyValDefault
 from mcd.ui.componentlike import StorageRouter
 import typing
@@ -20,7 +21,6 @@ def _setSelectedIndex(context, key : str) -> None:
     except ValueError as e:
         print(F"value error : {e}")
         raise e
-
 
 def _nextRelevantIndex(context, originalIndex : int, moveUp = False) -> int:
     if _isNothingSelected(context):
@@ -152,7 +152,9 @@ def _isNothingSelected(context) -> bool:
 def _isKeyInActiveOject(key, context) -> bool:
     if len(context.selected_objects) == 0:
         return False
-    return key in context.selected_objects[0]
+    if context.active_object is None:
+        return key in context.selected_objects[0]
+    return key in context.active_object # NOT ALWAYS THE SAME! -> context.selected_objects[0]
 
 def _getValueFromActive(key, context):
     obs = context.selected_objects
@@ -205,3 +207,16 @@ def _indexOf(collection, object) -> int:
         if object == collection[i]:
             return i
     return -1
+
+def _selectInScene(objectName):
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.data.objects[objectName].select_set(True)
+    bpy.context.view_layer.objects.active = bpy.data.objects[objectName] # also make it the active object
+
+def selectObjectsInScene(objects, active = None):
+    bpy.ops.object.select_all(action='DESELECT')
+    [ob.select_set(True) for ob in objects]
+    if len(objects) == 0:
+        return
+    bpy.context.view_layer.objects.active = objects[0] if active is None else active
+

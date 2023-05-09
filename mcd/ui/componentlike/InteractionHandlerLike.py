@@ -8,6 +8,8 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+from mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
 from mcd.util import ObjectLookupHelper
 
 from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
@@ -15,9 +17,13 @@ from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from mcd.ui.actionstarterlist import ActionStarterList
 from mcd.ui.componentlike import AbstractDefaultSetter
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from mcd.ui.actionstarterlist import PlusActionStarterPopup
+from mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
 
 import json
 
+# TODO: option to add a new Playable from an interation handler
+# TODO: option to edit the chosen playable from interaction handler
 
 class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -112,7 +118,8 @@ class CU_OT_NumExtraPlayables(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
+# class InteractionHandlerLike(EnableFilterSettings, AbstractComponentLike):
+class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     @staticmethod
     def GetTargetKey() -> str:
         return "mel_interaction_handler"
@@ -127,18 +134,30 @@ class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
         mcl = context.scene.interactionHandlerLike
         row = box.row()
         row.prop(mcl, "playable", text="Playable")
+
+        # TODO: add rows
+        if mcl.playable: # is not None: # 'not None' won't catch empty strings
+            row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[mcl.playable].internalId
         # Extra playables
         for i in range(mcl.numExtraPlayables):
             row = box.row()
+            attrName = F"playable{i+1}"
             row.prop(mcl, F"playable{i+1}", text=F"Playable {i+1}")
+            attrib = getattr(mcl, attrName)
+            if attrib: # mcl.playable:
+                row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[attrib].internalId
         row = box.row()
         row.operator(CU_OT_NumExtraPlayables.bl_idname, icon="ADD", text="").should_add = True
         row.operator(CU_OT_NumExtraPlayables.bl_idname, icon="REMOVE", text="").should_add = False
 
         row = box.row()
+        row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Playable")
+
+        row = box.row()
         row.prop(mcl, "interactionType", text="Type")
         boxb = box.box()
         row = boxb.row()
+
 
         if mcl.interactionType == 'TRIGGER':
             row.prop(mcl, "isTriggerEnterExit")
@@ -174,9 +193,24 @@ class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
             # row.prop(mcl, "radius")
             row = boxb.row()
             row.prop(mcl, "enterSignal")
-            if not (mcl.interactionType == 'CLICK' and mcl.isClickHold == False):
+            if mcl.isClickHold:
                 row = boxb.row()
                 row.prop(mcl, "exitSignal")
+
+            boxc = boxb.box()
+            boxc.row().prop(mcl, "selfDestructBehaviour", text="Self Destruct Behaviour")
+            if mcl.selfDestructBehaviour != "NeverSelfDestruct":
+                boxc.row().prop(mcl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
+                boxc.row().prop(mcl, "destroyColliderAlso", text="Destroy Collider Also")
+
+        # sleep also settings
+        def dislaySleepAlsoSettings(box_ss):
+            if mcl.interactionType == 'CLICK':
+                box_ss.row().prop(mcl, "sleepHighlighterAlso", text="Sleep Highlighter Also")
+            box_ss.row().prop(mcl, "sleepColliderAlso", text="Sleep Collider Also")
+        
+        dislaySleepAlsoSettings(box.box())
+        # mcl.displayEnableSettings(box)
         
         # TRIGGER ENTER EXIT
         # CONSIDER : It starts to make more sense to 
@@ -187,7 +221,7 @@ class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
     playable : EnumProperty(
         # _playablesItemCallback, # TODO: use the CLU version of this. TIDY! # also to. finish designing SliderColliderLike
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable")),  # _playableEnumGetter(self, "_playable"),
         # post mortem: there's probably a way, but trying to store the playable's internalId, while displaying its name is 
         #   not working. 
         # set=lambda self, value : CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].internalId),
@@ -199,35 +233,30 @@ class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
     )
     playable1 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable1")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable1")),  # _playableEnumGetter(self, "_playable"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable1"), bpy.context.scene.as_custom[value].name),
     )
     playable2 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable2")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable2")),  # _playableEnumGetter(self, "_playable"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable2"), bpy.context.scene.as_custom[value].name),
     )
     playable3 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable3")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable3")),  # _playableEnumGetter(self, "_playable"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable3"), bpy.context.scene.as_custom[value].name),
     )
     playable4 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable4")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable4")),  # _playableEnumGetter(self, "_playable"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable4"), bpy.context.scene.as_custom[value].name),
     )
     playable5 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumGetter(_Append("_playable5")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable5")),  # _playableEnumGetter(self, "_playable"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable5"), bpy.context.scene.as_custom[value].name),
     )
     
-    # TODO: life would be better if we could have multiple playables. But lists of enums?? 
-    # playableB : PointerProperty( # TODO: learn how to to a select from list type property
-    #     type=CUSTOM_PG_AS_Collection,
-    # )
-    # TODO: finesse this bug (or abandon playable renaming; you could just allow playable copying??)
     interactionType : EnumProperty(
         items=interactionType,
         get=lambda self : CLU.getIntFromKey(_Append("_interaction_type")),
@@ -309,19 +338,38 @@ class InteractionHandlerLike(PropertyGroup, AbstractComponentLike):
         get=lambda self : CLU.getFloatFromKey(_Append("_discrete_click_fake_hold_time"), 0.2),
         set=lambda self, value : CLU.setValueAtKey(_Append("_discrete_click_fake_hold_time"))
     )
-    
 
-    # commandBehaviourType : EnumProperty(
-    #     name="Behavior",
-    #     description="What does the playable do each time interaction is initiated",
-    #     items=(
-    #         ('RestartForwards', 'RestartForwards', 'Just restart play from the beginning.'),
-    #         ('ToggleAndRestart', 'ToggleAndRestart', 'If the playback cursor is closer to the end, play backwards starting from the end. Else play forwards from the beginning.'),
-    #         ('FlipDirections', 'FlipDirections', 'Switch between forward and reverse with each invocation. Don\'t do anything to the playback position.'),
-    #     ),
-    #     get=lambda self : CLU.getIntFromKey(_Append("_command_behaviour_type")),
-    #     set=lambda self, value : CLU.setValueAtKey(_Append("_command_behaviour_type"), value)
-    # )
+    # destroy behaviour
+    selfDestructBehaviour : EnumProperty (
+        items=(
+            ('NeverSelfDestruct', 'Never Self Destruct', 'Never Self Destruct'),
+            ('AfterFirstInteraction', 'After First Interaction', 'After First Interaction'),
+        ),
+        get=lambda self : CLU.getIntFromKey(_Append("_self_destruct_behaviour")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_self_destruct_behaviour"), value)
+    )
+    destroyHighlighterAlso : BoolProperty (
+        description="",
+        get=lambda self : CLU.getBoolFromKey(_Append("_destroy_highlighter_also")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_destroy_highlighter_also"), value)
+    )
+    destroyColliderAlso : BoolProperty (
+        description="",
+        get=lambda self : CLU.getBoolFromKey(_Append("_destroy_collider_also")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_destroy_collider_also"), value)
+    )
+
+    sleepHighlighterAlso : BoolProperty(
+        description="When this handler receives a sleep signal, send the same signal (sleep or wake up) to the attached highlighter ",
+        get=lambda self : CLU.getBoolFromKey(_Append("_sleep_highlighter_also")),
+        set=lambda   self, value : CLU.setValueAtKey(_Append("_sleep_highlighter_also"), value)
+    )
+    sleepColliderAlso : BoolProperty(
+        description="When this handler receives a sleep signal, send the same signal (sleep or wake up) to the attached collider",
+        get=lambda self : CLU.getBoolFromKey(_Append("_sleep_collider_also")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_sleep_collider_also"), value)
+    )
+  
     
     
 
@@ -336,6 +384,7 @@ def register():
         register_class(c)
     
     bpy.types.Scene.interactionHandlerLike = bpy.props.PointerProperty(type=InteractionHandlerLike)
+
 
 def unregister():
     from bpy.utils import unregister_class

@@ -7,6 +7,8 @@ from bpy.props import (IntProperty,
                        BoolProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
+
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 from mcd.util import ObjectLookupHelper
 
 from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
@@ -14,8 +16,6 @@ from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from mcd.ui.actionstarterlist import ActionStarterList
 from mcd.ui.componentlike import AbstractDefaultSetter
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-
-import json
 
 class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -28,6 +28,7 @@ class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
+        # EnableFilterDefaultSetter.OnAddKey(ParticleSystemLike, key, targets)
         default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
         try:
             AbstractDefaultSetter._SetKeyValOnTargets(_Append(), default['default_name'], targets)
@@ -37,17 +38,50 @@ class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
-        AbstractDefaultSetter._RemoveKey(_Append(), targets=targets)
+        # EnableFilterDefaultSetter.OnRemoveKey(ParticleSystemLike, targets)
+        AbstractDefaultSetter._RemoveKey(_Append(), targets)
 
 def _Append(suffix : str = "") -> str:
     return F"{ParticleSystemLike.GetTargetKey()}{suffix}"
 
+class A():
+    @classmethod
+    def over(cls):
+        raise "override plz"
+    
+class Other():
+    @classmethod
+    def useOver(cls):
+        # test using a class method that we B happens to implement
+        #  but this class 'has no right' to know about
+        #  Works.
+        cls.over()
 
-class ParticleSystemLike(PropertyGroup, AbstractComponentLike):
+class B(A, Other):
+    @classmethod
+    def over(cls):
+        print("B overriding 'over'")
+
+def DtestBOTHER():
+    b=B()
+    print(F"will use Over")
+    b.useOver() # prints "B overriding 'over'" # meaning 
+
+def DtestIsSubclass():
+    clsOfB = B
+    print(F" is B subclass  of A3434 {issubclass(clsOfB, A)}")
+
+class ParticleSystemLike(EnableFilterSettings, AbstractComponentLike): # PropertyGroup, AbstractComponentLike, EnableFilterSettings):
+    # TODO: just go ahead with requiring _append for EFS children
+    #   perfect is enemy of good
+    @classmethod
+    def _append(cls, suffix: str = "") -> str:
+        return F"{ParticleSystemLike.GetTargetKey()}{suffix}"
+
     @staticmethod
     def GetTargetKey() -> str:
         return "mel_particle_system"
-
+    
     @staticmethod
     def AcceptsKey(key : str):
         return key == ParticleSystemLike.GetTargetKey()
@@ -55,10 +89,14 @@ class ParticleSystemLike(PropertyGroup, AbstractComponentLike):
     @staticmethod
     def Display(box, context) -> None:
         row = box.row()
-        mcl = context.scene.particleSystemLike
+        mcl : ParticleSystemLike = context.scene.particleSystemLike
         row = box.row()
         sp = row.split(factor=.7)
-        sp.prop(mcl, "name", text="Prefab Name")
+        sp.prop(mcl, "name", text=F"Prefab Name")
+
+        # DtestBOTHER()
+        # DtestIsSubclass()
+        # mcl.displayEnableSettings(box)
 
     # command info modifier(s)
     name : StringProperty(
@@ -83,6 +121,7 @@ def register():
     for c in classes:
         register_class(c)
     
+    # bpy.types.Scene.enableFilterSettings = bpy.props.PointerProperty(type=EnableFilterSettings)
     bpy.types.Scene.particleSystemLike = bpy.props.PointerProperty(type=ParticleSystemLike)
 
 def unregister():
@@ -91,4 +130,5 @@ def unregister():
         unregister_class(c)
 
     del bpy.types.Scene.particleSystemLike
+    del bpy.types.Scene.enableFilterSettings
 

@@ -30,8 +30,8 @@ class ObjectEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def EqualValues(a : object, b : object) -> bool:
-        return AbstractDefaultSetter._IsEqual(_Append("_on_object"), a, b) and \
-                AbstractDefaultSetter._IsEqual(_Append("_off_object"), a, b)
+        return AbstractDefaultSetter._IsEqual(_Append("_invert"), a, b) and \
+                AbstractDefaultSetter._IsEqual(_Append("_recursive"), a, b)
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
@@ -40,7 +40,7 @@ class ObjectEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
-        suffixes = ("_on_object", "_off_object")
+        suffixes = ("_invert", "_recursive") # "_on_object", "_off_object")
         for suffix in suffixes:
             AbstractDefaultSetter._RemoveKey(_Append(suffix), targets)
         # _removeSwapOwners(targets)
@@ -64,7 +64,9 @@ def _Append(suffix : str) -> str:
 # def _SyncWithObject(obj):
 #     onObjectName = CLU.getStringFromKey()
 
-class ObjectEnableLike(PropertyGroup, AbstractComponentLike):
+from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+
+class ObjectEnableLike(EnableFilterSettings, AbstractComponentLike):
     @staticmethod
     def GetTargetKey() -> str:
         return "mel_object_enable"
@@ -75,15 +77,19 @@ class ObjectEnableLike(PropertyGroup, AbstractComponentLike):
 
     @staticmethod
     def Display(box, context) -> None:
-        row = box.row()
         mcl = context.scene.objectEnableLike
-        row = box.row()
-        row.prop(mcl, "invert", text="Invert")
+        box.row().prop(mcl, "invert", text="Invert")
+        box.row().prop(mcl, "recursive", text="Recursive")
 
     invert : BoolProperty(
         description="If true, set disabled with a positive signal and enabled with a negative signal. Otherwise, enable positive, disable negative.",
         get=lambda self: CLU.getBoolFromKey(_Append("_invert"), False),
         set=lambda self, value: CLU.setValueAtKey(_Append("_invert"), value)
+    )
+    recursive : BoolProperty(
+        description="If true, recursively apply to children.",
+        get=lambda self: CLU.getBoolFromKey(_Append("_recursive"), False),
+        set=lambda self, value: CLU.setValueAtKey(_Append("_recursive"), value)
     )
 
 classes = (

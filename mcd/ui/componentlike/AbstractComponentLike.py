@@ -1,10 +1,4 @@
 import bpy
-from bpy.props import (IntProperty,
-                       FloatProperty,
-                       StringProperty,
-                       BoolProperty,
-                       CollectionProperty,)
-from bpy.types import (PropertyGroup,)
 
 class AbstractComponentLike(object):
     """Handle display of component like key values"""
@@ -23,3 +17,29 @@ class AbstractComponentLike(object):
     @classmethod
     def Append(cls, suffix : str) -> str:
         return F"{cls.GetTargetKey()}{suffix}"
+
+    # COMPLAINT: TOO SPAGHETTI-ish: just calling displayEnableSettings from 
+    #   each EnableableLIke's display is more straight forward. (if you don't 
+    #     understand this comment be glad.)
+    @classmethod
+    def __ProbableSceneInstanceName(cls) -> str:
+        return F"{cls.__name__[0].lower()}{cls.__name__[1:]}"
+    
+    @classmethod
+    def _GetSceneInstanceNonStandardName(cls) -> str:
+        return ""
+
+    
+    @classmethod
+    def GetSceneInstance(cls):
+        """this ugly method relies on our naming convention for component-like instance vars (bpy.types.Scene.particleSystemLike for example)"""
+        scn = bpy.context.scene
+        if len(cls._GetSceneInstanceNonStandardName()) > 0:
+            return getattr(scn, cls._GetSceneInstanceNonStandardName())
+        if hasattr(scn, cls.__ProbableSceneInstanceName()):
+            return getattr(scn, cls.__ProbableSceneInstanceName())
+        raise F"no scene instance found for [{cls.__name__}]"
+
+        
+
+
