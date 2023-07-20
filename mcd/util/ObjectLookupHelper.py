@@ -9,6 +9,12 @@ def _anySelectedHaveKey(key, context):
             return True
     return False
 
+def _allSelectedHaveKey(key, context):
+    for ob in context.selected_objects:
+        if key not in ob:
+            return False
+    return True
+
 def _getDisplayKeys(context):
     return [key for key in _getPrefItems(context).keys()] # these are always the keys we want, right?
     # return [item.key for item in context.scene.custom] # del me
@@ -90,12 +96,10 @@ def _currentFilteredKeys(context):
 def _getAllPrefsKeys(context):
     prefs = _getPrefItems(context=context)
     return prefs.keys()
-    # return [item.key for item in prefs.values()]
 
 def _getUnusedKeys(context):
     items = _getPrefItems(context)
     return [key for key in items.keys() if _anySelectedHaveKey(key, context) == False]
-    # return [k.key for k in items.values() if _anySelectedHaveKey(k.key, context) == False]
 
 def _addKeyIfMissing(context, key : str, default="zero"):
     for ob in context.selected_objects:

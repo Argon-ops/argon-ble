@@ -123,6 +123,11 @@ config = """
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Disable the specified component(s) attached to this object during import. Separate component names with commas."
+    },
+    "mel_text_mesh" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a text mesh to the current game object"
     }
 
 }
@@ -137,6 +142,11 @@ graveyard="""
         },
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Adds an animation action starter to this object."
+    },
+    "mel_light_enable" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a light during import"
     },
 }
 """

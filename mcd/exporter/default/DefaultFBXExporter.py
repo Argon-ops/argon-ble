@@ -61,6 +61,27 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
 
         last_props = context.window_manager.operator_properties_last('export_scene.fbx')
         last_props['use_custom_props'] = True # never a bad idea since the package does nothing without this
+
+        # WORK AROUND for bug where: 
+        #  if, during last export, the user chose a scale option other than default (for example: FBX SCALE ALL) 
+        #   this time around the script throws an error: 
+        # 
+        #    TypeError: Converting py args to operator properties:  expected a string enum, not int
+        # 
+        # Therefore presumptuously help out the last_props array
+        if 'apply_scale_options' in last_props and isinstance(last_props['apply_scale_options'], int):
+            aso = last_props['apply_scale_options']
+            enumstr = 'FBX_SCALE_NONE'
+            if aso == 1:
+                enumstr = 'FBX_SCALE_UNITS'
+            elif aso == 2:
+                enumstr = 'FBX_SCALE_CUSTOM'
+            elif aso == 3:
+                enumstr = 'FBX_SCALE_ALL' 
+            last_props['apply_scale_options'] = enumstr
+
+
+
         bpy.ops.export_scene.fbx(
             'INVOKE_DEFAULT',
             **last_props)

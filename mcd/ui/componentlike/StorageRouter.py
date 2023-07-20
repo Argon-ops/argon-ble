@@ -1,5 +1,5 @@
 
-from mcd.ui.componentlike import (MeshColliderLike, 
+from mcd.ui.componentlike import (LightEnableLike, MeshColliderLike, 
                                     StaticFlags, 
                                     RigidbodyLike, 
                                     OffMeshLinkLike,
@@ -16,48 +16,8 @@ from mcd.ui.componentlike import (MeshColliderLike,
                                     SpawnerLike,
                                     CamLockSessionEnableLike,
                                     DisableComponentLike,
+                                    TextMeshLike,
                                     )
-
-
-# default_setters = [
-#     MeshColliderLike.MeshColliderDefaultSetter,
-#     StaticFlags.StaticFlagsDefaultSetter, 
-#     RigidbodyLike.RigidbodyDefaultSetter,  
-#     OffMeshLinkLike.OffMeshLinkDefaultSetter, 
-#     BoxColliderLike.BoxColliderDefaultSetter,
-#     InteractionHandlerLike.InteractionHandlerDefaultSetter,
-#     InteractionHighlighterLike.InteractionHighlighterDefaultSetter,
-#     ParticleSystemLike.ParticleSystemDefaultSetter,
-#     EnableReceiverLike.EnableReceiverDefaultSetter,
-#     ObjectEnableLike.ObjectEnableDefaultSetter,
-#     ScreenOverlayEnableLike.ScreenOverlayEnableDefaultSetter,
-#     AudioEnableLike.AudioEnableDefaultSetter,
-#     SliderColliderLike.SliderColliderDefaultSetter,
-#     ComponentByNameLike.ComponentByNameDefaultSetter,
-#     SpawnerLike.SpawnerDefaultSetter,
-#     CamLockSessionEnableLike.CamLockSessionEnableDefaultSetter,
-#     DisableComponentLike.DisableComponentDefaultSetter,
-#     ]
-
-# component_likes = [
-#     MeshColliderLike.MeshColliderLike,
-#     StaticFlags.StaticFlagsLike,
-#     RigidbodyLike.RigidbodyLike,
-#     OffMeshLinkLike.OffMeshLinkLike,
-#     BoxColliderLike.BoxColliderLike,
-#     InteractionHandlerLike.InteractionHandlerLike,
-#     InteractionHighlighterLike.InteractionHighlighterLike,
-#     ParticleSystemLike.ParticleSystemLike,
-#     EnableReceiverLike.EnableReceiverLike,
-#     ObjectEnableLike.ObjectEnableLike,
-#     ScreenOverlayEnableLike.ScreenOverlayEnableLike,
-#     AudioEnableLike.AudioEnableLike,
-#     SliderColliderLike.SliderColliderLike,
-#     ComponentByNameLike.ComponentByNameLike,
-#     SpawnerLike.SpawnerLike,
-#     CamLockSessionEnableLike.CamLockSessionEnableLike,
-#     DisableComponentLike.DisableComponentLike,
-#     ]
 
 _components = {
     MeshColliderLike.MeshColliderLike : MeshColliderLike.MeshColliderDefaultSetter,
@@ -77,6 +37,8 @@ _components = {
     SpawnerLike.SpawnerLike : SpawnerLike.SpawnerDefaultSetter,
     CamLockSessionEnableLike.CamLockSessionEnableLike : CamLockSessionEnableLike.CamLockSessionEnableDefaultSetter,
     DisableComponentLike.DisableComponentLike : DisableComponentLike.DisableComponentDefaultSetter,
+    TextMeshLike.TextMeshLike : TextMeshLike.TextMeshDefaultSetter,
+    LightEnableLike.LightEnableLike : LightEnableLike.LightEnableDefaultSetter,
 }
 
 from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
@@ -141,8 +103,8 @@ def handleRemoveKey(key, context): # target_list):
 def handleSetDefaultValue(key, val, context): # targets):
     targets = _getTargetList(key, context)
 
-    for component_like_class, default_setter in _components.items(): # default_setters:
-        # if default_setter.AcceptsKey(key):
+    for component_like_class, default_setter in _components.items(): 
+
         if component_like_class.AcceptsKey(key):
 
             # target_list = context.selected_objects if default_setter.IsMultiSelectAllowed() else [context.active_object]

@@ -17,10 +17,18 @@
 # ##### END GPL LICENSE BLOCK #####
 # <pep8 compliant>
 
+from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+
 import bpy
 import re
 # from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
 from mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
+from mcd.ui.componentlike.adjunct import NumExtraPlayables
+
+def AppendNewPlayableToInteractionHandlerLike(playableName : str):
+    neps = NumExtraPlayables.AddSubtractNumExtraPlayables(True, bpy.context)
+    CLU.setValueAtKey(F"mel_interaction_handler_playable{neps}", playableName)
+
 
 class CU_OT_PlayableCreate(bpy.types.Operator):
     """Add a Playable"""
@@ -29,11 +37,14 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     bl_property = "new_name"
 
-    new_name : bpy.props.StringProperty(name="New Name")
+    new_name : bpy.props.StringProperty(
+        name="New Name"
+    )
     playableType : bpy.props.EnumProperty(
         name="Playable Type",
         items=CPACModule.getPlayableTypes(),
     )
+    should_append : bpy.props.BoolProperty()
 
     @classmethod
     def poll(cls, context):
@@ -51,7 +62,16 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
 
         CPACModule.CUSTOM_PG_AS_Collection.InitPlayable(item)
 
-        scn.as_custom_index = (len(scn.as_custom)-1)
+        # can we launch the playable editor pop up? <--Yes. 
+        # 
+        # TODO: can we use getattr(bpy.ops, CU_OT_PPPopup.bl_idname) # to preserve intellisensing where this op comes from
+        #  TODO: also add an entry in the InteractionHandler if this new pop up was called from IH.
+        bpy.ops.view3d.playable_pick_popup('INVOKE_DEFAULT', playableId=item.internalId)
+
+        if self.should_append:
+            AppendNewPlayableToInteractionHandlerLike(item.name)
+
+        scn.as_custom_index = len(scn.as_custom)-1
         info = '%s added to list' % (item.name)
         self.report({'INFO'}, info)
         return {'FINISHED'}

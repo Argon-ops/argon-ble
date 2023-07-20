@@ -50,7 +50,7 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
     )
 
     invert : BoolProperty(
-        description="If true, set the signal to 1 minus signal before taking a threshold value. Otherwise, don't change the signal's value",
+        description="If true, set the signal to 1 minus signal before comparing with the threshold value. Otherwise, don't change the signal's value",
         get=lambda self : CLU.getBoolFromKey(self.Append("_invert"), False),
         set=lambda self, value : CLU.setValueAtKey(self.Append("_invert"), value)
     )
@@ -61,6 +61,17 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         set=lambda self, value : CLU.setValueAtKey(self.Append("_threshold"), value),
         soft_min=0.0,
         soft_max=1.0,
+    )
+
+    setInitialState : EnumProperty(
+        items=(
+            ('DONT', 'Don\'t set initial state', 'Do nothing at start up'),
+            ('ONE', 'On', 'Send a one signal at start up'),
+            ('ZERO', 'Off', 'Send a zero signal at start up')
+        ),
+        description="Defines what state this component should set itself to at start up",
+        get=lambda self : CLU.getIntFromKey(self.Append("_set_initial_state"), 0),
+        set=lambda self, value : CLU.setValueAtKey(self.Append("_set_initial_state"), value)
     )
 
     # TODO: initial state strat??
@@ -87,6 +98,7 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         box.row().prop(self, "clamp01", text="Clamp01")
         box.row().prop(self, "invert", text="Invert")
         box.row().prop(self, "threshold", text="Threshold")
+        box.row().prop(self, "setInitialState", text="Set Initial State")
 
 
 classes = (

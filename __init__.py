@@ -12,6 +12,7 @@ bl_info = {
 
 
 
+
 # See notes at the end of this file for a reminder of what/how to import modules using this list
 modulesNames = [
     'more_stuff_here.more',
@@ -27,6 +28,7 @@ modulesNames = [
     'mcd.cduoperator.SelectByKey',
     'mcd.cduoperator.AddKeyToSelected',
     'mcd.util.DisplayHelper',
+    'mcd.ui.componentlike.adjunct.NumExtraPlayables',
 
     # scene level var declarations
     'mcd.ui.export.ExportBox',
@@ -54,6 +56,7 @@ modulesNames = [
     'mcd.exporter.edyj.BlenderToUnityFbxExporter',
     'mcd.exporter.default.DefaultFBXExporter',
     'mcd.ui.componentlike.RigidbodyLike',
+    'mcd.ui.componentlike.LightEnableLike',
     'mcd.ui.componentlike.OffMeshLinkLike',
     'mcd.ui.componentlike.unityinfo.UnityPaths',
     'mcd.ui.componentlike.InteractionHandlerLike',
@@ -68,6 +71,7 @@ modulesNames = [
     'mcd.ui.componentlike.SpawnerLike',
     'mcd.ui.componentlike.CamLockSessionEnableLike',
     'mcd.ui.componentlike.DisableComponentLike',
+    'mcd.ui.componentlike.TextMeshLike',
     'mcd.ui.materiallist.MaterialListPanel',
     'mcd.shareddataobject.SharedDataObject',
     'mcd.ui.materiallist.MaterialListExporter',

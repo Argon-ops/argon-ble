@@ -1,5 +1,6 @@
 import bpy
 
+# REMINDER: Load Post handlers are called after a file loads
 def RefreshHandlerCallbacks(handlerss, callbacks):
     for handlers in handlerss:
         for callback in callbacks:

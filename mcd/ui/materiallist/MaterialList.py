@@ -118,6 +118,90 @@ class CUSTOM_OT_actions(Operator):
         return {"FINISHED"}
 
 
+def AddMaterial(scene, mat : bpy.types.Material) -> None:
+    mat_list = scene.ml_custom
+    if not mat_list.get(mat.name):
+        item = mat_list.add()
+        item.id = len(mat_list)
+        item.material = mat
+        item.name = item.material.name
+        scene.ml_custom_index = (len(mat_list)-1)
+    #TODO not quite here: select this material
+
+def SelectMaterial(scene, mat : bpy.types.Material) -> int:
+    if mat is None:
+        return -1
+    idx = scene.ml_custom.keys().index(mat.name)
+    if idx >= 0 and idx < len(scene.ml_custom.keys()):
+        scene.ml_custom_index = idx
+        return idx
+    return -1
+
+def SetUnityName(scene, idx, unityMaterialName):
+    item = scene.ml_custom[idx]
+    item.unityMaterial = unityMaterialName
+
+
+# TODO: operator idea: show / hide all destroyed materials -- or even set material for all to some obnoxious material
+
+class CUSTOM_OT_addSpecificMaterial(Operator):
+    """Add a material to the material map"""
+    bl_idname = "ml_custom.add_specific_material"
+    bl_label = "Add material"
+    bl_description = "Add a material to the material map"
+    bl_options = {'REGISTER'}
+
+    @staticmethod
+    def _getUnityMaterialName() -> str:
+        choice = bpy.context.scene.ml_specific_material_choice
+        if choice is None:
+            return ""
+        map_item = bpy.context.scene.ml_custom.get(choice.name)
+        if map_item:
+            return map_item.unityMaterial
+        return ""
+    
+    @staticmethod 
+    def _storeUnityMaterialName(asmSelf, value):
+        asmSelf.unityMaterialStoreName = value
+
+    unityMaterialStoreName : StringProperty()
+
+    unityMaterialName : StringProperty(
+        description="The name of the unity material that this material should map to. No need to include '.mat'",
+        get=lambda self : CUSTOM_OT_addSpecificMaterial._getUnityMaterialName(),
+        set=lambda self, value : CUSTOM_OT_addSpecificMaterial._storeUnityMaterialName(self, value)
+    )
+    
+
+    @classmethod
+    def poll(cls, context):
+        return True
+    
+    def invoke(self, context, event):
+        wm = context.window_manager
+        dpi = context.preferences.system.pixel_size
+        ui_size = context.preferences.system.ui_scale
+        dialog_size = int(450 * dpi * ui_size)
+        return wm.invoke_props_dialog(self, width=dialog_size)        
+
+    def execute(self, context):
+        AddMaterial(context.scene, context.scene.ml_specific_material_choice)
+        idx = SelectMaterial(context.scene, context.scene.ml_specific_material_choice)
+        SetUnityName(context.scene, idx, self.unityMaterialStoreName)
+        return {'FINISHED'}
+
+     
+    def draw(self, context):
+        row = self.layout.row()
+        row.row()
+        row.prop(context.scene, "ml_specific_material_choice", text="Material")
+        row.prop(self, "unityMaterialName", text="Unity Material")
+        # row.prop(self, "chosenMaterial", text="Material")
+        row.row()
+
+
+
 class CUSTOM_OT_addBlendMaterials(Operator):
     """Add all materials of the current Blend-file to the UI list"""
     bl_idname = "ml_custom.add_bmaterials"
@@ -133,14 +217,16 @@ class CUSTOM_OT_addBlendMaterials(Operator):
         scn = context.scene
         for mat in bpy.data.materials:
             if not context.scene.ml_custom.get(mat.name):
-                item = scn.ml_custom.add()
-                item.id = len(scn.ml_custom)
-                item.material = mat
-                item.name = item.material.name
-                scn.ml_custom_index = (len(scn.ml_custom)-1)
-                info = '%s added to list' % (item.name)
-                self.report({'INFO'}, info)
-        return{'FINISHED'}
+                AddMaterial(context.scene, mat)
+                # item = scn.ml_custom.add()
+                # item.id = len(scn.ml_custom)
+                # item.material = mat
+                # item.name = item.material.name
+                # scn.ml_custom_index = (len(scn.ml_custom)-1)
+                # info = '%s added to list' % (item.name)
+                # self.report({'INFO'}, info)
+        return {'FINISHED'}
+   
 
 
 class CUSTOM_OT_printItems(Operator):
@@ -294,6 +380,7 @@ def MaterialMapToDictionary(context):
 
 classes = (
     CUSTOM_OT_actions,
+    CUSTOM_OT_addSpecificMaterial,
     CUSTOM_OT_addBlendMaterials,
     CUSTOM_OT_printItems,
     CUSTOM_OT_clearList,
@@ -311,6 +398,7 @@ def register():
     bpy.types.Scene.ml_custom = CollectionProperty(type=CUSTOM_PG_materialCollection)
     bpy.types.Scene.ml_custom_index = IntProperty()
     bpy.types.Scene.ml_show_material_map = BoolProperty()
+    bpy.types.Scene.ml_specific_material_choice = PointerProperty(type=bpy.types.Material)
 
 
 def unregister():
@@ -321,7 +409,7 @@ def unregister():
     del bpy.types.Scene.ml_custom
     del bpy.types.Scene.ml_custom_index
     del bpy.types.Scene.ml_show_material_map
-
+    del bpy.types.Scene.ml_specific_material_choice 
 
 # if __name__ == "__main__":
 #     register()

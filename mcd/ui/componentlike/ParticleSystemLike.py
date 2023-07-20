@@ -90,9 +90,8 @@ class ParticleSystemLike(EnableFilterSettings, AbstractComponentLike): # Propert
     def Display(box, context) -> None:
         row = box.row()
         mcl : ParticleSystemLike = context.scene.particleSystemLike
-        row = box.row()
-        sp = row.split(factor=.7)
-        sp.prop(mcl, "name", text=F"Prefab Name")
+        box.row().prop(mcl, "name", text="Prefab Name")
+        box.row().prop(mcl, "toggleGameObject", text="Toggle Game Object")
 
         # DtestBOTHER()
         # DtestIsSubclass()
@@ -109,6 +108,12 @@ class ParticleSystemLike(EnableFilterSettings, AbstractComponentLike): # Propert
         description="should the particle system be active at the start of play",
         get=lambda self : CLU.getBoolFromKey(_Append("_initial_state")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_initial_state"), value)
+    )
+
+    toggleGameObject : BoolProperty(
+        description="should the particle system's gameobject become active/inactive when the particle system starts and stops",
+        get=lambda self : CLU.getBoolFromKey(_Append("_toggle_game_object")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_toggle_game_object"), value)
     )
     
 

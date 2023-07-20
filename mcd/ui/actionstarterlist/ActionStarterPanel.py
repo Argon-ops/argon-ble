@@ -34,7 +34,7 @@ def Draw(layout, context):
 
     col = row.column(align=True)
     # col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='ADD', text="").action = 'ADD'
-    col.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="")
+    col.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="").should_append = False
     col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='REMOVE', text="").action = 'REMOVE'
     col.separator()
     col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='TRIA_UP', text="").action = 'UP'

@@ -17,8 +17,11 @@ class CDU_MT_AddKeyMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         unused_keys = ObjectLookupHelper._getUnusedKeys(context=context)
-        for unkey in unused_keys:
-            layout.operator(CUSTOM_OT_AddKeyToSelected.bl_idname, text=F"{DisplayHelper._trimMelPrefix(unkey)}").target_key = unkey
+        for key in ObjectLookupHelper._getAllPrefsKeys(context): # unused_keys:
+            if ObjectLookupHelper._allSelectedHaveKey(key, context):
+                layout.label(text=F"{DisplayHelper._trimMelPrefix(key)}")
+                continue
+            layout.operator(CUSTOM_OT_AddKeyToSelected.bl_idname, text=F"{DisplayHelper._trimMelPrefix(key)}").target_key = key
 
 def register():
     print(F"__SelByKey register__")

@@ -357,12 +357,12 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         set=lambda self, value : _ASJson.setValueAt(self, "audio_always_forwards", value)
     )
 
-    autoAddEnableReceiver : BoolProperty(
-        name="Add Enable Receiver",
-        description="Add an Enable Receiver component on the target objects. Enable Receivers enable/disable their IEnablable targets based on their interpretation of the signal",
-        get=lambda self : _ASJson.getBoolAt(self, "auto_add_enable_receiver"),
-        set=lambda self, value : _ASJson.setValueAt(self, "auto_add_enable_receiver", value)
-    )
+    # autoAddEnableReceiver : BoolProperty(
+    #     name="Add Enable Receiver",
+    #     description="Add an Enable Receiver component on the target objects. Enable Receivers enable/disable their IEnablable targets based on their interpretation of the signal",
+    #     get=lambda self : _ASJson.getBoolAt(self, "auto_add_enable_receiver"),
+    #     set=lambda self, value : _ASJson.setValueAt(self, "auto_add_enable_receiver", value)
+    # )
 
     # These two props (applyToChildren and setInitialState) are duplicated in EnableReceiverLike.
     #  Setting these will result in an EnableMessageReceiver being applied to the target object in Unity
@@ -370,25 +370,33 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     #    The point is we want to give the user a convenient shortcut for adding this component that they probably want
     applyToChildren : BoolProperty(
         name="Apply to Children",
-        description="Should search children for IEnableables",
+        description="If true, the importer will search the target and the target's children for message receivers. If false, only search the target",
         get=lambda self : _ASJson.getBoolAt(self, "apply_to_children"),
         set=lambda self, value : _ASJson.setValueAt(self, "apply_to_children", value)
     )
-    setInitialState : EnumProperty(
-        items=(
-            ('DONT', 'Don\'t set initial state', 'Do nothing at start up'),
-            ('TRUE', 'Enabled', 'Set enabled at start up'),
-            ('FALSE', 'Disabled', 'Set disabled at start up')
-        ),
-        get=lambda self : _ASJson.getIntAt(self, "set_initial_state" ),
-        set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state", value)
-    )
+
+    # TODO: not really here: could make a button. it's text is the playable name.
+    #    its operator is just a popup that let's you choose which playable you want.
+    #      more clicks. but visually clearer. This instead of the current label : enum-drop-down
+
+    # setInitialState : EnumProperty(
+    #     items=(
+    #         ('DONT', 'Don\'t set initial state', 'Do nothing at start up'),
+    #         ('TRUE', 'Enabled', 'Set enabled at start up'),
+    #         ('FALSE', 'Disabled', 'Set disabled at start up')
+    #     ),
+    #     get=lambda self : _ASJson.getIntAt(self, "set_initial_state" ),
+    #     set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state", value)
+    # )
     # enableSignalFilter : EnumProperty(
     #     items=(
     #         ('Greater than half', 'Greater than half', 'Signal values greater than .5 will be considered true/enable. Otherwise false/disable'),
     #         ('Less than half')
     #     )
     # )
+
+    # TODO: not really here: need some clarity around the language of 'Enable Filters'
+    #   Maybe just an explanation label 
 
     autoAddScalarReceiver : BoolProperty(
         name="Add Scalar Receiver",
@@ -426,6 +434,11 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         get=lambda self : _ASJson.getFloatAt(self, "shake_duration", 0.8),
         set=lambda self, value : _ASJson.setValueAt(self, "shake_duration", value)
     )
+    shakeDisplacementDistance : FloatProperty(
+        description="Defines how violently the camera will shake",
+        get=lambda self : _ASJson.getFloatAt(self, "shake_displacement_distance", 0.3),
+        set=lambda self, value : _ASJson.setValueAt(self, "shake_displacement_distance", value)
+    )
 
     signalFilters : EnumProperty(
         items=(
@@ -451,10 +464,22 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         set=lambda self, value : _ASJson.setValueAt(self, "should_play_after", value)
     )
 
+    playAfterAdditionalDelay : FloatProperty(
+        description="Defines the number of seconds to wait after the end of this command before starting the next command",
+        get=lambda self : _ASJson.getFloatAt(self, "play_after_additional_delay"),
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after_additional_delay", value)
+    )
+
     playAfter : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
         get=lambda self : CLU.playableEnumIndexFromName(_ASJson.getStringAt(self, "play_after")), 
         set=lambda self, value : _ASJson.setValueAt(self, "play_after", CLU.playableFromIndex(value).name) # TODO: is internalId not really used any where ?
+    )
+
+    playAfterDeferToLatest : BoolProperty(
+        description="If true, the second command will only be invoked at the end of the last delay, in the case where multiple invocations of the first command create overlapping delay intervals. If false, the second command will always fire after delay, ignoring subsequent invocations of the first command",
+        get=lambda self : _ASJson.getBoolAt(self, "play_after_defer_to_latest"),
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after_defer_to_latest", value)
     )
 
     # headline
@@ -498,7 +523,7 @@ class CU_OT_Select(bpy.types.Operator):
 
 class CU_OT_PlayablePickPopup(bpy.types.Operator):
     """Edit a Playable. At the moment this just duplicates the in-row edit options. Use if we need more complex options"""
-    bl_idname = "view3d.viewport_edit_playable"
+    bl_idname = "view3d.playable_pick_popup" #"view3d.viewport_edit_playable"
     bl_label = "Edit Playable"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -509,7 +534,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         return True 
         
     def execute(self, context):
-        info = '%s bye' % ("BYE")
+        info = '%s PlayablePickPop bye' % ("BYE")
         self.report({'INFO'}, info)
         return {'FINISHED'}
 
@@ -542,7 +567,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
         rowb=box.row()
         rowb.operator(AS_OT_AddToTargets.bl_idname, icon='ADD', text="ADD" ).playableName = playable.name # self.playableName
-        # TODO WARNING IF extra targets len is zero or no non None targets
+        # TODO WARNING IF extra targets len is zero or no none None targets
 
     def draw(self, context):
         scn = context.scene
@@ -583,27 +608,17 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
             self.layout.row().prop(playable, "allowsInterrupts", text="Allows Interrupts")
         
-        elif playableType == 3:
+        elif playableType == 3: 
             row = self.layout.row()
             #targets box
-            self.drawTargetsList(playable, self.layout.box())
-            row = self.layout.row()
-            row.prop(playable, "autoAddEnableReceiver", text="Add Enable Receiver")
-            if playable.autoAddEnableReceiver:
-                row = self.layout.row()
-                row.prop(playable, "applyToChildren", text="Apply to Children")
-                row.prop(playable, "setInitialState", text="Set Initial State")
+            boxt = self.layout.box()
+            self.drawTargetsList(playable, boxt)
 
-            row = self.layout.row()
-            row.prop(playable, "autoAddScalarReceiver", text="Add Scalar Receiver")
-            if playable.autoAddScalarReceiver:
-                row = self.layout.row()
-                row.prop(playable, "applyToChildrenScalar", text="Appy to Children")
-                row.prop(playable, "setInitialStateScalar", text="Set Initial State")
-                row.prop(playable, "scalarInitialState", text="Scalar Initial State")
-            
+            boxt.row().prop(playable, "applyToChildren", text="Apply to Children")
+           
         elif playableType == 4: # camera shake
             self.layout.row().prop(playable, "shakeDuration", text="Duration")
+            self.layout.row().prop(playable, "shakeDisplacementDistance", text="Displacement Distance")
 
         elif playableType == 5: # camera overlay
             self.layout.row().prop(playable, "overlayName", text="Overlay Name")
@@ -621,67 +636,15 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
         self.layout.row().prop(playable, "shouldPlayAfter", text="Play A Command After")
         if playable.shouldPlayAfter:
-            self.layout.row().prop(playable, "playAfter", text="Play After")
+            row = self.layout.row()
+            row.prop(playable, "playAfter", text="Play After")
+            row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId \
+                    = context.scene.as_custom[CLU.playableEnumIndexFromName(playable.playAfter)].internalId
+            self.layout.row().prop(playable, "playAfterAdditionalDelay", text="Delay Seconds")
+            self.layout.row().prop(playable, "playAfterDeferToLatest", text="Play After Defer to Latest")
 
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
         
-
-        # if int(playable.playableType) == 1 or int(playable.playableType) == 2: # anim type
-            
-        # BEGIN OLD STRUCTURE
-        #########
-        #########
-
-        # if int(playable.playableType) > 0: # not event-only 
-        #     row = self.layout.row()
-
-        #     #targets box
-        #     box = self.layout.box()  
-        #     rowb = box.row()
-        #     rowb.label(text="Targets") 
-            
-        #     for targ in playable.targets:
-        #         rowb = box.row()
-        #         rowb.prop(targ, "object", text='target')
-        #         rowb.operator(AS_OT_RemoveFromTargets.bl_idname, icon='X', text="").playableNameConcatTargetName = F"{playable.name},,,{targ.name}"
-        #     rowb=box.row()
-        #     rowb.operator(AS_OT_AddToTargets.bl_idname, icon='ADD', text="ADD" ).playableName = playable.name # self.playableName
-
-        #     # TODO WARNING IF extra targets len is zero or no non None targets
-
-        #     if int(playable.playableType) != 3: # not enable message
-        #         row = self.layout.row()
-        #         row.prop(playable, "animAction", text="Action Name")
-        #         row = self.layout.row()
-        #         row.prop(playable, "audioClipName", text="Audio Clip Name", icon="SOUND")
-        #         if len(playable.audioClipName) > 0:
-        #             self.layout.row().prop(playable, "loopAudio", text="Loop Audio")
-
-        #     if int(playable.playableType) == 3: # enable message
-        #         row = self.layout.row()
-        #         row.prop(playable, "autoAddEnableReceiver", text="Add Enable Receiver")
-        #         if playable.autoAddEnableReceiver:
-        #             row = self.layout.row()
-        #             row.prop(playable, "applyToChildren", text="Apply to Children")
-        #             row.prop(playable, "setInitialState", text="Set Initial State")
-
-        #         row = self.layout.row()
-        #         row.prop(playable, "autoAddScalarReceiver", text="Add Scalar Receiver")
-        #         if playable.autoAddScalarReceiver:
-        #             row = self.layout.row()
-        #             row.prop(playable, "applyToChildrenScalar", text="Appy to Children Scalar")
-        #             row.prop(playable, "setInitialStateScalar", text="Set Initial State Scalar")
-        #             row.prop(playable, "scalarInitialState", text="Scalar Initial State")
-            
-        # if int(playable.playableType) == 1: # anim
-        #     row = self.layout.row()
-        #     row.prop(playable, "commandBehaviourType", text="Behaviour")
-        #     if not playable.commandBehaviourType in ('RestartForwards',):
-        #         self.layout.row().prop(playable, "audioAlwaysForwards", text="Audio Always Forwards")
-
-        # if int(playable.playableType) == 1 or int(playable.playableType) == 2: # anim type
-        #     row = self.layout.row()
-        #     row.prop(playable, "allowsInterrupts", text="Allows Interrupts")
 
 
 def syncPlayables():
@@ -716,7 +679,7 @@ def onObjectNameMsgbus(*args):
         ensure the json data is in sync with any name change"""
     # Complaint: this will get called in many cases where it's not needed.
     # Also interesting: gets called about 20 times per rename
-    # print(F"**onObjectNameMSGBUS")
+    print(F"**onObjectNameMSGBUS")
     syncPlayables()
     _ASJson.updateAllPlayableExtraTargets(bpy.context)
 

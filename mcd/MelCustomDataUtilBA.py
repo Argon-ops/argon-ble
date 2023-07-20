@@ -101,20 +101,24 @@ class CDU_UL_PerObjectItems(UIList):
 
     def filter_items(self, context, data, propname):
 
+        kvs = getattr(data, propname)
+
+        if len(context.selected_objects) == 0:
+            return [~self.bitflag_filter_item] * len(kvs), []
+        
         def _shouldIncludeKey(key, context) -> int:
             # filter using the search bar if it's shown
             if self.use_filter_show and len(self.filter_name) > 0 and self.filter_name not in key:
                 return ~self.bitflag_filter_item
             
-            if ObjectLookupHelper._anySelectedHaveKey(key, context):
+            if ObjectLookupHelper._allSelectedHaveKey(key, context):
                 return self.bitflag_filter_item
             return ~self.bitflag_filter_item
 
-        kvs = getattr(data, propname)
        
         flags = list(map(lambda kv : _shouldIncludeKey(kv.key, context), kvs))
         order = []
-        # TODO: respect the sort alpha if they want it? could be slow?
+        # TODO consider: respect the sort alphabetical if they want it? could be slow?
         # print(F"sort alpha ? {self.use_filter_sort_alpha} show filtering? {self.use_filter_show}")
         return flags, order
 

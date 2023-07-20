@@ -5,7 +5,8 @@ from bpy.props import (IntProperty,
                        EnumProperty,
                        PointerProperty,
                        BoolProperty,
-                       CollectionProperty,)
+                       CollectionProperty,
+                       FloatVectorProperty)
 from bpy.types import (PropertyGroup,)
 from mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
 from mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
@@ -30,16 +31,15 @@ def resubAllLoadPostInterHighlighter(dummy):
     perObjectFieldName = "highlighterPerObjectData"
 
     fieldsAndPropNames = (
-        ("rendererTarget", 
-         "_renderer_target"), # for each object PointerProperty that needs updates, add a line here
+        ("rendererTarget", "_renderer_target"), # for each object PointerProperty that needs updates, add a line here
     )
     print(F"=== resub all for highlighter ===")
     for fieldAndPropName in fieldsAndPropNames:
         MsgbusUtils.resubscribeAll_LP(
             perObjectFieldName, 
             fieldAndPropName[0], 
-            _Append(fieldAndPropName[1]),  
-            HighlighterPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
+            _Append(fieldAndPropName[1])) #,  
+            #HighlighterPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
@@ -95,11 +95,11 @@ class HighlighterPerObjectData(PropertyGroup, AbstractPerObjectData):
             context.active_object, 
             self,
             "rendererTarget",
-            _Append("_renderer_target"),
-            MsgbusUtils.GetOwnerToken(context.active_object, HighlighterPerObjectData.OwnerKey("_renderer_target"))
+            _Append("_renderer_target")
         )
     )
 
+# TODO: not here: bug where the program renames one of your objects to z_Duks_sharedDataRoot ???
 
 class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
 
@@ -120,13 +120,19 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
         boxb.row().prop(mcl, "mode", text="Mode")
         if mcl.mode == "HighlightMaterial":
             boxb.row().prop(mcl, "highlightMat", text="Highlight Material")
-            # per obje
-            hlpo = context.active_object.highlighterPerObjectData
-            box.row().prop(hlpo, "rendererTarget", text="Renderer Target (Optional)")
+
+            # fend off a None error. although not sure how we get here when active_object is None (guess: copy pasting an object that has this?)
+            if context.active_object is not None:
+                # per obje
+                hlpo = context.active_object.highlighterPerObjectData
+                box.row().prop(hlpo, "rendererTarget", text="Renderer Target (Optional)")
         else:
             boxb.row().prop(mcl, "clickBeaconPrefab", text="Click Beacon Prefab")
             boxb.row().prop(mcl, "beaconPlacementOption", text="Beacon Placement Option")
+            boxb.row().prop(mcl, "beaconNudgeVector", text="Beacon Nudge")
+            boxb.row().prop(mcl, "beaconShouldRotateNinety")
 
+        box.row().prop(mcl, "downtimeSeconds", text="Downtime Seconds")
         box.row().prop(mcl, "onSleepAction", text="On Sleep Action")
 
     mode : EnumProperty(
@@ -146,6 +152,7 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
     )
 
     clickBeaconPrefab : StringProperty(
+        description="Defines the name of the prefab that should be used as a click beacon. For example 'my-sprite'. Path not needed. '.prefab' not needed ",
         get=lambda self : CLU.getStringFromKey(_Append("_click_beacon_prefab")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_click_beacon_prefab"), value),
     )
@@ -160,11 +167,31 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_beacon_placement_option"), value),
     )
 
+    beaconNudgeVector : FloatVectorProperty(
+        description="Defines how far to move the beacon away from its anchor position. Scales with renderer or collider bounds where possible",
+        get=lambda self : CLU.getFloatArrayFromKey(_Append("_beacon_nudge_vector")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_beacon_nudge_vector"), value),
+        soft_min=-3.0,
+        soft_max=3.0,
+    )
+
+    beaconShouldRotateNinety : BoolProperty(
+        description="Rotate the beacon by 90 degrees in the colliders local space if true. Do nothing otherwise",
+        get=lambda self : CLU.getBoolFromKey(_Append("_beacon_should_rotate_ninety")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_beacon_should_rotate_ninety"), value),
+    )
+
     onSleepAction : EnumProperty(
         items=TurnOnOffAction.TurnOnOffAction,
         description="Defines what this highlighter should do when it gets put to 'sleep': Nothing, Turn On, Turn Off. Turn Off is the default",
         get=lambda self : CLU.getIntFromKey(_Append("_on_sleep_action"), 2),
         set=lambda self, value : CLU.setValueAtKey(_Append("_on_sleep_action"), value)
+    )
+
+    downtimeSeconds : FloatProperty(
+        description="",
+        get=lambda self : CLU.getFloatFromKey(_Append("_downtime_seconds"), 0),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_downtime_seconds"), value)
     )
   
 

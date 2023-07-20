@@ -32,6 +32,15 @@ def getFloatArrayFromKey(key):
     fray = getValueFromKey(key)
     return fray if fray is not None else (0.0, 0.0, 0.0)
 
+def getColorArrayFromKey(key):
+    fray = getValueFromKey(key)
+    # print(F"colors {', '.join([str(c) for c in fray])}")
+    return fray if fray is not None else (0.0, 0.0, 0.0)
+
+def getFloat4ArrayFromKey(key):
+    fray = getValueFromKey(key)
+    return fray if fray is not None else (0.0, 0.0, 0.0, 0.0)
+
 def getFloatBackedBooleanVector(key):
     fff = getValueFromKey(key)
     if len(fff) < 3:
@@ -47,6 +56,7 @@ def setFloatBackedBooleanVector(key, boolVector):
 
 def setValueAtKey(key_name, value):
     AbstractDefaultSetter._SetKeyValOnTargets(key_name, value, bpy.context.selected_objects)
+
 
 def setObjectPathStrangeAtKey(key_name, pointerObject):
     if pointerObject is None:

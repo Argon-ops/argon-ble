@@ -112,8 +112,8 @@ def resubscribeAllLoadPostCamLock(dummy):
         MsgbusUtils.resubscribeAll_LP(
             perObjectFieldName, 
             fieldAndPropName[0], 
-            _Append(fieldAndPropName[1]), 
-            CamLockPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
+            _Append(fieldAndPropName[1])) #, 
+            # CamLockPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
 
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
@@ -131,27 +131,22 @@ class CamLockPerObjectData(PropertyGroup, AbstractPerObjectData):
         type=bpy.types.Object,
         description="Optional: disable this object and its children at the start of the session. Enable at the end.",
         update=lambda self, context: MsgbusUtils.onObjectUpdate(
-            context.active_object, # context.selected_objects, 
-            # self.hideRootObject, 
+            context.active_object,  
             self, 
             "hideRootObject",
-            _Append("_hide_root_object"),
-            MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_hide_root_object"))) 
-                # "camLockPerObData_hide_root_object")) # _DtheCBOwner) #test. want the below
-            # MsgbusUtils.OwnerTokens.GetOrAddToken(self.ownerTokens, "_hide_root_object"))
+            _Append("_hide_root_object"))
+            # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_hide_root_object"))) 
     )
 
     showRootObject : PointerProperty(
         type=bpy.types.Object,
         description="Optional: enable this object and its children at the start of the session. Disable at the end.",
         update=lambda self, context: MsgbusUtils.onObjectUpdate(
-            context.active_object, # context.selected_objects,
-            # self.showRootObject,
+            context.active_object,
             self,
             "showRootObject",
-            _Append("_show_root_object"),
-            MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_show_root_object")))
-            # MsgbusUtils.OwnerTokens.GetOrAddToken(self.ownerTokens, "_show_root_object"))
+            _Append("_show_root_object"))
+            # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_show_root_object")))
     )
 
 #END REGION
