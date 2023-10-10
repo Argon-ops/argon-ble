@@ -1,4 +1,14 @@
 
+###########################################################
+###########################################################
+###########################################################
+## PRE Re-shuffle where we eliminate zDuks_AS_SHared...
+###########################################################
+###########################################################
+###########################################################
+
+'''
+
 import bpy
 
 from bpy.props import (IntProperty,
@@ -23,7 +33,6 @@ from mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
 from mcd.util import DisplayHelper
 
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-
 
 
 class AS_OT_AddToTargets(Operator):
@@ -56,7 +65,7 @@ class AS_OT_AddToTargets(Operator):
         else:
             next = playable.targets.add() 
             next.name = F"{len(playable.targets)}-targ"
-            # _ASJson.updateExtraTargets(playable)
+            _ASJson.updateExtraTargets(playable)
             print(F" we did it")
               
         return {"FINISHED"}
@@ -89,7 +98,7 @@ class AS_OT_RemoveFromTargets(Operator):
         else:
             idx = ObjectLookupHelper._indexOf(playable.targets, target)
             playable.targets.remove(idx)
-            # _ASJson.updateExtraTargets(playable)
+            _ASJson.updateExtraTargets(playable)
               
         return {"FINISHED"}
 
@@ -106,82 +115,21 @@ def getPlayableTypes():
         ('8', 'Message Bus', 'Send a message on the MessageBus')
     )
 
-class PlayablesExporter:
-
-    __COMMAND_MARKER_KEY__ = "mel_action_starter"
-
-    @staticmethod
-    def PreExport(targetDataHolder):
-        PlayablesExporter.PurgePreviousTargetObjects()
-        PlayablesExporter.WriteCommandsToTargetObject(targetDataHolder)
-        PlayablesExporter.SanitizeExport(targetDataHolder)
-
-    def DshowTargetKeys(target):
-        print(F"showing target keys: for {target.name}")
-        for k in target.keys():
-            if ASSharedDataUtil.__DATA_KEY_PREFIX__ in k:
-                print(F"{target.name} has key: {k}")
-
-    def PurgePreviousTargetObjects():
-        for previous in ObjectLookupHelper._findAllObjectsWithKey(PlayablesExporter.__COMMAND_MARKER_KEY__):
-            del previous[PlayablesExporter.__COMMAND_MARKER_KEY__]
-            keys = [key for key in previous.keys()]
-            for key in keys:
-                print(F"found key: {key}")
-                if key.startswith(ASSharedDataUtil.__DATA_KEY_PREFIX__):
-                    print(F"will del key {key}")
-                    del previous[key]
-
-    def WriteCommandsToTargetObject(target):
-        # target = bpy.context.scene.objects[0]
-        target[PlayablesExporter.__COMMAND_MARKER_KEY__] = 1
-        PlayablesExporter._ExportCommands(target)
-                    # ASSharedDataUtil.GetCommandDataSharedObject())
-        return target
-
-    def _ExportCommands(writeToOb):
-        import json
-        cmds = bpy.context.scene.as_custom
-        print(F"num cmds: {len(cmds)}")
-        for command in bpy.context.scene.as_custom:
-            d = CUSTOM_PG_AS_Collection.ToDict(command)
-            key = ASSharedDataUtil.GetPlayableBaseKey(command.name)
-            print(F"base key: {key}")
-            writeToOb[key] = json.dumps(d)
-
-    def SanitizeExport(target):
-        configs = ObjectLookupHelper._findAllObjectsWithKey(PlayablesExporter.__COMMAND_MARKER_KEY__)
-        for config in configs:
-            if config != target:
-                print(F"IMPOSTER config {config.name} __ real one is {target.name}")
-        print(F"END OF SANITIZE")
-
-    def CleanUpTargetObject(target):
-        # return # !! Test so we can see
-        for command in bpy.context.scene.as_custom:
-            del target[ASSharedDataUtil.GetPlayableBaseKey(command.name)]
-        del target[PlayablesExporter.__COMMAND_MARKER_KEY__]
-
-    
-
-
-class ASSharedDataUtil:
+class _ASJson:
     __DATA_KEY_SUFFIX__="_data"
 
-    __DATA_KEY_PREFIX__="mel_AS_"
-
-    def GetCommandDataSharedObject():
-        ob = SharedDataObject.getSharedDataObjectWithName("z_DuksGames_AS_SharedObject")
+    def GetActionStarterSharedObject():
+        ob = SharedDataObject.getSharedDataObjectWithName("zDuksGames_AS_SharedObject")
         ob["mel_action_starter"] = 1 # tag object so that the importer will see it
         return ob
 
-    # def SharedASObjectExists():
-    #     return SharedDataObject.objectExists("zDuksGames_AS_SharedObject")
+    def SharedASObjectExists():
+        return SharedDataObject.objectExists("zDuksGames_AS_SharedObject")
 
     @staticmethod
-    def GetPlayableBaseKey(playableName : str) ->str:
+    def _getASBaseKey(actionName : str) ->str:
         # prefix must match the import script in unity addon
-        return F"{ASSharedDataUtil.__DATA_KEY_PREFIX__}{playableName}"
+        return F"mel_AS_{actionName}"
 
     @staticmethod
     def _getDataKey(actionName : str):
@@ -251,8 +199,7 @@ class ASSharedDataUtil:
 
     @staticmethod
     def setValueAt(collectionSelf, key, value):
-        collectionSelf[key] = value
-        # _ASJson.setValueWithPlayableName(collectionSelf.name, key, value)
+        _ASJson.setValueWithPlayableName(collectionSelf.name, key, value)
 
     @staticmethod
     def setValueWithPlayableName(playableName, key, value):
@@ -327,8 +274,6 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
 
     @staticmethod
     def InitPlayable(playable):
-        return 
-        ### ALL GOOD...
         """Make sure a few defaults are written to the storage object"""
         _ASJson.setValueAt(playable, "playableId", playable.name)
         _ASJson.setValueAt(playable, "playableType", int(playable.playableType))
@@ -342,47 +287,21 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
 
         playable.internalId = F"ID_{playable.name}"
 
-
-    def DPrintInfo(self):
-        print(self.DGetInfo())
-
-    def DGetInfo(self):
-        return F"NAME: {self.name} | PLAYABLE_TYPE: {self.playableType}"
-    
-    @staticmethod
-    def ToDict(pgSelf):
-        d = {}
-        for fieldName in pgSelf.__annotations__.keys():
-            serVal = CUSTOM_PG_AS_Collection.GetSerialiazableValue(pgSelf, fieldName)
-            d[fieldName] = serVal
-        return d
-    
-    @staticmethod 
-    def GetSerialiazableValue(pgSelf, fieldName : str):
-        val = getattr(pgSelf, fieldName)
-        if fieldName == "targets":
-            return [(ObjectLookupHelper._hierarchyToStringStrange(target.object) if target.object is not None else "") for target in val]
-        elif fieldName == "animAction":
-            return val.name if val is not None else ""
-        return val
-
-
     name : StringProperty(
         name="name",
         description = "the name of the action starter ",
-        # update=lambda self, context : _ASJson.setValueAt(self, "playableId", self.name)
-    )
+        update=lambda self, context : _ASJson.setValueAt(self, "playableId", self.name))
     
     nextName : StringProperty(
         name="next_name",
         description="the name of the playable",
-        ##get=lambda self :  _ASJson.getStringAt(self, "playableId"),
-        ##set=lambda self, value : _ASJson.setNextName(self, value),
+        get=lambda self :  _ASJson.getStringAt(self, "playableId"),
+        set=lambda self, value : _ASJson.setNextName(self, value),
     )
 
-    # internalId : StringProperty(
-    #     name="internal id"
-    # )
+    internalId : StringProperty(
+        name="internal id"
+    )
     
     # TODO: fields for an object to own the animator (or bool option please generate for me)
     # TODO: fields for an object to own the audioSource (or bool option please use some audio mixer attached to camera)
@@ -396,8 +315,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         items=getPlayableTypes(),
         description="",
         default=1, #TODO use this
-        ##get=lambda self : _ASJson.getIntAt(self, "playableType", 1),
-        ##set=lambda self, value : _ASJson.setValueAt(self, "playableType", value)                                           
+        get=lambda self : _ASJson.getIntAt(self, "playableType", 1),
+        set=lambda self, value : _ASJson.setValueAt(self, "playableType", value)                                           
     )
     commandBehaviourType : EnumProperty(
         name="Behaviour",
@@ -407,22 +326,22 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
             ('ToggleAndRestart', 'ToggleAndRestart', 'If the playback cursor is closer to the end, play backwards starting from the end. Else play forwards from the beginning.'),
             ('FlipDirections', 'FlipDirections', 'Switch between forward and reverse with each invocation. Just change directions and don\'t set the playback position (to either start or end) before hand.'),
         ),
-        ##get=lambda self : _ASJson.getIntAt(self, "command_behaviour_type", 0), # CLU.getIntFromKey(_Append("_command_behaviour_type")),
-        ##set=lambda self, value : _ASJson.setValueAt(self, "command_behaviour_type", value) # CLU.setValueAtKey(_Append("_command_behaviour_type"), value)
+        get=lambda self : _ASJson.getIntAt(self, "command_behaviour_type", 0), # CLU.getIntFromKey(_Append("_command_behaviour_type")),
+        set=lambda self, value : _ASJson.setValueAt(self, "command_behaviour_type", value) # CLU.setValueAtKey(_Append("_command_behaviour_type"), value)
     )
 
     customInfo : StringProperty(
         name="Custom Info2",
         description="Optional. Use any way you want in a CommandEvent handler. The contents of this field will be copied to the 'CustomInfo' field in each CommandEvent sent from this playable",
-        #get=lambda self : _ASJson.getStringAt(self, "custom_info"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "custom_info", value)
+        get=lambda self : _ASJson.getStringAt(self, "custom_info"),
+        set=lambda self, value : _ASJson.setValueAt(self, "custom_info", value)
     )
 
     allowsInterrupts : BoolProperty(
         name="Allows Interrupts",
         description="Should subsequent interactions interrupt a command that is already running. Looping animations that don't allow interrupts will never stop playing.",
-        #get=lambda self : _ASJson.getBoolAt(self, "allowsInterrupts", False),
-        #set=lambda self, value : _ASJson.setValueAt(self, "allowsInterrupts", value)
+        get=lambda self : _ASJson.getBoolAt(self, "allowsInterrupts", False),
+        set=lambda self, value : _ASJson.setValueAt(self, "allowsInterrupts", value)
     )
     
     # BUGGG: its possible to choose a playableType like animation, assign a target then switch to (e.g.) Screen Overlay for the playable type
@@ -440,34 +359,34 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         name="action name",
         type=bpy.types.Action,
         poll = lambda self, action : True, # _isActionInList(self, action), 
-        # update=lambda self, context : _ASJson.updateFromPointer(self, "anim_name", self.animAction)
+        update=lambda self, context : _ASJson.updateFromPointer(self, "anim_name", self.animAction)
     )
     # TODO: consider adding an audio only type playable
     audioClipName : StringProperty(
         name="audio clip name",
         description="the name of a clip in your Unity project.",
-        #get=lambda self : _ASJson.getStringAt(self, "audio_name"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "audio_name", value)
+        get=lambda self : _ASJson.getStringAt(self, "audio_name"),
+        set=lambda self, value : _ASJson.setValueAt(self, "audio_name", value)
     )
     loopAudio : BoolProperty(
         name="Loop Audio",
         description="If true, audio will loop while animating. If false, audio will play once. (Once per loop, if this is a looping animation.) If there is only audio, this option does nothing.  ",
-        #get=lambda self : _ASJson.getBoolAt(self, "loop_audio"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "loop_audio", value)
+        get=lambda self : _ASJson.getBoolAt(self, "loop_audio"),
+        set=lambda self, value : _ASJson.setValueAt(self, "loop_audio", value)
     )
 
     audioAlwaysForwards : BoolProperty(
         name="Audio Always Forwards",
         description="Should audio play forwards even when the animation is playing backwards",
-        #get=lambda self : _ASJson.getBoolAt(self, "audio_always_forwards"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "audio_always_forwards", value)
+        get=lambda self : _ASJson.getBoolAt(self, "audio_always_forwards"),
+        set=lambda self, value : _ASJson.setValueAt(self, "audio_always_forwards", value)
     )
 
     # autoAddEnableReceiver : BoolProperty(
     #     name="Add Enable Receiver",
     #     description="Add an Enable Receiver component on the target objects. Enable Receivers enable/disable their IEnablable targets based on their interpretation of the signal",
-    #     #get=lambda self : _ASJson.getBoolAt(self, "auto_add_enable_receiver"),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "auto_add_enable_receiver", value)
+    #     get=lambda self : _ASJson.getBoolAt(self, "auto_add_enable_receiver"),
+    #     set=lambda self, value : _ASJson.setValueAt(self, "auto_add_enable_receiver", value)
     # )
 
     # These two props (applyToChildren and setInitialState) are duplicated in EnableReceiverLike.
@@ -477,8 +396,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     applyToChildren : BoolProperty(
         name="Apply to Children",
         description="If true, the importer will search the target and the target's children for message receivers. If false, only search the target",
-        #get=lambda self : _ASJson.getBoolAt(self, "apply_to_children"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "apply_to_children", value)
+        get=lambda self : _ASJson.getBoolAt(self, "apply_to_children"),
+        set=lambda self, value : _ASJson.setValueAt(self, "apply_to_children", value)
     )
 
     # TODO: not really here: could make a button. it's text is the playable name.
@@ -491,8 +410,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     #         ('TRUE', 'Enabled', 'Set enabled at start up'),
     #         ('FALSE', 'Disabled', 'Set disabled at start up')
     #     ),
-    #     #get=lambda self : _ASJson.getIntAt(self, "set_initial_state" ),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state", value)
+    #     get=lambda self : _ASJson.getIntAt(self, "set_initial_state" ),
+    #     set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state", value)
     # )
     # enableSignalFilter : EnumProperty(
     #     items=(
@@ -504,46 +423,46 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     # TODO: not really here: need some clarity around the language of 'Enable Filters'
     #   Maybe just an explanation label 
 
-    # autoAddScalarReceiver : BoolProperty(
-    #     name="Add Scalar Receiver",
-    #     description="Add a Scalar Receiver component to the target objects",
-    #     #get=lambda self : _ASJson.getBoolAt(self, "auto_add_scalar_receiver"),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "auto_add_scalar_receiver", value)
-    # )
-    # applyToChildrenScalar : BoolProperty(
-    #     name="Apply to Children Scalar",
-    #     description="Should scalar receiver search children for scalar targets",
-    #     #get=lambda self : _ASJson.getBoolAt(self, "apply_to_children_scalar"),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "apply_to_children_scalar", value)
-    # )
-    # setInitialStateScalar : BoolProperty(
-    #     description="Should the scalar receiver initialize its targets with a value at Start",
-    #     #get=lambda self : _ASJson.getBoolAt(self, "set_inital_state_scalar"),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state_scalar", value)
-    # )
-    # scalarInitialState : FloatProperty(
-    #     description="Defines the value to set the scalar targets to at Start",
-    #     #get=lambda self : _ASJson.getFloatAt(self, "scalar_initial_state"),
-    #     #set=lambda self, value : _ASJson.setValueAt(self, "scalar_initial_state", value)
-    # )
+    autoAddScalarReceiver : BoolProperty(
+        name="Add Scalar Receiver",
+        description="Add a Scalar Receiver component to the target objects",
+        get=lambda self : _ASJson.getBoolAt(self, "auto_add_scalar_receiver"),
+        set=lambda self, value : _ASJson.setValueAt(self, "auto_add_scalar_receiver", value)
+    )
+    applyToChildrenScalar : BoolProperty(
+        name="Apply to Children Scalar",
+        description="Should scalar receiver search children for scalar targets",
+        get=lambda self : _ASJson.getBoolAt(self, "apply_to_children_scalar"),
+        set=lambda self, value : _ASJson.setValueAt(self, "apply_to_children_scalar", value)
+    )
+    setInitialStateScalar : BoolProperty(
+        description="Should the scalar receiver initialize its targets with a value at Start",
+        get=lambda self : _ASJson.getBoolAt(self, "set_inital_state_scalar"),
+        set=lambda self, value : _ASJson.setValueAt(self, "set_initial_state_scalar", value)
+    )
+    scalarInitialState : FloatProperty(
+        description="Defines the value to set the scalar targets to at Start",
+        get=lambda self : _ASJson.getFloatAt(self, "scalar_initial_state"),
+        set=lambda self, value : _ASJson.setValueAt(self, "scalar_initial_state", value)
+    )
 
     #screen overlay
     overlayName : StringProperty(
         description="The name of the UIDocument element to overlay. (Classic GUI not supported at the moment sorry)",
-        #get=lambda self : _ASJson.getStringAt(self, "overlay_name"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "overlay_name", value)
+        get=lambda self : _ASJson.getStringAt(self, "overlay_name"),
+        set=lambda self, value : _ASJson.setValueAt(self, "overlay_name", value)
     )
 
     # camera shake
     shakeDuration : FloatProperty(
         description="Camera shake duration in seconds",
-        #get=lambda self : _ASJson.getFloatAt(self, "shake_duration", 0.8),
-        #set=lambda self, value : _ASJson.setValueAt(self, "shake_duration", value)
+        get=lambda self : _ASJson.getFloatAt(self, "shake_duration", 0.8),
+        set=lambda self, value : _ASJson.setValueAt(self, "shake_duration", value)
     )
     shakeDisplacementDistance : FloatProperty(
         description="Defines how violently the camera will shake",
-        #get=lambda self : _ASJson.getFloatAt(self, "shake_displacement_distance", 0.1),
-        #set=lambda self, value : _ASJson.setValueAt(self, "shake_displacement_distance", value)
+        get=lambda self : _ASJson.getFloatAt(self, "shake_displacement_distance", 0.1),
+        set=lambda self, value : _ASJson.setValueAt(self, "shake_displacement_distance", value)
     )
 
     signalFilters : EnumProperty(
@@ -552,13 +471,13 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
             ('ConstantValue', 'Constant Value', 'CV'),
             ('OneMinusSignal', 'One Minus Signal', 'OMS'),
         ),
-        #get=lambda self : _ASJson.getIntAt(self, "signal_filters", 0),
-        #set=lambda self, value : _ASJson.setValueAt(self, "signal_filters", value)
+        get=lambda self : _ASJson.getIntAt(self, "signal_filters", 0),
+        set=lambda self, value : _ASJson.setValueAt(self, "signal_filters", value)
     )
 
     signalConstantValue : FloatProperty(
-        #get=lambda self : _ASJson.getFloatAt(self, "signal_constant_value"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "signal_constant_value", value)
+        get=lambda self : _ASJson.getFloatAt(self, "signal_constant_value"),
+        set=lambda self, value : _ASJson.setValueAt(self, "signal_constant_value", value)
     )
     #  WAIT Commands already have modifiers! but how do we add them from the ble side?
     #  You don't , yet.  They get auto added for a certain animation play behavior type. 
@@ -566,51 +485,50 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
 
     shouldPlayAfter : BoolProperty(
         description="Should this command invoke another command after it finishes",
-        # get=lambda self : _ASJson.getBoolAt(self, "should_play_after"),
-        # set=lambda self, value : _ASJson.setValueAt(self, "should_play_after", value)
+        get=lambda self : _ASJson.getBoolAt(self, "should_play_after"),
+        set=lambda self, value : _ASJson.setValueAt(self, "should_play_after", value)
     )
 
     playAfterAdditionalDelay : FloatProperty(
         description="Defines the number of seconds to wait after the end of this command before starting the next command",
-        #get=lambda self : _ASJson.getFloatAt(self, "play_after_additional_delay"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "play_after_additional_delay", value)
+        get=lambda self : _ASJson.getFloatAt(self, "play_after_additional_delay"),
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after_additional_delay", value)
     )
 
     playAfter : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        #get=lambda self : CLU.playableEnumIndexFromName(_ASJson.getStringAt(self, "play_after")), 
-        #set=lambda self, value : _ASJson.setValueAt(self, "play_after", CLU.playableFromIndex(value).name) # TODO: is internalId not really used any where ?
+        get=lambda self : CLU.playableEnumIndexFromName(_ASJson.getStringAt(self, "play_after")), 
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after", CLU.playableFromIndex(value).name) # TODO: is internalId not really used any where ?
     )
 
     playAfterDeferToLatest : BoolProperty(
         description="If true, the second command will only be invoked at the end of the last delay, in the case where multiple invocations of the first command create overlapping delay intervals. If false, the second command will always fire after delay, ignoring subsequent invocations of the first command",
-        #get=lambda self : _ASJson.getBoolAt(self, "play_after_defer_to_latest"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "play_after_defer_to_latest", value)
+        get=lambda self : _ASJson.getBoolAt(self, "play_after_defer_to_latest"),
+        set=lambda self, value : _ASJson.setValueAt(self, "play_after_defer_to_latest", value)
     )
 
     # headline
     headlineText : StringProperty(
-        #get=lambda self : _ASJson.getStringAt(self, "headline_text"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "headline_text", value)
+        get=lambda self : _ASJson.getStringAt(self, "headline_text"),
+        set=lambda self, value : _ASJson.setValueAt(self, "headline_text", value)
     )
 
     headlineDisplaySeconds : FloatProperty(
-        #get=lambda self : _ASJson.getFloatAt(self, "headline_display_seconds", 1.5),
-        #set=lambda self, value : _ASJson.setValueAt(self, "headline_display_seconds", value)
+        get=lambda self : _ASJson.getFloatAt(self, "headline_display_seconds", 1.5),
+        set=lambda self, value : _ASJson.setValueAt(self, "headline_display_seconds", value)
     )
 
     # message bus
     messageBusType : StringProperty(
-        #get=lambda self : _ASJson.getStringAt(self, "message_bus_type"),
-        #set=lambda self, value : _ASJson.setValueAt(self, "message_bus_type", value)
+        get=lambda self : _ASJson.getStringAt(self, "message_bus_type"),
+        set=lambda self, value : _ASJson.setValueAt(self, "message_bus_type", value)
     )
 
     def draw(self, layout):
         # Row view
         split = layout.row().split(factor=.65)
         split.label(text=self.name)
-        split.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = self.name # internalId
-        # split.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = self.internalId
+        split.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = self.internalId
 
 class CU_OT_Select(bpy.types.Operator):
     """Select"""
@@ -640,8 +558,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
     bl_label = "Edit Playable"
     bl_options = {'REGISTER', 'UNDO'}
     
-    playableName : bpy.props.StringProperty(name="playabeName")
-    # playableId : bpy.props.StringProperty(name="internalId") # bpy.props.IntProperty(name="playabeIdx")
+    playableId : bpy.props.StringProperty(name="internalId") # bpy.props.IntProperty(name="playabeIdx")
 
     @classmethod
     def poll(cls, context):
@@ -659,11 +576,11 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         dialog_size = int(450 * dpi * ui_size)
         return wm.invoke_props_dialog(self, width=dialog_size)
     
-    # def _findPlayable(self, as_custom):
-    #     for pl in as_custom:
-    #         if pl.internalId == self.playableId:
-    #             return pl
-    #     return None
+    def _findPlayable(self, as_custom):
+        for pl in as_custom:
+            if pl.internalId == self.playableId:
+                return pl
+        return None
 
     def drawTargetsList(self, playable, box):
         from mcd.ui.InspectorPopup import CU_OT_InspectorPopup
@@ -683,27 +600,14 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         rowb.operator(AS_OT_AddToTargets.bl_idname, icon='ADD', text="ADD" ).playableName = playable.name # self.playableName
         # TODO WARNING IF extra targets len is zero or no none None-targets
 
-# TODO: just package the Command (AS custom) data as JSON in a file that you write next to the output fbx. 
-
-# WARNING WIDE RANGING THOUGHTS: Command Namespaces
-# TODO: CONSIDER: institute a sort of namespace for Commands > they are always under a scene. 
-#     Of course, the scene's name may not be known at export time
-#   Basically we're imagining a list of as_custom lists??
-#    With the goal of enabling importing one blend file into another and preserving the actions??
-#     RELATED: what does happen to the as_custom list when user imports or appends:
-#             -IMPORT FBX: depends...we could add an option to *embed* the Command list in a zDuks
-#             -APPEND FBX: not sure: well, if you append a collection, not likely that scene data would append also?
-#   Seems to entail a pretty big re-think of how actions are referenced (by clickables, other actions, etc.)
-
     def draw(self, context):
         scn = context.scene
 
-        print(F"playableName is '{self.playableName}' ***")
+        print(F"playableId is {self.playableId} ***")
         # TODO: internalId / playableId is more flexible, but we're not using. only added it to facilitate
         #   changing playableNames. it worked but there were other problems and in the end we decided to ban renaming playables
         #  so, we could go back to just owning a 'playableName' and looking up with this: "scn.as_custom[self.playableName]"
-        playable = scn.as_custom[self.playableName] 
-        # playable = self._findPlayable(scn.as_custom) # scn.as_custom[self.playableIdx] # scn.as_custom[self.playableName]
+        playable = self._findPlayable(scn.as_custom) # scn.as_custom[self.playableIdx] # scn.as_custom[self.playableName]
 
         if playable is None:
             print(F"Something went wrong in Playable popup draw function. with playableId: [{self.playableId}]")
@@ -711,7 +615,6 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         
         row = self.layout.row()
         row.label(text=F"{getPlayableTypes()[int(playable.playableType)][1]} > {playable.name} ")
-        self.layout.row().prop(playable, "playableType")
 
         playableType = int(playable.playableType)
         if playableType == 0: # event only
@@ -770,25 +673,21 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         if playable.shouldPlayAfter:
             row = self.layout.row()
             row.prop(playable, "playAfter", text="Play After")
-            row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = playable.playAfter 
-            # row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[CLU.playableEnumIndexFromName(playable.playAfter)].internalId
+            row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId \
+                    = context.scene.as_custom[CLU.playableEnumIndexFromName(playable.playAfter)].internalId
             self.layout.row().prop(playable, "playAfterAdditionalDelay", text="Delay Seconds")
             self.layout.row().prop(playable, "playAfterDeferToLatest", text="Play After Defer to Latest")
 
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
         
 
-def cleanUpPostExport(dataMuleObject ):
-    print("clean up post export")
-    # TODO: remove playable data from object[0]
 
 def syncPlayables():
     # lament: if we could capture the action whose name was edited, we could update only 
     #   playables that use that action. Instead, we're updating all of them.
     playables = bpy.context.scene.as_custom
     for playable in playables:
-        break # TODO del me
-        # _ASJson.updateFromPointer(playable, "anim_name", playable.animAction)
+        _ASJson.updateFromPointer(playable, "anim_name", playable.animAction)
         # _ASJson.updateObjectAndPath(playable, "target", "target_path", playable.target)
         # _ASJson.updateFromPointer(playable, "target", playable.target)
     
@@ -817,7 +716,7 @@ def onObjectNameMsgbus(*args):
     # Also interesting: gets called about 20 times per rename
     print(F"**onObjectNameMSGBUS")
     syncPlayables()
-    # _ASJson.updateAllPlayableExtraTargets(bpy.context)
+    _ASJson.updateAllPlayableExtraTargets(bpy.context)
 
 def setupActionMsgBusSubscription():
     owner = object()
@@ -837,9 +736,9 @@ def setupActionMsgBusSubscription():
         args=(),
         notify=onObjectNameMsgbus,)
 
-# def setupSyncPostLoad():
-#     from mcd.util import AppHandlerHelper
-#     AppHandlerHelper.RefreshLoadPostHandler(syncPlayablesOnLoadPost) 
+def setupSyncPostLoad():
+    from mcd.util import AppHandlerHelper
+    AppHandlerHelper.RefreshLoadPostHandler(syncPlayablesOnLoadPost) 
 
 classes = (
     PG_AS_TargetsPropGroup,
@@ -854,9 +753,8 @@ def register():
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
-
-    # setupActionMsgBusSubscription()
-    # setupSyncPostLoad()
+    setupActionMsgBusSubscription()
+    setupSyncPostLoad()
 
     # bpy.types.Scene.ShowExtraTargets = BoolProperty(name="Extra Targets")
 
@@ -866,3 +764,4 @@ def unregister():
         unregister_class(cls)
     
     # del bpy.types.Scene.ShowExtraTargets
+'''

@@ -17,6 +17,11 @@ from mcd.ui.componentlike import (LightEnableLike, MeshColliderLike,
                                     CamLockSessionEnableLike,
                                     DisableComponentLike,
                                     TextMeshLike,
+                                    VisualEffectLike,
+                                    RE2PickSessionLike,
+                                    LayerCamLockPickableLike,
+                                    DestroyLike,
+                                    ForcePCWLike,
                                     )
 
 _components = {
@@ -39,6 +44,11 @@ _components = {
     DisableComponentLike.DisableComponentLike : DisableComponentLike.DisableComponentDefaultSetter,
     TextMeshLike.TextMeshLike : TextMeshLike.TextMeshDefaultSetter,
     LightEnableLike.LightEnableLike : LightEnableLike.LightEnableDefaultSetter,
+    VisualEffectLike.VisualEffectLike : VisualEffectLike.VisualEffectDefaultSetter,
+    RE2PickSessionLike.RE2PickSessionLike : RE2PickSessionLike.RE2PickSessionDefaultSetter,
+    LayerCamLockPickableLike.LayerCamLockPickableLike : LayerCamLockPickableLike.LayerCamLockPickableDefaultSetter,
+    DestroyLike.DestroyLike : DestroyLike.DestroyDefaultSetter,
+    ForcePCWLike.ForcePCWLike : ForcePCWLike.ForcePCWDefaultSetter,
 }
 
 from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
@@ -70,7 +80,7 @@ def displayItem(key, box, context):
 
 # REMINDER: multi select is complicated if we need object references. (Example: CamLockPerObjectData) #unfortunately just disallow it in these cases
 def _isMultiSelectAllowed(key):
-    for ds in _components.values(): # default_setters:
+    for ds in _components.values(): 
         if ds.AcceptsKey(key):
             return ds.IsMultiSelectAllowed()
     return True
@@ -85,19 +95,16 @@ def handleRemoveKey(key, context): # target_list):
     for target in targets:
         if key in target:
             del target[key]
+
     # let the default setters do their own clean up
-    for clc, ds in _components.items(): # default_setters:
-        if ds.AcceptsKey(key):
-            print(F"accepts key {key}")
-            ds.OnRemoveKey(key, targets)
+    for clc, default_setter in _components.items(): # default_setters:
+        if default_setter.AcceptsKey(key):
+            default_setter.OnRemoveKey(key, targets)
             # if issubclass(clc, EnableFilterSettings):
             if hasattr(clc, "IS_ENABLEABLE_CLASS"): 
-                print("is subclass")
-                print(F"{clc.__name__} is subclass")
                 EnableFilterDefaultSetter.OnRemoveKey(clc, targets)
             if hasattr(clc, "IS_SLEEPSTATE_CLASS"):
                 CLU.GenericDefaultSetter.OnRemoveKey(clc, targets)
-            
             break
 
 def handleSetDefaultValue(key, val, context): # targets):
@@ -111,6 +118,7 @@ def handleSetDefaultValue(key, val, context): # targets):
             # print(F"handle Set Default with targets {len(target_list)}")
             # if not default_setter.IsMultiSelectAllowed():
             #     print(F"no multi. target [0] is {target_list[0].name}")
+
             # make sure the base key is set to something. the default setter can overwrite if it wants
             _setPrimitiveValue(key, val, targets) # target_list) 
             default_setter.OnAddKey(key, val, targets) #=target_list)

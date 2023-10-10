@@ -61,8 +61,13 @@ modulesNames = [
     'mcd.ui.componentlike.unityinfo.UnityPaths',
     'mcd.ui.componentlike.InteractionHandlerLike',
     'mcd.ui.componentlike.InteractionHighlighterLike',
+    'mcd.ui.componentlike.LayerCamLockPickableLike',
     'mcd.ui.componentlike.EnableReceiverLike',
     'mcd.ui.componentlike.ParticleSystemLike',
+    'mcd.ui.componentlike.VisualEffectLike',
+    'mcd.ui.componentlike.RE2PickSessionLike',
+    'mcd.ui.componentlike.DestroyLike',
+    'mcd.ui.componentlike.ForcePCWLike',
     'mcd.ui.componentlike.ScreenOverlayEnableLike',
     'mcd.ui.componentlike.AudioEnableLike',
     'mcd.ui.componentlike.ObjectEnableLike',
@@ -80,6 +85,9 @@ modulesNames = [
     'mcd.ui.actionstarterlist.ActionStarterPanel',
     'mcd.objectinfo.ObjectInfo',
     'mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
+    'mcd.exporter.ExportOp',
+    'mcd.settings.GlobalSettings',
+    'mcd.foo.ScratchPad',
     ]
 
 

@@ -38,6 +38,7 @@ import bpy
 import mathutils
 import math
 
+from mcd.exporter.edyj import EdyJAppendExportParams as EJA
 
 # Multi-user datablocks are preserved here. Unique copies are made for applying the rotation.
 # Eventually multi-user datablocks become single-user and gets processed.
@@ -169,7 +170,8 @@ def fix_object(ob):
 		fix_object(child)
 
 
-def export_unity_fbx(context, filepath, active_collection, selected_objects, deform_bones, leaf_bones, primary_bone_axis, secondary_bone_axis):
+def export_unity_fbx(context, filepath, active_collection, selected_objects, deform_bones, leaf_bones, primary_bone_axis, secondary_bone_axis,
+					 extra_export_settings):
 	global shared_data
 	global hidden_collections
 	global hidden_objects
@@ -224,7 +226,6 @@ def export_unity_fbx(context, filepath, active_collection, selected_objects, def
 	try:
 		# Fix rotations
 		for ob in root_objects:
-			print(ob.name)
 			fix_object(ob)
 
 		# Restore multi-user meshes
@@ -254,6 +255,8 @@ def export_unity_fbx(context, filepath, active_collection, selected_objects, def
 		# Export FBX file
 
 		params = dict(filepath=filepath, apply_scale_options='FBX_SCALE_UNITS', object_types={'EMPTY', 'MESH', 'ARMATURE'}, use_active_collection=active_collection, use_selection=selected_objects, use_armature_deform_only=deform_bones, add_leaf_bones=leaf_bones, primary_bone_axis=primary_bone_axis, secondary_bone_axis=secondary_bone_axis, use_custom_props=True)
+
+		EJA.Append(params, extra_export_settings)
 
 		print("Invoking default FBX Exporter:", params)
 
@@ -355,6 +358,30 @@ class ExportUnityFbx(Operator, ExportHelper):
 	# https://blender.stackexchange.com/questions/55437/add-gui-elements-to-exporter-window
 	# https://docs.blender.org/api/current/bpy.types.UILayout.html
 
+
+	# ------------------------------------------------------------------------
+	#  MMP: Additional settings
+	# ------------------------------------------------------------------------
+
+	# MMP: see the __init__.py of the default exporter for all fbx export options
+	object_types: EnumProperty(
+			name="Object Types",
+			options={'ENUM_FLAG'},
+			items=(('EMPTY', "Empty", ""),
+					('CAMERA', "Camera", ""),
+					('LIGHT', "Lamp", ""),
+					('ARMATURE', "Armature", "WARNING: not supported in dupli/group instances"),
+					('MESH', "Mesh", ""),
+					('OTHER', "Other", "Other geometry types, like curve, metaball, etc. (converted to meshes)"),
+					),
+			description="Which kind of object to export",
+			default={'EMPTY', 'CAMERA', 'LIGHT', 'ARMATURE', 'MESH', 'OTHER'},
+			)
+	
+
+
+	
+
 	def draw(self, context):
 		layout = self.layout
 		row = layout.row()
@@ -375,14 +402,30 @@ class ExportUnityFbx(Operator, ExportHelper):
 		row.prop(self, "primary_bone_axis")
 		row = layout.row()
 		row.prop(self, "secondary_bone_axis")
+		#MMP
+		layout.row().prop(self, "object_types", text="Object Types")
 
 	def execute(self, context):
 		from mcd.exporter import ExportOp
-		ExportOp.PreExport(context) 
+
 		from mcd.shareddataobject import SharedDataObject
-		SharedDataObject.selectSharedDataObjects(True)
-		result = export_unity_fbx(context, self.filepath, self.active_collection, self.selected_objects, self.deform_bones, self.leaf_bones, self.primary_bone_axis, self.secondary_bone_axis)
-		SharedDataObject.selectSharedDataObjects(False)
+		targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny() 
+		print(F"EDyJ COmmand data holder: {targetDataHolder.name}")
+		tarName = targetDataHolder.name
+
+		ExportOp.PreExport(targetDataHolder) 
+
+		extra_export_settings = {}
+		extra_export_settings['object_types'] = self.object_types
+
+		# SharedDataObject.selectSharedDataObjects(True)
+		result = export_unity_fbx(context, self.filepath, self.active_collection, self.selected_objects, self.deform_bones, self.leaf_bones, self.primary_bone_axis, self.secondary_bone_axis, extra_export_settings)
+		# SharedDataObject.selectSharedDataObjects(False)
+
+		# the export function makes the object reference in targetDataHolder invalid
+		#   so store the name and recover the object by looking it up
+		targetDataHolder = context.scene.objects[tarName] 
+		ExportOp.PostExport(targetDataHolder)
 		return result
 
 

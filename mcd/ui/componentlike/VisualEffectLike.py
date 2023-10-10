@@ -17,10 +17,10 @@ from mcd.ui.actionstarterlist import ActionStarterList
 from mcd.ui.componentlike import AbstractDefaultSetter
 from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
-class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
+class VisualEffectDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
     def AcceptsKey(key : str):
-        return ParticleSystemLike.AcceptsKey(key)
+        return VisualEffectLike.AcceptsKey(key)
 
     @staticmethod
     def EqualValues(a : object, b : object) -> bool:
@@ -28,7 +28,7 @@ class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        # EnableFilterDefaultSetter.OnAddKey(ParticleSystemLike, key, targets)
+        # EnableFilterDefaultSetter.OnAddKey(VisualEffectLike, key, targets)
         default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
         try:
             AbstractDefaultSetter._SetKeyValOnTargets(_Append(), default['default_name'], targets)
@@ -41,32 +41,32 @@ class ParticleSystemDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
         AbstractDefaultSetter._RemoveKey(_Append(), targets)
 
 def _Append(suffix : str = "") -> str:
-    return F"{ParticleSystemLike.GetTargetKey()}{suffix}"
+    return F"{VisualEffectLike.GetTargetKey()}{suffix}"
 
 
-class ParticleSystemLike(EnableFilterSettings, AbstractComponentLike): 
+class VisualEffectLike(EnableFilterSettings, AbstractComponentLike): 
     
     @classmethod
     def _append(cls, suffix: str = "") -> str:
-        return F"{ParticleSystemLike.GetTargetKey()}{suffix}"
+        return F"{VisualEffectLike.GetTargetKey()}{suffix}"
 
     @staticmethod
     def GetTargetKey() -> str:
-        return "mel_particle_system"
+        return "mel_visual_effect"
     
     @staticmethod
     def AcceptsKey(key : str):
-        return key == ParticleSystemLike.GetTargetKey()
+        return key == VisualEffectLike.GetTargetKey()
 
     @staticmethod
     def Display(box, context) -> None:
-        mcl : ParticleSystemLike = context.scene.particleSystemLike
+        mcl : VisualEffectLike = context.scene.visualEffectLike
         box.row().prop(mcl, "name", text="Prefab Name")
         box.row().prop(mcl, "toggleGameObject", text="Toggle Game Object")
+        
 
-    # command info modifier(s)
     name : StringProperty(
-        description="the name of a particle system prefab in the target Unity project",
+        description="the name of a visual effect prefab in the target Unity project",
         get=lambda self : CLU.getStringFromKey(_Append("")),
         set=lambda self, value : CLU.setValueAtKey(_Append(""), value)
     )
@@ -85,7 +85,7 @@ class ParticleSystemLike(EnableFilterSettings, AbstractComponentLike):
     
 
 classes = (
-    ParticleSystemLike,
+    VisualEffectLike,
     )
 
 def register():
@@ -93,12 +93,12 @@ def register():
     for c in classes:
         register_class(c)
     
-    bpy.types.Scene.particleSystemLike = bpy.props.PointerProperty(type=ParticleSystemLike)
+    bpy.types.Scene.visualEffectLike = bpy.props.PointerProperty(type=VisualEffectLike)
 
 def unregister():
     from bpy.utils import unregister_class
     for c in classes:
         unregister_class(c)
 
-    del bpy.types.Scene.particleSystemLike
+    del bpy.types.Scene.visualEffectLike
 

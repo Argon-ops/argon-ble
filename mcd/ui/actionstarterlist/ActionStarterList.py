@@ -33,7 +33,8 @@ import json
 from mcd.util import ObjectLookupHelper
 from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
                                                         CUSTOM_PG_AS_Collection,
-                                                        _ASJson)
+                                                        # _ASJson
+                                                    )
 # -------------------------------------------------------------------
 #   Operators
 # -------------------------------------------------------------------
@@ -82,12 +83,13 @@ class CUSTOM_OT_AS_actions(Operator):
 
             elif self.action == 'REMOVE':
                 # remove the corresponding custom property on the shared data object
-                if _ASJson.SharedASObjectExists():
-                    actionStarterKey = _ASJson._getDataKey(item.name) 
-                    try:
-                        del _ASJson.GetActionStarterSharedObject()[actionStarterKey]
-                    except KeyError as ke:
-                        print(F"KeyError for {actionStarterKey} is not a problem")
+                # NOT NEEDED
+                # if _ASJson.SharedASObjectExists():
+                #     actionStarterKey = _ASJson._getDataKey(item.name) 
+                #     try:
+                #         del _ASJson.GetActionStarterSharedObject()[actionStarterKey]
+                #     except KeyError as ke:
+                #         print(F"KeyError for {actionStarterKey} is not a problem")
 
                 # remove the list item
                 scn.as_custom.remove(idx)

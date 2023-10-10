@@ -54,7 +54,11 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
     #  pretty sure we had this set up before. not sure what happened
     def execute(self, context):
         from mcd.exporter import ExportOp
-        ExportOp.PreExport(context) 
+
+        targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny()
+        print(F"DEFAULt COmmand data holder: {targetDataHolder.name}")
+
+        ExportOp.PreExport(targetDataHolder) 
         
         # return self._exportNoDialog(context) # test
         SharedDataObject.selectSharedDataObjects(True)
@@ -62,13 +66,11 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
         last_props = context.window_manager.operator_properties_last('export_scene.fbx')
         last_props['use_custom_props'] = True # never a bad idea since the package does nothing without this
 
-        # WORK AROUND for bug where: 
-        #  if, during last export, the user chose a scale option other than default (for example: FBX SCALE ALL) 
+
+        #  WORK AROUND: if, during last export, the user chose a scale option other than default (for example: FBX SCALE ALL) 
         #   this time around the script throws an error: 
-        # 
-        #    TypeError: Converting py args to operator properties:  expected a string enum, not int
-        # 
-        # Therefore presumptuously help out the last_props array
+        #      TypeError: Converting py args to operator properties:  expected a string enum, not int
+        # Therefore presumptuously update the last_props array
         if 'apply_scale_options' in last_props and isinstance(last_props['apply_scale_options'], int):
             aso = last_props['apply_scale_options']
             enumstr = 'FBX_SCALE_NONE'
@@ -87,6 +89,11 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
             **last_props)
 
         SharedDataObject.selectSharedDataObjects(False) #TODO: ideally we'd restore the prev selection state
+
+        print(F"After call bpy.ops.export_scene.fbx")
+        #  TODO: this happens to early apparently. 
+        #   the call to bpy.ops.export_ is not synchronous?  TEST
+        # ExportOp.PostExport(targetDataHolder)
         return {'FINISHED'}
 
 

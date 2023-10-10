@@ -113,7 +113,6 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
 
     @staticmethod
     def Display(box, context) -> None:
-        row = box.row()
         mcl = context.scene.interactionHighlighterLike
 
         boxb=box.box()
@@ -126,20 +125,23 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
                 # per obje
                 hlpo = context.active_object.highlighterPerObjectData
                 box.row().prop(hlpo, "rendererTarget", text="Renderer Target (Optional)")
-        else:
+        elif mcl.mode == "ClickBeacon":
             boxb.row().prop(mcl, "clickBeaconPrefab", text="Click Beacon Prefab")
             boxb.row().prop(mcl, "beaconPlacementOption", text="Beacon Placement Option")
             boxb.row().prop(mcl, "beaconNudgeVector", text="Beacon Nudge")
-            boxb.row().prop(mcl, "beaconShouldRotateNinety")
+            boxb.row().prop(mcl, "beaconShouldRotateNinety", text="Rotate Ninety")
+            boxb.row().prop(mcl, "visibleRadius", text="Visible Radius")
 
         box.row().prop(mcl, "downtimeSeconds", text="Downtime Seconds")
         box.row().prop(mcl, "onSleepAction", text="On Sleep Action")
+        box.row().prop(mcl, "isInvisibleToProximity", text="Is Invisible to Proximity")
 
     mode : EnumProperty(
         items=(
             ('HighlightMaterial', 'HighlightMaterial', 'HL desc'),
             ('ClickBeacon', 'ClickBeacon', 'CB desc'),
-            ('ClickAndNearbyBeacon', 'ClickAndNearbyBeacon', 'CANB desc'),
+            # ('ClickAndNearbyBeacon', 'ClickAndNearbyBeacon', 'CANB desc'),
+            ('Invisible', 'Invisible', 'A highlighter does nothing. Dummy highlighters are needed in some situations')
         ),
         get=lambda self : CLU.getIntFromKey(_Append("_mode")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_mode"), value),
@@ -192,6 +194,23 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
         description="",
         get=lambda self : CLU.getFloatFromKey(_Append("_downtime_seconds"), 0),
         set=lambda self, value : CLU.setValueAtKey(_Append("_downtime_seconds"), value)
+    )
+
+    # TODO: decide if this is the same thing as enableRadius
+    visibleRadius : FloatProperty(
+        description="When the camera is further than this radius from the beacon, the beacon will be hidden. \
+                        If zero or less, the beacon will never be hidden",
+        get=lambda self : CLU.getFloatFromKey(_Append("_visible_radius"), -1.0),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_visible_radius"), value)
+    )
+
+    isInvisibleToProximity : BoolProperty (
+        description="Highlighters are automatically found and toggled visible/active/off by the proximity detection \
+                        system--but not if this is set to true. If true, the detection system will ignore this highlighter. \
+                            Use when you want to interact with the highlighters in some other way. \
+                                For example, use this on highlighters that should only activate during a cam lock session.",
+        get=lambda self : CLU.getBoolFromKey(_Append("_is_invisible_to_proximity"), False),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_is_invisible_to_proximity"), value)
     )
   
 

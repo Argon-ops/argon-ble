@@ -169,10 +169,10 @@ class TextMeshLike(PropertyGroup, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_anchor"), value)
     )
 
-    fontSize : IntProperty(
+    fontSize : FloatProperty(
         get=lambda self : CLU.getIntFromKey(_Append("_font_size"), 32),
         set=lambda self, value : CLU.setValueAtKey(_Append("_font_size"), value),
-        soft_min=1,
+        soft_min=0,
     )
 
     # TODO: add the other suffixes

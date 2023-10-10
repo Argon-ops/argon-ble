@@ -28,9 +28,18 @@ config = """
         "help" : "Remove this game object's renderer during import"
     },
     "mel_destroy" : {
-        "hint" : "PRIMITIVE",
-        "default" : 0,
-        "help" : "Destroy this game object and its children during post-processing"
+        "hint" : "CUSTOM_INSPECTOR",
+        "default" : {
+            "meaningless-key" : 41
+        },
+        "help" : "Destroy this game object and possibly its children during post-processing"
+    },
+    "mel_force_pcw" : {
+        "hint" : "CUSTOM_INSPECTOR",
+        "default" : {
+            "meaningless-key" : 41
+        },
+        "help" : "Force the import script to add PlayableClipWrappers for any animation clips that associated with this object"
     },
     "mel_tag" : {
         "default" : "",
@@ -42,6 +51,11 @@ config = """
         "hint" : "PRIMITIVE",
         "help" : "Set this game object's layer. Case-insensitive"
     },
+    "mel_layer_cam_lock_pickable" : {
+        "default" : { "isTrigger" : false },
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Put this object on the Argon-specific layer 'CamLockPickable'"
+    }, 
     "mel_replace_with_prefab" : {
         "default" : "prefab-name",
         "hint" : "PRIMITIVE",
@@ -102,7 +116,21 @@ config = """
             "default_name" : ""
         },
         "hint" : "CUSTOM_INSPECTOR",
-        "help" : "Add a particle system component during import"
+        "help" : "Add a particle system prefab during import"
+    },
+    "mel_visual_effect" : {
+        "default" : {
+            "default_name" : ""
+        },
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a visual effect prefab during import"
+    },
+    "mel_re2_pick_session" : {
+        "default" : {
+            "default_name" : ""
+        },
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a Resident Evil 2 style pick session component"
     },
     "mel_spawner" : {
         "default" : {},

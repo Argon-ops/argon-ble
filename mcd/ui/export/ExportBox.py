@@ -5,13 +5,16 @@ from bpy.props import (BoolProperty,)
 from mcd.util import DisplayHelper
 
 def Draw(box, context):
-    # box = layout.box()
+
     row = box.row()
     DisplayHelper._drawShowHideTriangle(row, context.scene, "show_export_box", context.scene.show_export_box)
     row.label(text="Export")
     if not context.scene.show_export_box:
         return
 
+    # TODO: it'd be nice to make a separate operator so that we could
+    #   consolidate the preparatory code.
+    #  also maybe facilitate an asynchronous callback
     box.prop(context.scene, "export_correct_rotation", text="Correct rotation")
     if context.scene.export_correct_rotation:
         box.operator(BlenderToUnityFbxExporter.ExportUnityFbx.bl_idname, text="Export Unity FBX (.fbx)", icon="EXPORT")

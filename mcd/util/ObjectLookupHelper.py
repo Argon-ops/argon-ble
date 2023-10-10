@@ -15,6 +15,8 @@ def _allSelectedHaveKey(key, context):
             return False
     return True
 
+
+
 def _getDisplayKeys(context):
     return [key for key in _getPrefItems(context).keys()] # these are always the keys we want, right?
     # return [item.key for item in context.scene.custom] # del me
@@ -126,6 +128,10 @@ def _guessReasonableValue(key, context):
 def _MIXED_():
     return "%%__MIXED__%%"
 
+def _findAllObjectsWithKey(key):
+    obs = bpy.context.scene.objects
+    return [ob for ob in obs if key in ob]
+
 def _getFirstVal(key, context):
     obs = context.selected_objects
     if len(obs) == 0:
@@ -146,6 +152,16 @@ def _getSharedVal(key, context):
             # shared != obs[i][key]: # TODO: this inequality probably breaks when we're dealing with the special handling keys
             return _MIXED_()
     return shared
+
+def DdumpAllKeyVals(context):
+    obs = context.selected_objects
+    for ob in obs:
+        print(F"**KEYS in {ob.name}******************")
+        for k,v in ob.items():
+            print(F"   {k} : {v}")
+        print(F"----------------------")
+    print(F"")
+
 
 def _isMixedValues(key, context):
     return len(context.selected_objects) > 1 and _getSharedVal(key, context) == _MIXED_()

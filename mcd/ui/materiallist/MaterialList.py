@@ -152,14 +152,18 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
     bl_options = {'REGISTER'}
 
     @staticmethod
-    def _getUnityMaterialName() -> str:
+    def _getUnityMaterialName(asmSelf) -> str:
         choice = bpy.context.scene.ml_specific_material_choice
         if choice is None:
-            return ""
+            return asmSelf.unityMaterialStoreName
+            # return ""
         map_item = bpy.context.scene.ml_custom.get(choice.name)
         if map_item:
+            if asmSelf.unityMaterialStoreName:
+                return asmSelf.unityMaterialStoreName
             return map_item.unityMaterial
-        return ""
+        return asmSelf.unityMaterialStoreName
+        # return ""
     
     @staticmethod 
     def _storeUnityMaterialName(asmSelf, value):
@@ -169,10 +173,9 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
 
     unityMaterialName : StringProperty(
         description="The name of the unity material that this material should map to. No need to include '.mat'",
-        get=lambda self : CUSTOM_OT_addSpecificMaterial._getUnityMaterialName(),
+        get=lambda self : CUSTOM_OT_addSpecificMaterial._getUnityMaterialName(self),
         set=lambda self, value : CUSTOM_OT_addSpecificMaterial._storeUnityMaterialName(self, value)
     )
-    
 
     @classmethod
     def poll(cls, context):
@@ -183,6 +186,11 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
         dpi = context.preferences.system.pixel_size
         ui_size = context.preferences.system.ui_scale
         dialog_size = int(450 * dpi * ui_size)
+
+        # prepare pre-launch
+        context.scene.ml_specific_material_choice = None
+        self.unityMaterialStoreName = ""
+
         return wm.invoke_props_dialog(self, width=dialog_size)        
 
     def execute(self, context):
@@ -197,6 +205,7 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
         row.row()
         row.prop(context.scene, "ml_specific_material_choice", text="Material")
         row.prop(self, "unityMaterialName", text="Unity Material")
+
         # row.prop(self, "chosenMaterial", text="Material")
         row.row()
 
@@ -214,17 +223,10 @@ class CUSTOM_OT_addBlendMaterials(Operator):
         return len(bpy.data.materials)
     
     def execute(self, context):
-        scn = context.scene
         for mat in bpy.data.materials:
             if not context.scene.ml_custom.get(mat.name):
                 AddMaterial(context.scene, mat)
-                # item = scn.ml_custom.add()
-                # item.id = len(scn.ml_custom)
-                # item.material = mat
-                # item.name = item.material.name
-                # scn.ml_custom_index = (len(scn.ml_custom)-1)
-                # info = '%s added to list' % (item.name)
-                # self.report({'INFO'}, info)
+                
         return {'FINISHED'}
    
 
@@ -316,7 +318,13 @@ class CUSTOM_UL_items(UIList):
             # split.label(text="Index: %d" % (index))
             # static method UILayout.icon returns the integer value of the icon ID
             # "computed" for the given RNA object.
-            split.prop(mat, "name", text="", emboss=False, icon_value=layout.icon(mat))
+
+            # TODO: track material gets deleted via a msg bus
+            if mat is not None:
+                split.prop(mat, "name", text="", emboss=False, icon_value=layout.icon(mat))
+            # else:
+            #     split.prop(mat, "name", text="", emboss=False, icon="BRUSH_INFLATE")
+
 
             split.prop(item, "unityMaterial", text="Unity Material")
             # split.prop_search() # TODO <-- figure the data type item that should exist
@@ -336,9 +344,10 @@ class CUSTOM_UL_items(UIList):
 
 def _getMaterialKey(blenderMaterialName : str) ->str:
     # prefix must match the import script in unity addon
-    return F"_mel_UM_{blenderMaterialName}"
+    return F"{MaterialListExporter.Prefix}{blenderMaterialName}"
 
 from mcd.shareddataobject import SharedDataObject
+from mcd.util import ObjectLookupHelper
 
 def _lookupUnityMaterialName(blenderMaterialName : str):
     data = SharedDataObject.getEmptySharedDataOject() 
@@ -348,12 +357,56 @@ def _lookupUnityMaterialName(blenderMaterialName : str):
     return ""
 
 def _getUnityMaterial(self):
-    return _lookupUnityMaterialName(self.material.name)
+    return _lookupUnityMaterialName(self.material.name) if self.material is not None else ""
 
 def _setUM(self, value):
     data = SharedDataObject.getEmptySharedDataOject()
     key = _getMaterialKey(self.material.name)
     data[key] = value
+
+
+class MaterialListExporter:
+    ''' Pack the material list into a target object pre-export'''
+
+    Prefix = "_mel_UM_"
+
+    __TARGET_KEY_MARKER__="mel_material_list_marker"
+
+    @staticmethod
+    def PreExport(target):
+        MaterialListExporter.PurgePreviousTargetObjects()
+        MaterialListExporter.WriteCommandsToTargetObject(target)
+
+    def PurgePreviousTargetObjects():
+        for previous in ObjectLookupHelper._findAllObjectsWithKey(MaterialListExporter.__TARGET_KEY_MARKER__):
+            del previous[MaterialListExporter.__TARGET_KEY_MARKER__]
+            keys = [key for key in previous.keys() if key.startswith(MaterialListExporter.Prefix)]
+            for key in keys:
+                del previous[key]
+
+    def WriteCommandsToTargetObject(target):
+        # target[MaterialListExporter.__TARGET_KEY_MARKER__] = 1
+        MaterialListExporter._WriteList(target)
+    
+    def _WriteList(target):
+        import json
+        mlist = bpy.context.scene.ml_custom
+        data = []
+        for mpair in mlist:
+            if not mpair.unityMaterial: 
+                pass
+            materialMap = {
+                "material" : mpair.material.name,
+                "unityMaterial" : mpair.unityMaterial
+            }
+            data.append(materialMap)
+            # data[_getMaterialKey(mpair.material.name)] = mpair.unityMaterial
+            # target[key] = mpair.unityMaterial
+        payload = { 
+            "map" : data
+        }
+        target[MaterialListExporter.__TARGET_KEY_MARKER__] = json.dumps(payload)
+
 
 class CUSTOM_PG_materialCollection(PropertyGroup):
     material: PointerProperty(
@@ -363,8 +416,9 @@ class CUSTOM_PG_materialCollection(PropertyGroup):
     unityMaterial : StringProperty(
         name="UnityMaterial",
         description="the name of the material. no need to include '.mat' ",
-        get=_getUnityMaterial,
-        set=_setUM)
+        # get=_getUnityMaterial,
+        # set=_setUM
+        )
 
 def MaterialMapToDictionary(context):
     raise BaseException("no one is using this rn")
@@ -373,6 +427,24 @@ def MaterialMapToDictionary(context):
     for item in items:
         d[item.material.name] = item.unityMaterial
     return d
+
+# -------------------------------------------------------------------
+#   Msgbus for deleted materials
+# -------------------------------------------------------------------
+
+def materials_callback(*args):
+    print(F"^^^materials cb got args {args}")
+
+_subscribe_owner = object()
+
+def _subscribe():
+    subscribe_to = bpy.data.materials
+    bpy.msgbus.subscribe_rna(
+        key=subscribe_to,
+        owner=_subscribe_owner,
+        args=(1,2,3),
+        notify=materials_callback
+    )
 
 # -------------------------------------------------------------------
 #   Register & Unregister
@@ -399,6 +471,8 @@ def register():
     bpy.types.Scene.ml_custom_index = IntProperty()
     bpy.types.Scene.ml_show_material_map = BoolProperty()
     bpy.types.Scene.ml_specific_material_choice = PointerProperty(type=bpy.types.Material)
+
+    _subscribe()
 
 
 def unregister():

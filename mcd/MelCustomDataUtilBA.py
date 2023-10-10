@@ -218,6 +218,11 @@ class CDU_PT_CustomPropHelper(Panel):
         box = layout.box()
         ActionStarterPanel.Draw(box, context)
 
+        box = layout.box()
+        from mcd.settings import GlobalSettings
+        GlobalSettings.DrawGlobalsButton(box)
+        
+
 # MORE TODOs:
 #   bring back the load config file button if only for dbug. but maybe not only?
 

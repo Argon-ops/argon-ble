@@ -63,6 +63,12 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         soft_max=1.0,
     )
 
+    isSelfToggling : BoolProperty(
+        description="If true, toggle on/off each time this component receives a signal; the value of the signal itself will be ignored",
+        get=lambda self : CLU.getBoolFromKey(self.Append("_is_self_toggling"), False),
+        set=lambda self, value : CLU.setValueAtKey(self.Append("_is_self_toggling"), value)
+    )
+
     setInitialState : EnumProperty(
         items=(
             ('DONT', 'Don\'t set initial state', 'Do nothing at start up'),
@@ -74,15 +80,13 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         set=lambda self, value : CLU.setValueAtKey(self.Append("_set_initial_state"), value)
     )
 
-    # TODO: initial state strat??
-
     @classmethod
     def displayEnableSettings(cls, box):
         # with GetSceneInstance. this can be a static 
         #   then the classes don't even need to call it from their Display methods
-        #   can be called by Inspector.py
+        #    can be called by Inspector.py
 
-        # Possibly evil: this relies on the child class being an instance of AbstractComponentLike 
+        # Mild evil: this relies on the child class being an instance of AbstractComponentLike 
         #    (i.e. AbstractComponentLike is it's other parent)
         #  why are we dabbling in evil: so that child classes can be spared calling this method from their Display methods manually
         self = cls.GetSceneInstance() 
@@ -95,9 +99,13 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         row.label(text="Enable Filter")
         if not bpy.context.scene.showEnableSettings:
             return
-        box.row().prop(self, "clamp01", text="Clamp01")
-        box.row().prop(self, "invert", text="Invert")
-        box.row().prop(self, "threshold", text="Threshold")
+        box.row().prop(self, "isSelfToggling", text="Self Toggle")
+        if not self.isSelfToggling:
+            boxb = box.box()
+            boxb.row().prop(self, "clamp01", text="Clamp01")
+            boxb.row().prop(self, "invert", text="Invert")
+            boxb.row().prop(self, "threshold", text="Threshold")
+
         box.row().prop(self, "setInitialState", text="Set Initial State")
 
 

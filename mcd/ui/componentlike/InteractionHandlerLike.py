@@ -8,8 +8,6 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
-from mcd.ui.componentlike.adjunct import NumExtraPlayables
-# from mcd.ui.componentlike.adjunct.NumExtraPlayables import CU_OT_NumExtraPlayables
 from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 from mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
 from mcd.util import ObjectLookupHelper
@@ -26,6 +24,50 @@ import json
 
 # TODO: option to add a new Playable from an interation handler
 # TODO: option to edit the chosen playable from interaction handler
+
+
+#REGION ADD REMOVE EXTRA PLAYABLES
+
+__MaxExtraPlayables = 5
+
+def AddSubtractNumExtraPlayables(should_add, context):
+    hl = context.scene.interactionHandlerLike
+    if should_add and hl.numExtraPlayables < __MaxExtraPlayables:
+        hl.numExtraPlayables = hl.numExtraPlayables + 1
+    if not should_add and hl.numExtraPlayables > 0:
+        hl.numExtraPlayables = hl.numExtraPlayables - 1
+
+    return hl.numExtraPlayables
+
+def RemoveUnusedPlayableData(context):
+    hl = context.scene.interactionHandlerLike
+    if hl.numExtraPlayables >= __MaxExtraPlayables:
+        return
+    for i in range(hl.numExtraPlayables + 1, __MaxExtraPlayables):
+        key = _Append(F"_playable{i}")
+        print(F"try to del {key}")
+        ObjectLookupHelper._removeKeyFromSelected(key, context)
+
+class CU_OT_NumExtraPlayables(bpy.types.Operator):
+    """Num Extra Playables"""
+    bl_idname = "view3d.num_extra_playables"
+    bl_label = "Change the number of playables"
+    bl_options = {'REGISTER', 'UNDO'}
+    bl_property = "num_extra_playables"
+
+    should_add : BoolProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return True 
+    
+    def invoke(self, context, event):
+        AddSubtractNumExtraPlayables(self.should_add, context)
+        RemoveUnusedPlayableData(context)
+        return {'FINISHED'}
+
+#ENDREGION
+
 
 class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -44,7 +86,6 @@ class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSette
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_allows_interrupt"), default['allows_interrupt'], targets)
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), default['enter_signal'], targets)
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_interaction_type"), default['interaction_type'], targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_command_behaviour_type"), 0, targets) # TODO : add formal defaults for these too
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), 1, targets)
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_exit_signal"), 0, targets)
             AbstractDefaultSetter._SetKeyValOnTargets(_Append("_is_click_hold"), 0, targets)
@@ -55,7 +96,7 @@ class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSette
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
-        suffixes = ("_playable", "_allows_interrupt", "_interaction_type", "_is_trigger_enter_exit", "_command_behaviour_type", \
+        suffixes = ("_playable", "_allows_interrupt", "_interaction_type", "_is_trigger_enter_exit", \
                     "_enter_signal", "_exit_signal", "_is_click_hold", "_num_extra_playables", "_playable1", "_playable2", "_playable3", "_playable4", "_playable5",
                     "_click_feedback", )
 
@@ -95,32 +136,6 @@ signalInputTypes=(
     ("Object", "Object Type", "an object")
     )
 
-# class CU_OT_NumExtraPlayables(bpy.types.Operator):
-#     """Num Extra Playables"""
-#     bl_idname = "view3d.num_extra_playables"
-#     bl_label = "Change the number of playables"
-#     bl_options = {'REGISTER', 'UNDO'}
-#     bl_property = "num_extra_playables"
-
-#     should_add : BoolProperty()
-
-#     @classmethod
-#     def poll(cls, context):
-#         return True 
-    
-#     def invoke(self, context, event):
-#         hl = context.scene.interactionHandlerLike
-#         if self.should_add and hl.numExtraPlayables < 5:
-#             hl.numExtraPlayables = hl.numExtraPlayables + 1
-#             print(F"will add now num is: {hl.numExtraPlayables}")
-#         if not self.should_add and hl.numExtraPlayables > 0:
-#             hl.numExtraPlayables = hl.numExtraPlayables - 1
-
-#         print(F"num is: {hl.numExtraPlayables}")
-        
-#         return {'FINISHED'}
-
-# class InteractionHandlerLike(EnableFilterSettings, AbstractComponentLike):
 class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     @staticmethod
     def GetTargetKey() -> str:
@@ -136,36 +151,35 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         row = boxa.row()
         mcl = context.scene.interactionHandlerLike
 
-        def drawPlayableRow(attrName):
-            attrib = getattr(mcl, attrName)
-            spl=row.split(factor=.8)
-            spl.label(text=F"{attrName} : {attrib}")
-            spl.prop(mcl, attrName, text="") # text=F"Playable {i+1}")
-            if attrib: # mcl.playable:
-                row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[attrib].internalId
+        row = boxa.row()
+        row.label(text="Playables")
 
-        # row.prop(mcl, "playable", text="Playable")
-        # row.label(text=mcl.playable)
-        # if mcl.playable: # is not None: # 'not None' won't catch empty strings
-        #     row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[mcl.playable].internalId
-        drawPlayableRow("playable")
+        def drawPlayableRow(attrName, idx):
+            # TODO: handle the case where no playables exist in the blend file's as_custom (not even 1!)
+            #  We are getting this warning:
+            # WARN (bpy.rna): C:\Users\blender\git\blender-v320\blender.git\source\blender\python\intern\bpy_rna.c:1339 pyrna_enum_to_py: current value '0' matches no enum in 'InteractionHandlerLike', '', 'playable'
+            attrib = getattr(mcl, attrName)
+            spl=row.split(factor=.6)
+            spl.label(text=F"{idx + 1} : {attrib}")
+            spl.prop(mcl, attrName, text="") 
+            if attrib: 
+                row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = attrib 
+                # row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[attrib].internalId
+            plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Playable")
+            plusOp.should_insert = True
+            plusOp.insert_at_idx = idx 
+
+        row = boxa.row()
+        drawPlayableRow("playable", 0)
+
         # Extra playables
         for i in range(mcl.numExtraPlayables):
             row = boxa.row()
-            drawPlayableRow(F"playable{i+1}")
-            # attrName = F"playable{i+1}"
-            # attrib = getattr(mcl, attrName)
-            # spl=row.split(factor=.8)
-            # spl.label(text=F"Playable{i+1} : {attrib}")
-            # spl.prop(mcl, F"playable{i+1}", text="") # text=F"Playable {i+1}")
-            # if attrib: # mcl.playable:
-            #     row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[attrib].internalId
+            drawPlayableRow(F"playable{i+1}", i + 1)
+            
         row = boxa.row()
-        row.operator(NumExtraPlayables.CU_OT_NumExtraPlayables.bl_idname, icon="ADD", text="").should_add = True
-        row.operator(NumExtraPlayables.CU_OT_NumExtraPlayables.bl_idname, icon="REMOVE", text="").should_add = False
-
-        row = boxa.row()
-        row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Playable").should_append = True
+        row.operator(CU_OT_NumExtraPlayables.bl_idname, icon="ADD", text="").should_add = True
+        row.operator(CU_OT_NumExtraPlayables.bl_idname, icon="REMOVE", text="").should_add = False
 
         row = box.row()
         row.prop(mcl, "interactionType", text="Type")
@@ -194,6 +208,12 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                 elif mcl.exitSignalInputType == 'Playable':
                     row.prop(mcl, "exitSignalPlayable", text="")
 
+        # TODO: looks like we have the ability for playables to be signal providers
+        #  but let clicks inters use this also
+        #   Then one could easily implement a toggle button behaviour right???
+        #     just set the target playable as its own signal provider...
+        #       and invert...
+
         elif mcl.interactionType == 'CLICK':
             # boxb.row().prop(mcl, "clickFeedback", text="Click Feedback")
             row = boxb.row()
@@ -204,13 +224,14 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                 if mcl.handleDiscreteClicksAlso:
                     row.prop(mcl, "discreteClickFakeHoldTime", text="Discrete Click Hold Time")
 
+            # TODO: "useRadius"
             # row = boxb.row()
             # row.prop(mcl, "radius")
             row = boxb.row()
-            row.prop(mcl, "enterSignal")
+            row.prop(mcl, "enterSignal", text="Mouse Down Signal")
             if mcl.isClickHold:
                 row = boxb.row()
-                row.prop(mcl, "exitSignal")
+                row.prop(mcl, "exitSignal", text="Mouse Up Signal")
 
             boxc = boxb.box()
             boxc.row().prop(mcl, "selfDestructBehaviour", text="Self Destruct Behaviour")
@@ -218,6 +239,11 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                 boxc.row().prop(mcl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
                 boxc.row().prop(mcl, "destroyColliderAlso", text="Destroy Collider Also")
                 boxc.row().prop(mcl, "destroyGameObjectAlso", text="Destroy Game Object Also")
+
+
+# TODO: in InterHandler add playable list. seems to assume
+#   that a playable exists. In any case you don't get full options to add a playable
+#     forced to go down to the playable panel
 
         # sleep also settings
         def dislaySleepAlsoSettings(box_ss):
@@ -406,14 +432,10 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         get=lambda self : CLU.getBoolFromKey(_Append("_sleep_collider_also")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_sleep_collider_also"), value)
     )
-  
-# TODO: interaction handler: when you click new playable:
-#   After client actually creates the playable:
-#    add a new playable row / slot.
-#    set this slot to the newly created playable.
-    
+
 
 classes = (
+    CU_OT_NumExtraPlayables,
     InteractionHandlerLike,
     )
 
