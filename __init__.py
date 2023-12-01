@@ -33,6 +33,7 @@ modulesNames = [
     # scene level var declarations
     'mcd.ui.export.ExportBox',
     'mcd.ui.materiallist.MaterialList',
+    'mcd.ui.actionstarterlist.CommandNameItems',
     'mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
     'mcd.ui.actionstarterlist.ActionStarterList',
 
@@ -70,6 +71,7 @@ modulesNames = [
     'mcd.ui.componentlike.ForcePCWLike',
     'mcd.ui.componentlike.ScreenOverlayEnableLike',
     'mcd.ui.componentlike.AudioEnableLike',
+    'mcd.ui.componentlike.SwapMaterialEnableLike',
     'mcd.ui.componentlike.ObjectEnableLike',
     'mcd.ui.componentlike.SliderColliderLike',
     'mcd.ui.componentlike.ComponentByNameLike',
@@ -77,6 +79,7 @@ modulesNames = [
     'mcd.ui.componentlike.CamLockSessionEnableLike',
     'mcd.ui.componentlike.DisableComponentLike',
     'mcd.ui.componentlike.TextMeshLike',
+    'mcd.ui.componentlike.PlayableScalarAdapterLike',
     'mcd.ui.materiallist.MaterialListPanel',
     'mcd.shareddataobject.SharedDataObject',
     'mcd.ui.materiallist.MaterialListExporter',
@@ -89,6 +92,7 @@ modulesNames = [
     'mcd.settings.GlobalSettings',
     'mcd.foo.ScratchPad',
     ]
+
 
 
 

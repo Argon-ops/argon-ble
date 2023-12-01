@@ -70,6 +70,7 @@ class TextMeshLike(PropertyGroup, AbstractComponentLike):
     def Display(box, context) -> None:
         oml = context.scene.textMeshLike
         box.row().prop(oml, "content", text="Text")
+        # box.row().prop(oml, "fontName", text="Font (Optional)")
         box.row().prop(oml, "fontSize", text="Font Size")
         box.row().prop(oml, "useTMPro", text="Text Mesh Pro")
         if not oml.useTMPro:
@@ -101,6 +102,17 @@ class TextMeshLike(PropertyGroup, AbstractComponentLike):
         get=lambda self : CLU.getStringFromKey(_Append("_content")),
         set=lambda  self, value : CLU.setValueAtKey(_Append("_content"), value)
     )
+
+    #
+    #  Unfortunately switching fonts in editor in TMPro is non trivial
+    #   Users can just set the TMProFont Asset manually in the editor. The import won't 
+    #     overwrite overrides
+    #
+    # fontName : StringProperty(
+    #     description="(Optional) Defines the font name.",
+    #     get=lambda self : CLU.getStringFromKey(_Append("_font_name")),
+    #     set = lambda self, value : CLU.setValueAtKey(_Append("_font_name"), value)
+    # )
 
     alwaysFaceCamera : BoolProperty(
         get=lambda self : CLU.getBoolFromKey(_Append("_always_face_camera")),

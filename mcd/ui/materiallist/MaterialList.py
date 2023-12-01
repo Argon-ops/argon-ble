@@ -117,32 +117,48 @@ class CUSTOM_OT_actions(Operator):
             self.report({'INFO'}, info)
         return {"FINISHED"}
 
+def _GetMaterialIndexInList(scene, mat : bpy.types.Material) -> int:
+    for i in range(len(scene.ml_custom)):
+        item = scene.ml_custom[i]
+        if item.material.name == mat.name:
+            print(F"^^^ Found idx: {i} for {item.material.name}")
+            return i
+    return -1
 
 def AddMaterial(scene, mat : bpy.types.Material) -> None:
     mat_list = scene.ml_custom
-    if not mat_list.get(mat.name):
+
+    if _GetMaterialIndexInList(scene, mat) == -1: # mat_list.get doesn't always work. sometimes item.name != mat.name (FIXME) ! # not mat_list.get(mat.name):
         item = mat_list.add()
         item.id = len(mat_list)
         item.material = mat
         item.name = item.material.name
         scene.ml_custom_index = (len(mat_list)-1)
+        print(F"%% {mat.name} was not in room. now added at idx: {scene.ml_custom_index} item.name: {item.name} ID: {item.id}")
+    
+    DnowAdded = mat_list.get(mat.name)
+    print(F"Added material: {DnowAdded.name} with mat name: {DnowAdded.material.name}") # ID: {DnowAdded.id}")
     #TODO not quite here: select this material
 
 def SelectMaterial(scene, mat : bpy.types.Material) -> int:
     if mat is None:
         return -1
-    idx = scene.ml_custom.keys().index(mat.name)
+    idx = _GetMaterialIndexInList(scene, mat) # scene.ml_custom.keys().index(mat.name)
+    print(F"$$$ Found idx: {idx} in keys for {mat.name}")
     if idx >= 0 and idx < len(scene.ml_custom.keys()):
         scene.ml_custom_index = idx
         return idx
     return -1
 
-def SetUnityName(scene, idx, unityMaterialName):
+def SetUnityName(scene, idx, unityMaterialName) -> None:
+    if idx < 0:
+        return
     item = scene.ml_custom[idx]
     item.unityMaterial = unityMaterialName
 
 
 # TODO: operator idea: show / hide all destroyed materials -- or even set material for all to some obnoxious material
+# FIXME: items don't remove from list when materials are deleted
 
 class CUSTOM_OT_addSpecificMaterial(Operator):
     """Add a material to the material map"""
@@ -380,9 +396,9 @@ class MaterialListExporter:
     def PurgePreviousTargetObjects():
         for previous in ObjectLookupHelper._findAllObjectsWithKey(MaterialListExporter.__TARGET_KEY_MARKER__):
             del previous[MaterialListExporter.__TARGET_KEY_MARKER__]
-            keys = [key for key in previous.keys() if key.startswith(MaterialListExporter.Prefix)]
-            for key in keys:
-                del previous[key]
+            # keys = [key for key in previous.keys() if key.startswith(MaterialListExporter.Prefix)]
+            # for key in keys:
+            #     del previous[key]
 
     def WriteCommandsToTargetObject(target):
         # target[MaterialListExporter.__TARGET_KEY_MARKER__] = 1
@@ -393,8 +409,9 @@ class MaterialListExporter:
         mlist = bpy.context.scene.ml_custom
         data = []
         for mpair in mlist:
-            if not mpair.unityMaterial: 
-                pass
+            # if not mpair.unityMaterial: 
+            #     pass
+            #  allow empty unityMaterial
             materialMap = {
                 "material" : mpair.material.name,
                 "unityMaterial" : mpair.unityMaterial

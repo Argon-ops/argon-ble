@@ -240,3 +240,6 @@ def selectObjectsInScene(objects, active = None):
         return
     bpy.context.view_layer.objects.active = objects[0] if active is None else active
 
+def DLog(s : str) -> None:
+    print(s)
+

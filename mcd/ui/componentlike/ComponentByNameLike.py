@@ -69,7 +69,7 @@ class ComponentByNameLike(PropertyGroup, AbstractComponentLike):
     )
 
     namespace : StringProperty(
-        description="Optional namespace specification. Use if you have types with the same name in separate namespaces. (For example 'Some.MadeUp.Namespace')",
+        description="Optional namespace specification. Use if you have types with the same name in separate namespaces. (This text should match the name space in your C#. code: 'Some.Example.Namespace' )",
         get=lambda self : CLU.getStringFromKey(_Append("_namespace")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_namespace"), value)
     )

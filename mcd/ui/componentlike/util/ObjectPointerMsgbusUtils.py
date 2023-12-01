@@ -81,8 +81,8 @@ def updateMsgbus(target, ptrPropObject, propertyKey, callbackOwner):
 
 
 # params:
-# target:  object that owns a PerObject PropertyGroup instance
-#       e.g. typically this is the current active-selected object.
+# target:  object that owns a PerObject PropertyGroup instance.
+#            typically this is the current active-selected object.
 # ptrObjectSelf : the per-object-data object, 
 # ptrPropName : the name of the PointerProperty (e.g. 'showObjectRoot')
 # propertyKey:   the key under which the referred to object's name should be stored

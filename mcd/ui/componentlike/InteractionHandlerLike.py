@@ -234,11 +234,23 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                 row.prop(mcl, "exitSignal", text="Mouse Up Signal")
 
             boxc = boxb.box()
+            # TODO: add an option (not default) never destroy not even destroy messages
             boxc.row().prop(mcl, "selfDestructBehaviour", text="Self Destruct Behaviour")
-            if mcl.selfDestructBehaviour != "NeverSelfDestruct":
-                boxc.row().prop(mcl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
-                boxc.row().prop(mcl, "destroyColliderAlso", text="Destroy Collider Also")
-                boxc.row().prop(mcl, "destroyGameObjectAlso", text="Destroy Game Object Also")
+            boxd = boxc.box()
+            # if mcl.selfDestructBehaviour != "NeverSelfDestruct":
+            # CONSIDER: there could be a self destruct directive neverSelfDestructAndEvenIgnoreDestroyMessages
+            #   or a directive destroyMessagesOnly
+            boxd.row().label(text="On Destroy Settings")
+            boxd.row().prop(mcl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
+            boxd.row().prop(mcl, "destroyColliderAlso", text="Destroy Collider Also")
+            boxd.row().prop(mcl, "destroyGameObjectAlso", text="Destroy Game Object Also")
+
+            boxc.row().prop(mcl, "sleepBehaviour", text="Sleep Behaviour")
+
+            # TODO: let any click or trigger handler have destroy settings...
+            #  so separate configs: the destroy settings 
+            #    and the destroy when: never, after first interaction
+            
 
 
 # TODO: in InterHandler add playable list. seems to assume
@@ -399,6 +411,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
 
     # destroy behaviour
     selfDestructBehaviour : EnumProperty (
+        description="When (if ever) should this handler self destruct",
         items=(
             ('NeverSelfDestruct', 'Never Self Destruct', 'Never Self Destruct'),
             ('AfterFirstInteraction', 'After First Interaction', 'After First Interaction'),
@@ -421,6 +434,18 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         get=lambda self : CLU.getBoolFromKey(_Append("_destroy_game_object_also")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_destroy_game_object_also"), value)
     )
+
+    # sleep behaviour
+    sleepBehaviour : EnumProperty (
+        description="When (if ever) should this handler sleep",
+        items=(
+            ('NeverSleep', 'NeverSleep', 'NeverSleep'),
+            ('AfterAnyInteraction', 'AfterAnyInteraction', 'AfterAnyInteraction')
+        ),
+        get=lambda self : CLU.getIntFromKey(_Append("_sleep_behaviour")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_sleep_behaviour"), value)
+    )
+    
 
     sleepHighlighterAlso : BoolProperty(
         description="When this handler receives a sleep signal, send the same signal (sleep or wake up) to the attached highlighter ",

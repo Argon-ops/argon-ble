@@ -21,7 +21,6 @@ class PG_GlobalImportSettings(PropertyGroup):
 
         Must match with the C# side for JSON serialization 
     '''
-
     pcwForAllClips : BoolProperty(
         description= "If true, generate a PlayableClipWrapper for each animation clip in the exported file. \
                 This is useful if you want to use PlayableClipWrappers in your own Unity scripts. \
@@ -85,7 +84,7 @@ class CU_OT_ArgonGlobalsPopup(bpy.types.Operator):
     bl_idname = "view3d.argon_globals"
     bl_label = "Argon Global Settings"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_property = "argon_global_settings"
+    # bl_property = "argon_global_settings"
 
     @classmethod
     def poll(cls, context):

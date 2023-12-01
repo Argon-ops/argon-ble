@@ -106,6 +106,11 @@ config = """
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add an audio enable component"
     },
+    "mel_swap_material_enable" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a swap material enable component"
+    },
     "mel_slider_collider" : {
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
@@ -156,6 +161,11 @@ config = """
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add a text mesh to the current game object"
+    },
+    "mel_playable_scalar_adapter" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a Playable Scalar Adapter"
     }
 
 }

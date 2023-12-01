@@ -100,8 +100,6 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         from mcd.util import ObjectLookupHelper
         ObjectLookupHelper.DdumpAllKeyVals(context)
 
-
-
         scn.as_custom_index = len(scn.as_custom)-1
         info = '%s added to list' % (item.name)
         self.report({'INFO'}, info)

@@ -22,6 +22,8 @@ from mcd.ui.componentlike import (LightEnableLike, MeshColliderLike,
                                     LayerCamLockPickableLike,
                                     DestroyLike,
                                     ForcePCWLike,
+                                    PlayableScalarAdapterLike,
+                                    SwapMaterialEnableLike,
                                     )
 
 _components = {
@@ -49,6 +51,8 @@ _components = {
     LayerCamLockPickableLike.LayerCamLockPickableLike : LayerCamLockPickableLike.LayerCamLockPickableDefaultSetter,
     DestroyLike.DestroyLike : DestroyLike.DestroyDefaultSetter,
     ForcePCWLike.ForcePCWLike : ForcePCWLike.ForcePCWDefaultSetter,
+    PlayableScalarAdapterLike.PlayableScalarAdapterLike : PlayableScalarAdapterLike.PlayableScalarAdapterDefaultSetter,
+    SwapMaterialEnableLike.SwapMaterialEnableLike : SwapMaterialEnableLike.SwapMaterialEnableDefaultSetter,
 }
 
 from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
