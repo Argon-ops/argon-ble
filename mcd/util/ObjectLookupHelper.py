@@ -1,6 +1,6 @@
 import bpy
-from mcd.lookup import KeyValDefault
-from mcd.ui.componentlike import StorageRouter
+from bb.mcd.lookup import KeyValDefault
+from bb.mcd.ui.componentlike import StorageRouter
 import typing
 
 def _anySelectedHaveKey(key, context):

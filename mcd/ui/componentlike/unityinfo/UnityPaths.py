@@ -6,7 +6,7 @@ from bpy.props import (IntProperty,
                        CollectionProperty,
                        PointerProperty)
 from bpy.types import (PropertyGroup,)
-from mcd.util import ObjectLookupHelper
+from bb.mcd.util import ObjectLookupHelper
 import os
 
 

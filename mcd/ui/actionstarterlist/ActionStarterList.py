@@ -30,8 +30,8 @@ from bpy.types import (Operator,
                        UIList)
 import json
 
-from mcd.util import ObjectLookupHelper
-from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
                                                         CUSTOM_PG_AS_Collection,
                                                         # _ASJson
                                                     )

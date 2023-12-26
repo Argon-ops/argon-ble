@@ -10,9 +10,7 @@ from bpy.types import (Operator,
                        UIList,
                        AddonPreferences)
 
-from mcd.util import ObjectLookupHelper # WANT but try
-# import sys
-# ObjectLookupHelper = sys.modules[modulesNames['mcd.util.ObjectLookupHelper']]
+from bb.mcd.util import ObjectLookupHelper
 
 # -------------------------------------------------------------------
 # Getters / Setters for KeyValItem

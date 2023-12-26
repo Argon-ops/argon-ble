@@ -1,0 +1,45 @@
+
+
+    #  Commands already have modifiers. but how do we add them from the ble side?
+    #  We don't yet.  They get auto added for a certain animation play behavior type. 
+    #   So, this could be one way to add them.
+
+    
+# WIDE RANGING THOUGHTS: Command Namespaces
+# TODO: CONSIDER: institute a sort of namespace for Commands > they are always under a scene. 
+#     Of course, the scene's name may not be known at export time
+#   Basically we're imagining a list of as_custom lists??
+#    With the goal of enabling importing one blend file into another and preserving the actions??
+#     RELATED: what does happen to the as_custom list when user imports or appends:
+#             -IMPORT FBX: depends...we could add an option to *embed* the Command list in a zDuks
+#             -APPEND FBX: not sure: well, if you append a collection, not likely that scene data would append also?
+#   Seems to entail a pretty big re-think of how actions are referenced (by clickables, other actions, etc.)
+
+# NOTES
+# S.O. regarding reloading modules from blender's python editor: https://blender.stackexchange.com/a/255605/100992
+
+# This script follows: https://b3d.interplanety.org/en/creating-multifile-add-on-for-blender/
+# It performs a number of contortions that enable reloading/re-running multi-file add-ons
+#   from blender's editor window. See also the project dir's __init__.py 
+
+
+# HOW TO DO A MULTI-FILE MODULE:
+#  add the modules absolute name to moduleNames list
+#   (where absolute name means its 'dot' name relative to the project folder root 
+#      which we should have added to sys.path; not starting with a dot. <--ACTUALLY: 
+    #   relative to the folder CONTAINING the project folder.
+    #    So in our case the project folder is named 'bb'
+    #    Example import statement: from bb.mcd.ui.materiallist import MaterialListExporter
+    # )
+    
+#   if the module includes blender class(es) that should register,
+#    you probably want to include register/unregister definitions in the module file. 
+#    its easiest to keep track of who is registering when this way.
+#  even if there are no blender classes in the module, still add its name to moduleNames
+#   because this way it will be reloaded. meaning changes to the file will show up right away; without restarting blender
+#  if a module needs to import another module, just use "import othermodule" or "from another.thing import something"
+#   QUESTION: do we actually need to import or are we merely making intellisense work?
+#     ANSWER: seems like it's doing more? a brief test suggested that without an import statement at the top of the module
+#       the (not) imported function worked but it was a previous cached version..
+# Lastly, it seems that we still need to restart blender entirely when we add a new file.
+    

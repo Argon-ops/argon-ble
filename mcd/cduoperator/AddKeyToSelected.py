@@ -8,9 +8,9 @@ from bpy.props import (StringProperty,
 from bpy.types import (Operator, 
                        PropertyGroup,)
 
-from mcd.util import ObjectLookupHelper
-from mcd.lookup import KeyValDefault
-from mcd.ui.componentlike import StorageRouter
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.lookup import KeyValDefault
+from bb.mcd.ui.componentlike import StorageRouter
 
 """ NOTES:
     We can envision one scheme where: Each playable type adds a pointer instance of itself to the scene.

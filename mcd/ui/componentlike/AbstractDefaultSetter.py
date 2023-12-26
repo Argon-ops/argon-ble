@@ -1,4 +1,4 @@
-from mcd.lookup import KeyValDefault
+from bb.mcd.lookup import KeyValDefault
 
 def _RemoveKey(key : str, targets):
     for target in targets:

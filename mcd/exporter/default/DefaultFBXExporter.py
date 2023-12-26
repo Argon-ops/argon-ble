@@ -18,7 +18,7 @@ from bpy_extras.io_utils import ExportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
 
-from mcd.shareddataobject import SharedDataObject
+from bb.mcd.shareddataobject import SharedDataObject
 
 class CDU_OT_DefaultExportUnityFBX(Operator):
     """Add key to all selected objects"""
@@ -53,7 +53,7 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
     # TODO: shouldn't we select the data objects?? 
     #  pretty sure we had this set up before. not sure what happened
     def execute(self, context):
-        from mcd.exporter import ExportOp
+        from bb.mcd.exporter import ExportOp
 
         targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny()
         print(F"DEFAULt COmmand data holder: {targetDataHolder.name}")

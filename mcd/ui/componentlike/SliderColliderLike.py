@@ -8,12 +8,12 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
-from mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
+from bb.mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
 
 from bpy.app.handlers import persistent
 
@@ -37,7 +37,7 @@ def resubAllLoadPostSliderCollider(dummy):
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
-    from mcd.util import AppHandlerHelper
+    from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(resubAllLoadPostSliderCollider) 
 
 # END REGION LoadPost boilerplate
@@ -185,6 +185,10 @@ def register():
     bpy.types.Object.sliderColliderPerObjectData = bpy.props.PointerProperty(type=SliderColliderPerObjectData)
     bpy.types.Scene.sliderColliderLike = bpy.props.PointerProperty(type=SliderColliderLike)
 
+def testCallThisFunc():
+    print(F"*** test call this func got called 888 ffaabb")
+
+def defer():
     resubAllLoadPostSliderCollider(dummy=None)
     setupLoadPost()
 

@@ -1,6 +1,5 @@
 import bpy
 
-# REMINDER: Load Post handlers are called after a file loads
 def RefreshHandlerCallbacks(handlerss, callbacks):
     for handlers in handlerss:
         for callback in callbacks:
@@ -10,12 +9,8 @@ def RefreshHandlerCallbacks(handlerss, callbacks):
 def RefreshLoadPostHandler(callback):
     RefreshHandlerCallbacks([bpy.app.handlers.load_post], [callback])
 
-# Debug
-def ClearAllLoadPostHandlers():
-    handlers = bpy.app.handlers.load_post
-    [handlers.remove(h) for h in handlers]
 
-
+# REMINDER: Load Post handlers are called after a file loads
 # REMINDER: how to depsgraph
     # h = bpy.app.handlers
     # handlers = [

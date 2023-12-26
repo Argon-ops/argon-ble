@@ -1,11 +1,11 @@
 import bpy
 from bpy.types import (Panel,)
-from mcd.util import CurrentItemIndex
-from mcd.ui.componentlike import StorageRouter
-from mcd.lookup import KeyValDefault
-from mcd.util import DisplayHelper
-from mcd.util import ObjectLookupHelper
-from mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
+from bb.mcd.util import CurrentItemIndex
+from bb.mcd.ui.componentlike import StorageRouter
+from bb.mcd.lookup import KeyValDefault
+from bb.mcd.util import DisplayHelper
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
 
 def _displayPrimitive(box, key, item):
     row = box.row()
@@ -30,7 +30,6 @@ def _drawHeader(box, key, context):
 
 def _drawMixed(box, key):
     row = box.row()
-    # row.label(text=F"Mixed values for {key}")
     row.operator(CUSTOM_OT_SetDefaultValue.bl_idname, text="make uniform").target_key = key
 
 def _drawHelp(help, box, context):
@@ -77,12 +76,8 @@ def drawCurrentItemDetails(layout, context):
     _displayPrimitive(box, key, item)
 
 
-
-
-
 def register():
     bpy.types.Scene.inspectorShowHelp = bpy.props.BoolProperty()
-    pass
 
 def unregister():
     del bpy.types.Scene.inspectorShowHelp

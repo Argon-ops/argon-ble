@@ -1,5 +1,5 @@
 
-from mcd.ui.componentlike import (LightEnableLike, MeshColliderLike, 
+from bb.mcd.ui.componentlike import (LightEnableLike, MeshColliderLike, 
                                     StaticFlags, 
                                     RigidbodyLike, 
                                     OffMeshLinkLike,
@@ -55,8 +55,8 @@ _components = {
     SwapMaterialEnableLike.SwapMaterialEnableLike : SwapMaterialEnableLike.SwapMaterialEnableDefaultSetter,
 }
 
-from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 def _defaultEquality(key : str, a : object, b : object) -> bool:
     if key in a and key in b:

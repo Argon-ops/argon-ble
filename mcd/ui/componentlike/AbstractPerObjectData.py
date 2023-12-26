@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import (CollectionProperty,)
 
-# from mcd.ui.componentlike.util.ObjectPointerMsgbusUtils import OwnerTokens
+# from bb.mcd.ui.componentlike.util.ObjectPointerMsgbusUtils import OwnerTokens
 
 class AbstractPerObjectData(object):
 

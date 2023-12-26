@@ -21,7 +21,7 @@ __DATA_OBJECT_NAME__="z_DuksGames_SharedData_"
 
 # # add a load post handler so that we resubscribeAll upon loading a new file         
 # def setupLoadPost():
-#     from mcd.util import AppHandlerHelper
+#     from bb.mcd.util import AppHandlerHelper
 #     AppHandlerHelper.RefreshLoadPostHandler(resubAllLoadPostSliderCollider) 
 
 # # END_REGION

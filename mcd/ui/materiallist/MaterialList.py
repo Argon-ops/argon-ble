@@ -75,35 +75,25 @@ class CUSTOM_OT_actions(Operator):
             pass
         else:
             if self.action == 'DOWN' and idx < len(scn.ml_custom) - 1:
-                item_next = scn.ml_custom[idx+1].name
+                # item_next = scn.ml_custom[idx+1].name
                 scn.ml_custom.move(idx, idx+1)
                 scn.ml_custom_index += 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
-                self.report({'INFO'}, info)
+                # info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
+                # self.report({'INFO'}, info)
 
             elif self.action == 'UP' and idx >= 1:
-                item_prev = scn.ml_custom[idx-1].name
+                # item_prev = scn.ml_custom[idx-1].name
                 scn.ml_custom.move(idx, idx-1)
                 scn.ml_custom_index -= 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
-                self.report({'INFO'}, info)
+                # info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
+                # self.report({'INFO'}, info)
 
             elif self.action == 'REMOVE':
-                # Don't delete the material from the project!
-                # just rm from our list
-                # item = scn.ml_custom[scn.ml_custom_index]
-                # mat = item.material
-                # if mat:         
-                #     mat_obj = bpy.data.materials.get(mat.name, None)
-                #     if mat_obj:
-                #         bpy.data.materials.remove(mat_obj, do_unlink=True)
-                # info = 'Item %s removed from scene' % (item)
                 scn.ml_custom.remove(idx)
                 if scn.ml_custom_index == 0:
                     scn.ml_custom_index = 0
                 else:
                     scn.ml_custom_index -= 1
-                # self.report({'INFO'}, info)
 
         if self.action == 'ADD':
             item = scn.ml_custom.add()
@@ -135,16 +125,12 @@ def AddMaterial(scene, mat : bpy.types.Material) -> None:
         item.name = item.material.name
         scene.ml_custom_index = (len(mat_list)-1)
         print(F"%% {mat.name} was not in room. now added at idx: {scene.ml_custom_index} item.name: {item.name} ID: {item.id}")
-    
-    DnowAdded = mat_list.get(mat.name)
-    print(F"Added material: {DnowAdded.name} with mat name: {DnowAdded.material.name}") # ID: {DnowAdded.id}")
-    #TODO not quite here: select this material
 
 def SelectMaterial(scene, mat : bpy.types.Material) -> int:
     if mat is None:
         return -1
-    idx = _GetMaterialIndexInList(scene, mat) # scene.ml_custom.keys().index(mat.name)
-    print(F"$$$ Found idx: {idx} in keys for {mat.name}")
+    idx = _GetMaterialIndexInList(scene, mat) 
+
     if idx >= 0 and idx < len(scene.ml_custom.keys()):
         scene.ml_custom_index = idx
         return idx
@@ -156,9 +142,6 @@ def SetUnityName(scene, idx, unityMaterialName) -> None:
     item = scene.ml_custom[idx]
     item.unityMaterial = unityMaterialName
 
-
-# TODO: operator idea: show / hide all destroyed materials -- or even set material for all to some obnoxious material
-# FIXME: items don't remove from list when materials are deleted
 
 class CUSTOM_OT_addSpecificMaterial(Operator):
     """Add a material to the material map"""
@@ -172,14 +155,13 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
         choice = bpy.context.scene.ml_specific_material_choice
         if choice is None:
             return asmSelf.unityMaterialStoreName
-            # return ""
+
         map_item = bpy.context.scene.ml_custom.get(choice.name)
         if map_item:
             if asmSelf.unityMaterialStoreName:
                 return asmSelf.unityMaterialStoreName
             return map_item.unityMaterial
         return asmSelf.unityMaterialStoreName
-        # return ""
     
     @staticmethod 
     def _storeUnityMaterialName(asmSelf, value):
@@ -221,8 +203,6 @@ class CUSTOM_OT_addSpecificMaterial(Operator):
         row.row()
         row.prop(context.scene, "ml_specific_material_choice", text="Material")
         row.prop(self, "unityMaterialName", text="Unity Material")
-
-        # row.prop(self, "chosenMaterial", text="Material")
         row.row()
 
 
@@ -318,34 +298,10 @@ class CUSTOM_UL_items(UIList):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             split = layout.split(factor=0.3)
 
-            # TODO: not here. just need some kind of a title and maybe another box around the upper two sections? certainly the export section
-            #   plus maybe bring the export sectino to the bottom
-
-            # TODO: UnityPaths makes a unity root folder available
-            #  some class uses this to maintain a list of unity materials in proj
-            #    (via searching the project for '.mat')
-            # Allow the user to input a string, and be super helpful by suggesting
-            #   the names of materials in their unity project.
-            #  Hopefully this helpfulness will be worth the effort
-            #    since it may also enable us to be helpful when prompting the user to make other mappings
-            # 
-            #   Also, we could potentially warn the user, if the name in the field isn't in their project. b/c e.g. they renamed the material
-
-            # split.label(text="Index: %d" % (index))
-            # static method UILayout.icon returns the integer value of the icon ID
-            # "computed" for the given RNA object.
-
-            # TODO: track material gets deleted via a msg bus
             if mat is not None:
                 split.prop(mat, "name", text="", emboss=False, icon_value=layout.icon(mat))
-            # else:
-            #     split.prop(mat, "name", text="", emboss=False, icon="BRUSH_INFLATE")
-
 
             split.prop(item, "unityMaterial", text="Unity Material")
-            # split.prop_search() # TODO <-- figure the data type item that should exist
-            # TODO: not really here: storing the material map data in an empty gets
-            #  awkward because what if the user wants to export with the option only_selected or active_collection?
 
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
@@ -362,8 +318,8 @@ def _getMaterialKey(blenderMaterialName : str) ->str:
     # prefix must match the import script in unity addon
     return F"{MaterialListExporter.Prefix}{blenderMaterialName}"
 
-from mcd.shareddataobject import SharedDataObject
-from mcd.util import ObjectLookupHelper
+from bb.mcd.shareddataobject import SharedDataObject
+from bb.mcd.util import ObjectLookupHelper
 
 def _lookupUnityMaterialName(blenderMaterialName : str):
     data = SharedDataObject.getEmptySharedDataOject() 
@@ -396,12 +352,8 @@ class MaterialListExporter:
     def PurgePreviousTargetObjects():
         for previous in ObjectLookupHelper._findAllObjectsWithKey(MaterialListExporter.__TARGET_KEY_MARKER__):
             del previous[MaterialListExporter.__TARGET_KEY_MARKER__]
-            # keys = [key for key in previous.keys() if key.startswith(MaterialListExporter.Prefix)]
-            # for key in keys:
-            #     del previous[key]
 
     def WriteCommandsToTargetObject(target):
-        # target[MaterialListExporter.__TARGET_KEY_MARKER__] = 1
         MaterialListExporter._WriteList(target)
     
     def _WriteList(target):
@@ -409,16 +361,13 @@ class MaterialListExporter:
         mlist = bpy.context.scene.ml_custom
         data = []
         for mpair in mlist:
-            # if not mpair.unityMaterial: 
-            #     pass
             #  allow empty unityMaterial
             materialMap = {
                 "material" : mpair.material.name,
                 "unityMaterial" : mpair.unityMaterial
             }
             data.append(materialMap)
-            # data[_getMaterialKey(mpair.material.name)] = mpair.unityMaterial
-            # target[key] = mpair.unityMaterial
+
         payload = { 
             "map" : data
         }
@@ -433,8 +382,6 @@ class CUSTOM_PG_materialCollection(PropertyGroup):
     unityMaterial : StringProperty(
         name="UnityMaterial",
         description="the name of the material. no need to include '.mat' ",
-        # get=_getUnityMaterial,
-        # set=_setUM
         )
 
 def MaterialMapToDictionary(context):
@@ -450,7 +397,8 @@ def MaterialMapToDictionary(context):
 # -------------------------------------------------------------------
 
 def materials_callback(*args):
-    print(F"^^^materials cb got args {args}")
+    print(F"^^^materials callback got args {args}")
+    # TODO: update list reflecting deleted materials 
 
 _subscribe_owner = object()
 
@@ -474,11 +422,11 @@ classes = (
     CUSTOM_OT_printItems,
     CUSTOM_OT_clearList,
     CUSTOM_UL_items,
-    # CUSTOM_PT_materialList,
     CUSTOM_PG_materialCollection
 )
 
 def register():
+    print(F" &&&& REGISTER MATERIAL LIST &&&&")
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
@@ -489,6 +437,10 @@ def register():
     bpy.types.Scene.ml_show_material_map = BoolProperty()
     bpy.types.Scene.ml_specific_material_choice = PointerProperty(type=bpy.types.Material)
 
+
+# this will be called slightly later than register 
+# because we don't have access to some variables during register
+def defer(): 
     _subscribe()
 
 
@@ -501,6 +453,3 @@ def unregister():
     del bpy.types.Scene.ml_custom_index
     del bpy.types.Scene.ml_show_material_map
     del bpy.types.Scene.ml_specific_material_choice 
-
-# if __name__ == "__main__":
-#     register()

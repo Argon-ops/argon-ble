@@ -38,7 +38,7 @@ import bpy
 import mathutils
 import math
 
-from mcd.exporter.edyj import EdyJAppendExportParams as EJA
+from bb.mcd.exporter.edyj import EdyJAppendExportParams as EJA
 
 # Multi-user datablocks are preserved here. Unique copies are made for applying the rotation.
 # Eventually multi-user datablocks become single-user and gets processed.
@@ -406,9 +406,9 @@ class ExportUnityFbx(Operator, ExportHelper):
 		layout.row().prop(self, "object_types", text="Object Types")
 
 	def execute(self, context):
-		from mcd.exporter import ExportOp
+		from bb.mcd.exporter import ExportOp
 
-		from mcd.shareddataobject import SharedDataObject
+		from bb.mcd.shareddataobject import SharedDataObject
 		targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny() 
 		print(F"EDyJ COmmand data holder: {targetDataHolder.name}")
 		tarName = targetDataHolder.name

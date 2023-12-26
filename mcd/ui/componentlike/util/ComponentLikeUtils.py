@@ -1,8 +1,8 @@
 import bpy
 # from bpy.mathutils import Vector
 
-from mcd.util import ObjectLookupHelper
-from mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
 
 def getValueFromKey(key_name):
     # CONSIDER: possibly we should show a consensus value of all selected objects?

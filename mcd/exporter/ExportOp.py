@@ -1,6 +1,6 @@
-from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import PlayablesExporter 
-from mcd.settings.GlobalSettings import GlobalSettingsExporter 
-from mcd.ui.materiallist.MaterialList import MaterialListExporter
+from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import PlayablesExporter 
+from bb.mcd.settings.GlobalSettings import GlobalSettingsExporter 
+from bb.mcd.ui.materiallist.MaterialList import MaterialListExporter
 
 #TODO: we're getting too many animations exported
 #  for each action the action applies to more animations than we intended
@@ -30,7 +30,7 @@ def PreExport(targetDataHolder):
   print(F"########################################")
   # CUSTOM_PG_AS_Collection.syncPlayables()
 
-  # from mcd.objectinfo import ObjectInfo
+  # from bb.mcd.objectinfo import ObjectInfo
   # ObjectInfo.writeObjectInfo(context)
 
 def PostExport(targetDataHolder):

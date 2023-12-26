@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import (StringProperty,)
 from bpy.types import (Operator,)
-from mcd.util import ObjectLookupHelper
+from bb.mcd.util import ObjectLookupHelper
 
 class CUSTOM_OT_SetDefaultValue(Operator):
     """Sets key and default value as custom properties on selected objects"""
@@ -15,7 +15,7 @@ class CUSTOM_OT_SetDefaultValue(Operator):
     
     def invoke(self, context, event):
         default = ObjectLookupHelper._guessReasonableValue(self.target_key, context) 
-        from mcd.ui.componentlike import StorageRouter
+        from bb.mcd.ui.componentlike import StorageRouter
         StorageRouter.handleSetDefaultValue(self.target_key, default, context)
 
         # ObjectLookupHelper._setValForKeyOnSelected(self.target_key, context, default)

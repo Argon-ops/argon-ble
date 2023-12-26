@@ -8,12 +8,12 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
-from mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
+from bb.mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
 
 from bpy.app.handlers import persistent
 
@@ -37,7 +37,7 @@ def resubAllLoadPostPlayableScalarAdapter(dummy):
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
-    from mcd.util import AppHandlerHelper
+    from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(resubAllLoadPostPlayableScalarAdapter) 
 
 # END REGION LoadPost boilerplate
@@ -154,6 +154,7 @@ def register():
     bpy.types.Object.playableScalarAdapterPerObjectData = bpy.props.PointerProperty(type=PlayableScalarAdapterPerObjectData)
     bpy.types.Scene.playableScalarAdapterLike = bpy.props.PointerProperty(type=PlayableScalarAdapterLike)
 
+def defer():
     resubAllLoadPostPlayableScalarAdapter(dummy=None)
     setupLoadPost()
 

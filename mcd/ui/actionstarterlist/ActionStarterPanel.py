@@ -1,20 +1,20 @@
 import bpy
-# from mcd.ui.materiallist.MaterialList import (
+# from bb.mcd.ui.materiallist.MaterialList import (
 #     CUSTOM_OT_actions,
 #     CUSTOM_OT_addBlendMaterials,
 #     )
 
-# from mcd.ui.materiallist import MaterialListExporter
+# from bb.mcd.ui.materiallist import MaterialListExporter
 
-from mcd.ui.actionstarterlist.ActionStarterList import(
+from bb.mcd.ui.actionstarterlist.ActionStarterList import(
     CUSTOM_OT_AS_actions,
     # CUSTOM_OT_addBlendAnimations,
     manualDrawASItems
     # CUSTOM_PG_AS_Collection
 )
 
-from mcd.util import DisplayHelper
-from mcd.ui.actionstarterlist import PlusActionStarterPopup
+from bb.mcd.util import DisplayHelper
+from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
 
 # At the moment this is just a function; not an actual bpy.Panel 
 def Draw(layout, context):
@@ -23,7 +23,7 @@ def Draw(layout, context):
     rows = 2
     row = layout.row()
     DisplayHelper._drawShowHideTriangle(row, context.scene, "as_show_starter_list", context.scene.as_show_starter_list )
-    row.label(text="Playables")
+    row.label(text="Commands")
     if not context.scene.as_show_starter_list:
         return
 

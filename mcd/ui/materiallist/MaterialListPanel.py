@@ -1,12 +1,11 @@
 import bpy
-from mcd.ui.materiallist.MaterialList import (
+from bb.mcd.ui.materiallist.MaterialList import (
     CUSTOM_OT_actions,
     CUSTOM_OT_addBlendMaterials,
     CUSTOM_OT_addSpecificMaterial,
     )
-from mcd.ui.materiallist import MaterialListExporter
 
-from mcd.util import DisplayHelper
+from bb.mcd.util import DisplayHelper
 
 def Draw(layout, context):
     scn = bpy.context.scene
@@ -33,7 +32,3 @@ def Draw(layout, context):
 
     layout.row().operator(CUSTOM_OT_addSpecificMaterial.bl_idname, icon="NODE_MATERIAL")
     layout.row().operator(CUSTOM_OT_addBlendMaterials.bl_idname, icon="NODE_MATERIAL")
-
-    # Actually lets just bundle the materials with the fbx export
-    # row = layout.row()
-    # row.operator(MaterialListExporter.CDU_OT_MaterialListExporter.bl_idname, text="Export material map", icon="EXPORT")

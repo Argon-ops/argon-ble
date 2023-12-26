@@ -1,9 +1,9 @@
 import bpy
 
-from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
+from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
         PlayablesExporter as PE
     )
-from mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
+from bb.mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
 
 def ObjDictTest():
     import json
@@ -13,7 +13,7 @@ def ObjDictTest():
     # print(json.dumps(ob.__dict__))
     # print(ob.__annotations__)
 
-    from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
+    from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
     for fn in ob.__annotations__.keys():
         serVal = AS.GetSerialiazableValue(ob, fn)
         print(F"field: {fn} val: {getattr(ob, fn)} serval: {serVal}")
@@ -24,14 +24,14 @@ def TestWriteCommands():
     PE.WriteCommandsToTargetObject(target)
 
 def ShowCommands():
-    from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
+    from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
     for cmd in bpy.context.scene.as_custom:
         print(F"CMD: {cmd.name} ")
         for fn in cmd.__annotations__.keys():
             print(F"{fn} : {AS.GetSerialiazableValue(cmd, fn)}")
 
 def TestGetFirst():
-    from mcd.shareddataobject import SharedDataObject as SDO
+    from bb.mcd.shareddataobject import SharedDataObject as SDO
     f = SDO.GetFirstSelectedObjectOrAny()
     print(F"first {f.name}")
 

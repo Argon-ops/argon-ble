@@ -7,9 +7,9 @@ from bpy.props import (IntProperty,
                        BoolProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
-from mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
 
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 _suffixes = {
     "_clamp01" : True,

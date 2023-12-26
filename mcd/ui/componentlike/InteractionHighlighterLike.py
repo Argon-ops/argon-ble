@@ -8,17 +8,17 @@ from bpy.props import (IntProperty,
                        CollectionProperty,
                        FloatVectorProperty)
 from bpy.types import (PropertyGroup,)
-from mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
-from mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
-from mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
+from bb.mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
+from bb.mcd.util import ObjectLookupHelper
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
 
-from mcd.ui.actionstarterlist import ActionStarterList
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from mcd.ui.sharedtypes import TurnOnOffAction
+from bb.mcd.ui.actionstarterlist import ActionStarterList
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.sharedtypes import TurnOnOffAction
 
 import json
 
@@ -43,7 +43,7 @@ def resubAllLoadPostInterHighlighter(dummy):
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
-    from mcd.util import AppHandlerHelper
+    from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(resubAllLoadPostInterHighlighter) 
 
 # END REGION LoadPost boilerplate
@@ -227,6 +227,7 @@ def register():
     bpy.types.Object.highlighterPerObjectData = bpy.props.PointerProperty(type=HighlighterPerObjectData)
     bpy.types.Scene.interactionHighlighterLike = bpy.props.PointerProperty(type=InteractionHighlighterLike)
 
+def defer():
     resubAllLoadPostInterHighlighter(dummy=None)
     setupLoadPost()
 

@@ -14,14 +14,14 @@ from bpy.types import (Operator,
                        PropertyGroup,
                        UIList)
 
-from mcd.util import ObjectLookupHelper
-from mcd.shareddataobject import SharedDataObject
-from mcd.ui.actionstarterlist import OT_TarAnimsList
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.shareddataobject import SharedDataObject
+from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
 
-from mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from mcd.util import DisplayHelper
+from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
+from bb.mcd.util import DisplayHelper
 
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 #REGION ADD/SUBTRACT
 class OT_CompositeCommandNamesActions(Operator):
@@ -93,7 +93,7 @@ class PG_AS_CommandName(PropertyGroup):
 
 class CUSTOM_UL_AS_CommandNameItems(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        from mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
+        from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
         row = layout.row()
         row.prop(item, "commandName", text="Command: ")
         row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = item.commandName

@@ -10,12 +10,12 @@ from bpy.props import (IntProperty,
                        BoolVectorProperty,
                        EnumProperty)
 from bpy.types import (PropertyGroup,)
-from mcd.util import ObjectLookupHelper
+from bb.mcd.util import ObjectLookupHelper
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter)
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter)
 
 _baseKey="mel_light_enable"
 

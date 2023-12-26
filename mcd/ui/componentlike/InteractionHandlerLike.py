@@ -7,18 +7,18 @@ from bpy.props import (IntProperty,
                        BoolProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
-from mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
-from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
-from mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
-from mcd.util import ObjectLookupHelper
+from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+from bb.mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
+from bb.mcd.util import ObjectLookupHelper
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 
-from mcd.ui.actionstarterlist import ActionStarterList
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from mcd.ui.actionstarterlist import PlusActionStarterPopup
-from mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
+from bb.mcd.ui.actionstarterlist import ActionStarterList
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
+from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
 
 import json
 
@@ -152,7 +152,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         mcl = context.scene.interactionHandlerLike
 
         row = boxa.row()
-        row.label(text="Playables")
+        row.label(text="Commands")
 
         def drawPlayableRow(attrName, idx):
             # TODO: handle the case where no playables exist in the blend file's as_custom (not even 1!)

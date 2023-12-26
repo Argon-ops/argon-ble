@@ -8,10 +8,10 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from mcd.util import ObjectLookupHelper
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 suffixes = {
     "_component_names" : "",
@@ -75,7 +75,6 @@ def register():
     for c in classes:
         register_class(c)
 
-    bpy.types.Object.fakeInt = bpy.props.IntProperty()
     bpy.types.Scene.disableComponentLike = bpy.props.PointerProperty(type=DisableComponentLike)
 
 def unregister():
@@ -84,5 +83,4 @@ def unregister():
         unregister_class(c)
 
     del bpy.types.Scene.disableComponentLike
-    del bpy.types.Object.fakeInt
 

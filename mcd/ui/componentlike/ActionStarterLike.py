@@ -11,11 +11,11 @@
 #                        BoolProperty,
 #                        CollectionProperty,)
 # from bpy.types import (PropertyGroup,)
-# from mcd.util import ObjectLookupHelper
+# from bb.mcd.util import ObjectLookupHelper
 
-# from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-# from mcd.ui.componentlike import AbstractDefaultSetter
-# from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+# from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+# from bb.mcd.ui.componentlike import AbstractDefaultSetter
+# from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 # def _append(suffix : str) -> str:
 #     return F"{ActionStarterLike.GetTargetKey()}{suffix}"

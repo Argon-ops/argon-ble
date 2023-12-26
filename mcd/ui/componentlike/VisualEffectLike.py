@@ -8,14 +8,14 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
-from mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+from bb.mcd.util import ObjectLookupHelper
 
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 
-from mcd.ui.actionstarterlist import ActionStarterList
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.actionstarterlist import ActionStarterList
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 class VisualEffectDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod

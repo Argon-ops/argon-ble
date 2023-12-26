@@ -26,22 +26,22 @@ from bpy.types import (Operator,
                        UIList,
                        AddonPreferences)
 
-from mcd.ui.KeyValItem import CUSTOM_PG_KeyValItem
-from mcd.ui.SelectByKeyMenu import CDU_MT_SelectByKeyMenu
-from mcd.util import ObjectLookupHelper
-from mcd.util import DisplayHelper
-from mcd.ui.AddKeyMenu import CDU_MT_AddKeyMenu
-from mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
-from mcd.ui import Inspector
-from mcd.lookup import KeyValDefault
-from mcd.exporter.default import DefaultFBXExporter
-from mcd.ui.componentlike.unityinfo import UnityPaths
-from mcd.ui.materiallist import MaterialList
-from mcd.ui.materiallist import MaterialListPanel
-from mcd.ui.materiallist import MaterialListExporter
-from mcd.ui.export import ExportBox
+from bb.mcd.ui.KeyValItem import CUSTOM_PG_KeyValItem
+from bb.mcd.ui.SelectByKeyMenu import CDU_MT_SelectByKeyMenu
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.util import DisplayHelper
+from bb.mcd.ui.AddKeyMenu import CDU_MT_AddKeyMenu
+from bb.mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
+from bb.mcd.ui import Inspector
+from bb.mcd.lookup import KeyValDefault
+from bb.mcd.exporter.default import DefaultFBXExporter
+from bb.mcd.ui.componentlike.unityinfo import UnityPaths
+from bb.mcd.ui.materiallist import MaterialList
+from bb.mcd.ui.materiallist import MaterialListPanel
+from bb.mcd.ui.materiallist import MaterialListExporter
+from bb.mcd.ui.export import ExportBox
 
-from mcd.ui.actionstarterlist import ActionStarterPanel
+from bb.mcd.ui.actionstarterlist import ActionStarterPanel
 
 # from more_stuff_here import more
 # more.more_stuff()
@@ -74,7 +74,7 @@ class CDU_OT_actions(Operator):
             pass
         else:
             if self.action == 'REMOVE':
-                from mcd.ui.componentlike import StorageRouter
+                from bb.mcd.ui.componentlike import StorageRouter
                 StorageRouter.handleRemoveKey(item.key, context) #.selected_objects)
                 scn.custom_index = ObjectLookupHelper._nextRelevantIndex(context, scn.custom_index)                
               
@@ -83,18 +83,6 @@ class CDU_OT_actions(Operator):
 # -------------------------------------------------------------------
 #   Drawing
 # -------------------------------------------------------------------
-
-# TODO: try zipping this module and loading it from prefs
-# TODO: for the prefs. (I guess) define __package__ for this package?
-# TODO:  make an FBX export button (with edy J script). it might be a child panel
-
-# TODO: Add nav mesh agent? 
-#  TODO: add off mesh link
-#  TODO: lean into the physics component tweaking. will make for appealing sizzle reel.
-# TODO: is there a way to check if the instance of the mesh in the open unity scene has overrides?
-#    otherwise, its confusing. overrides happen almost without you noticing. like just clicking on an enum picker in unity inspector
-
-# One thing that would be a little nice: custom icons for each data type that the keys can hold: str, int, object etc.
 
 class CDU_UL_PerObjectItems(UIList):
     """Draw each key-val row that's defined as a property of the selected objects."""
@@ -114,39 +102,22 @@ class CDU_UL_PerObjectItems(UIList):
             if ObjectLookupHelper._allSelectedHaveKey(key, context):
                 return self.bitflag_filter_item
             return ~self.bitflag_filter_item
-
        
         flags = list(map(lambda kv : _shouldIncludeKey(kv.key, context), kvs))
         order = []
-        # TODO consider: respect the sort alphabetical if they want it? could be slow?
-        # print(F"sort alpha ? {self.use_filter_sort_alpha} show filtering? {self.use_filter_show}")
+        # TODO: support sorting alphabetical 
         return flags, order
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         split = layout.split(factor=0.35)
         split.label(text=F"{DisplayHelper._trimMelPrefix(item.key)}")
-        shared = ObjectLookupHelper._getSharedVal(item.key, context=context)
         split = split.split(factor=.77)
-
-        # do we not need to make this key editable here: e.g. mel_mesh_collider
-        # detect if this is a simple present or absent key without a meaningful value (hint == TAG)
-        # decide if we want to have two editing spots for editable value-type values (is this convenient or bad ui... or both...)
-
-        ## WANT?
-        # if shared == ObjectLookupHelper._MIXED_():
-        #     pass
-        #     # split.operator(CUSTOM_OT_SetDefaultValue.bl_idname, text="mixed values: reset").target_key = item.key
-        # else:
-        #     if item.handlingHint == KeyValDefault.EHandlingHint.PRIMITIVE: # little wonky? only primitives get an editor right in the list
-        #         split.prop(item, item.relevant_prop_name, text="") 
-        #     else:                
-        #         split.label(text="") # smooth out formatting if we have nothing else to put here
-        split.label(text="") # smooth out formatting if we have nothing else to put here
+        split.label(text="") # empty label helps formatting
 
         if index == context.scene.custom_index:
             split.operator(CDU_OT_actions.bl_idname, icon='X', text="").action = 'REMOVE'
 
-def DrawInspectorListAndDetails(layout, context):
+def _drawInspectorListAndDetails(layout, context):
     scn = bpy.context.scene
     box = layout.box()
     row = box.row() # layout.row()
@@ -184,7 +155,7 @@ def drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=Tr
         row = box.row()
         row.menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
 
-    DrawInspectorListAndDetails(layout, context)
+    _drawInspectorListAndDetails(layout, context)
   
 
 class CDU_PT_CustomPropHelper(Panel):
@@ -201,7 +172,6 @@ class CDU_PT_CustomPropHelper(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # scn = bpy.context.scene
 
         drawInspector(layout, context)
         
@@ -219,7 +189,7 @@ class CDU_PT_CustomPropHelper(Panel):
         ActionStarterPanel.Draw(box, context)
 
         box = layout.box()
-        from mcd.settings import GlobalSettings
+        from bb.mcd.settings import GlobalSettings
         GlobalSettings.DrawGlobalsButton(box)
         
 
@@ -300,10 +270,7 @@ def register():
     # define a collection of KeyValItems and an index
     bpy.types.Scene.custom = CollectionProperty(type=CUSTOM_PG_KeyValItem)
     bpy.types.Scene.custom_index = IntProperty()
-    bpy.types.Scene.export_correct_rotation = BoolProperty(
-        name="Export Correct Rotation",
-        description="Toggle on to compensate for the 90 degree rotation that the FBX exporter applies. Recommended unless it breaks things; animations without armatures for example.",
-        default=True)
+    
     bpy.types.Scene.show_inspector = BoolProperty(default=True)
 
     bpy.types.Object.testint = IntProperty()
@@ -320,7 +287,6 @@ def unregister():
 
     del bpy.types.Scene.custom
     del bpy.types.Scene.custom_index
-    del bpy.types.Scene.export_correct_rotation
     del bpy.types.Scene.show_inspector
 
     del bpy.types.Object.testint

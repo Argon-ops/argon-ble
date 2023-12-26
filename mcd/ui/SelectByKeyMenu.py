@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import (StringProperty,)
 
-from mcd.util import (ObjectLookupHelper, DisplayHelper)
-from mcd.cduoperator import SelectByKey
+from bb.mcd.util import (ObjectLookupHelper, DisplayHelper)
+from bb.mcd.cduoperator import SelectByKey
 
 class CDU_MT_SelectByKeyMenu(bpy.types.Menu):
     """Menu for the select by key operator"""

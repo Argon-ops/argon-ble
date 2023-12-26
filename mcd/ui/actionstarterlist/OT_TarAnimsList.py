@@ -84,7 +84,7 @@
 #     """Draw each key-val row that's defined as a property of the selected objects."""
 
 #     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-#         from mcd.util import DisplayHelper
+#         from bb.mcd.util import DisplayHelper
 #         split = layout.split(factor=0.35)
 #         split.lable(text="Hi this is an item")
 

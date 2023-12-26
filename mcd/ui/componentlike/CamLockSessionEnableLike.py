@@ -8,48 +8,17 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from mcd.util import ObjectLookupHelper
-from mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
-from mcd.ui.componentlike import AbstractDefaultSetter
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
-from mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
-
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
+from bb.mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
 
 
 # When the prop is assigned an object
 #  add a callback to the msgbus. with the target obj as owner
 
-
-# class OT_PointerTests(bpy.types.Operator):
-#     """Tests on obj pointers"""
-#     bl_idname = "test.obj_pointers_etc"
-#     bl_label = ""
-#     bl_description = "a description would go here if there were one"
-#     bl_options = {'REGISTER', 'UNDO'}
-
-#     action : StringProperty(
-#         name="",
-#         default=""
-#         )
-
-#     def invoke(self, context, event):
-#         return self.execute(context)
-
-#     @classmethod
-#     def poll(cls, context):
-#         return len(context.selected_objects) > 0
-
-#     def execute(self, context):
-#         if self.action == "DELETE":
-#             DDeleteFakeProp(context.selected_objects)
-#             return {'FINISHED'}
-#         if self.action == 'clear_load_post_del_me':
-#             from mcd.util import AppHandlerHelper
-#             AppHandlerHelper.ClearAllLoadPostHandlers()
-#             return {'FINISHED'}
-#         DtestCheckFakeProp(context.selected_objects)
-#         return {'FINISHED'}
 
 suffixes = {
     "_release_cursor" : True,
@@ -71,7 +40,6 @@ class CamLockSessionEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSet
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        # DtestUseFakePtr(targets)
         pass
 
     @staticmethod
@@ -118,7 +86,7 @@ def resubscribeAllLoadPostCamLock(dummy):
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
-    from mcd.util import AppHandlerHelper
+    from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(resubscribeAllLoadPostCamLock) # [resubscribeAllLoadPostCamLock, "resubscribeAllLoadPostCamLock"])
 
 # Since Cam Lock data wants to have object pointer properties
@@ -151,7 +119,7 @@ class CamLockPerObjectData(PropertyGroup, AbstractPerObjectData):
 
 #END REGION
 
-from mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 
 class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
     @staticmethod
@@ -195,6 +163,7 @@ def register():
     bpy.types.Object.camLockPerObjectData = bpy.props.PointerProperty(type=CamLockPerObjectData)
     bpy.types.Scene.camLockSessionEnableLike = bpy.props.PointerProperty(type=CamLockSessionEnableLike)
 
+def defer():
     resubscribeAllLoadPostCamLock(dummy=None)
     setupLoadPost()
 

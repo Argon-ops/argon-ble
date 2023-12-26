@@ -1,5 +1,5 @@
 import bpy
-from mcd.shareddataobject import SharedDataObject
+from bb.mcd.shareddataobject import SharedDataObject
 
 def getProps(obj):
     try:
@@ -30,8 +30,8 @@ def getAnimInfo(lookup):
         
 
 
-lookup = dict()
-getAnimInfo(lookup=lookup)
+# lookup = dict()
+# getAnimInfo(lookup=lookup)
 
 def writeObjectInfo(context):
     # getAnimInfo()

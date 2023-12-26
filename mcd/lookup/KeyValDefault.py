@@ -2,7 +2,7 @@
 # this class codefies our expectations for which keys we'll find
 
 import json
-from mcd.melstor import MCDKeyValConfig ## WANT 
+from bb.mcd.melstor import MCDKeyValConfig 
 import typing
 
 class EHandlingHint():
@@ -29,33 +29,28 @@ def _parse(val : any) -> DefaultValueInfo:
         dvi.handlingHint = hint
         dvi.help = help
         return dvi
+    
+    hint = val['hint']
 
-    if _isPrimitive(val):
+    if hint == "PRIMITIVE":
         return createDefaultValueInfo(val, EHandlingHint.PRIMITIVE, "")
  
-    # if val has no keys its just a tag
-    if val is None or not val or len(val.keys()) == 0:
+    if hint == "TAG":
         return createDefaultValueInfo(0, EHandlingHint.TAG, "")
 
-    # must be an object with config directives
+    # object with config directives
     # TODO: serializbleDefault is pointless and even default is a little awkward.
     #    figure out what settings are easiest for the clients of this script
     default = 0
     if 'default' in val:
         default = val['default']
-    hint = val['hint']
-    hint = hint if hint else EHandlingHint.PRIMITIVE
+    hint = hint if hint else EHandlingHint.CUSTOM_INSPECTOR
     help = val['help']
     return createDefaultValueInfo(default, hint, help)
 
 def _addEntry(key : str, val):
     global _storage
-
-    if key in _storage.keys():
-        print(F"storage has this key already? do we care?")
-    
     _storage[key] = _parse(val)
-
 
 def _loadFrom(json_str : str):
     try:
@@ -70,7 +65,7 @@ def getDefaultValue(key : str):
     global _storage
     item = _storage[key]
     if item.handlingHint == EHandlingHint.TAG:
-        return -7 # value doesn't matter well never see this. nonetheless just give them any old value
+        return -7 # value doesn't matter well never see this. nonetheless just return something
     return item.default
 
 def getHandlingHint(key: str) -> EHandlingHint:

@@ -1,4 +1,3 @@
-import bpy
 
 def getFocusedItemIndex(context) -> int:
     return context.scene.custom_index 

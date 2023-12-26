@@ -2,8 +2,8 @@ import bpy
 from bpy.props import (StringProperty,PointerProperty)
 from bpy.types import (Operator,)
 
-from mcd.ui.componentlike import EnableReceiverLike
-from mcd.util import ObjectLookupHelper
+from bb.mcd.ui.componentlike import EnableReceiverLike
+from bb.mcd.util import ObjectLookupHelper
 
 class OT_EnableReceiverButton(Operator):
     """Add an enable receiver"""

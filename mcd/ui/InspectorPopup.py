@@ -14,14 +14,14 @@ from bpy.types import (Operator,
                        UIList)
 import json
 
-from mcd.util import ObjectLookupHelper
-from mcd.shareddataobject import SharedDataObject
-from mcd.ui.actionstarterlist import OT_TarAnimsList
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.shareddataobject import SharedDataObject
+from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
 
-from mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from mcd.util import DisplayHelper
-from mcd.ui import Inspector
-from mcd import MelCustomDataUtilBA
+from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
+from bb.mcd.util import DisplayHelper
+from bb.mcd.ui import Inspector
+from bb.mcd import MelCustomDataUtilBA
 
 ##############################################################
 ### REGION: HIDE / UNHIDE ####################################
@@ -101,7 +101,7 @@ def _unhideCollections(objectName):
 
 
 def _setVisible(objectName):
-    # TODO: try the batFinger answer here: https://blender.stackexchange.com/questions/146685/how-to-obtain-the-parent-of-a-collection-using-python
+    # TODO: try this batFinger: https://blender.stackexchange.com/questions/146685/how-to-obtain-the-parent-of-a-collection-using-python
     #   To traverse parent collections
     global _targ_needs_to_rehide
     
@@ -141,7 +141,6 @@ class CU_OT_InspectorPopup(bpy.types.Operator):
     
     objectName : bpy.props.StringProperty(name="internalId") # bpy.props.IntProperty(name="playabeIdx")
 
-
     @classmethod
     def poll(cls, context):
         return True 
@@ -157,14 +156,7 @@ class CU_OT_InspectorPopup(bpy.types.Operator):
         info = '%s bye. Inspector Popup is done with its pop up work' % ("BYE")
         self.report({'INFO'}, info)
         return {'FINISHED'}
-    
-# TODO (not here): an RE 2 style sprite based highlight mode
-# TODO (nor here): an RE 2 style next clickable-thing-picker mode where you just have to be looking at the 
-#    thing somewhat closely (and have it be the closest to center or something if there's contention). We impl'd something like this already for 
-#      the siren game
 
-# TODO: can we restore the users existing custom_index; i.e. which component-like was selected before
-#  CONSIDER: should we select a component like for them in the pop-up?
 
     def invoke(self, context, event):
         global _open_popup_instances

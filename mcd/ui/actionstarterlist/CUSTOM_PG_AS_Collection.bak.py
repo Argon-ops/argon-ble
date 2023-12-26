@@ -25,14 +25,14 @@ from bpy.types import (Operator,
                        UIList)
 import json
 
-from mcd.util import ObjectLookupHelper
-from mcd.shareddataobject import SharedDataObject
-from mcd.ui.actionstarterlist import OT_TarAnimsList
+from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.shareddataobject import SharedDataObject
+from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
 
-from mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from mcd.util import DisplayHelper
+from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
+from bb.mcd.util import DisplayHelper
 
-from mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 
 class AS_OT_AddToTargets(Operator):
@@ -583,7 +583,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         return None
 
     def drawTargetsList(self, playable, box):
-        from mcd.ui.InspectorPopup import CU_OT_InspectorPopup
+        from bb.mcd.ui.InspectorPopup import CU_OT_InspectorPopup
         rowb = box.row()
         rowb.label(text="Targets") 
         
@@ -737,7 +737,7 @@ def setupActionMsgBusSubscription():
         notify=onObjectNameMsgbus,)
 
 def setupSyncPostLoad():
-    from mcd.util import AppHandlerHelper
+    from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(syncPlayablesOnLoadPost) 
 
 classes = (

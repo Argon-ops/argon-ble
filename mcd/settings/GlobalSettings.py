@@ -13,7 +13,7 @@ from bpy.types import (Operator,
                        PropertyGroup,
                        UIList)
 
-from mcd.util import ObjectLookupHelper
+from bb.mcd.util import ObjectLookupHelper
 
 
 class PG_GlobalImportSettings(PropertyGroup):
@@ -110,8 +110,8 @@ class CU_OT_ArgonGlobalsPopup(bpy.types.Operator):
 # ------------------------------------------------------------------------
 
 classes = [
-    PG_GlobalImportSettings,
     CU_OT_ArgonGlobalsPopup,
+    PG_GlobalImportSettings,
 ]
 
 def register():
