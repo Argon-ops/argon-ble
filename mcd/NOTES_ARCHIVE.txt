@@ -43,3 +43,13 @@
 #       the (not) imported function worked but it was a previous cached version..
 # Lastly, it seems that we still need to restart blender entirely when we add a new file.
     
+
+            # TODO: UnityPaths makes a unity root folder available
+            #  some class uses this to maintain a list of unity materials in proj
+            #    (via searching the project for '.mat')
+            # Allow the user to input a string, and be super helpful by suggesting
+            #   the names of materials in their unity project.
+            #  Hopefully this helpfulness will be worth the effort
+            #    since it may also enable us to be helpful when prompting the user to make other mappings
+            # 
+            #   Also, we could potentially warn the user, if the name in the field isn't in their project. b/c e.g. they renamed the material

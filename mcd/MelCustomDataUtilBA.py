@@ -38,7 +38,6 @@ from bb.mcd.exporter.default import DefaultFBXExporter
 from bb.mcd.ui.componentlike.unityinfo import UnityPaths
 from bb.mcd.ui.materiallist import MaterialList
 from bb.mcd.ui.materiallist import MaterialListPanel
-from bb.mcd.ui.materiallist import MaterialListExporter
 from bb.mcd.ui.export import ExportBox
 
 from bb.mcd.ui.actionstarterlist import ActionStarterPanel
