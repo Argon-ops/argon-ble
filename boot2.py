@@ -8,11 +8,25 @@ import sys
 
 def get_project_dir():
     # should return the parent folder of the project folder.
-    #  we want to put specifically this folder to systhem path.
+    #  want to add specifically this folder to systhem path.
     #   edit as needed
-    return "E:\\temp\\ble-zip-import-test\\bb_zip_import_me"  
+
+    # in our set up the folder containing this boot script is the one we want
+    import bpy
+    print(bpy.context.space_data.text.filepath)
+    from pathlib import Path
+    path = Path(bpy.context.space_data.text.filepath)
+    print(F"ABSO: {path.parent.absolute()}")
+    return path.parent.absolute().__str__()
+
+    # return "E:\\temp\\checktwo\\argon-blender"  
+    # return "E:\\temp\\ble-zip-import-test\\bb_zip_import_me"  
+
+
 
 containing = get_project_dir() 
+
+print(F"CONTAINING: {containing}")
 
 init_file = os.path.join("bb", "__init__.py")
  

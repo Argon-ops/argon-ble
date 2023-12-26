@@ -104,6 +104,7 @@ import importlib
  
 
 for fullName in modulesFullNames: #.values():
+    print(F"mod full name {fullName}")
     if fullName in sys.modules:
         try:
             importlib.reload(sys.modules[fullName])
