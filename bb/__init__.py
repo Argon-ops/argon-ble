@@ -105,7 +105,11 @@ import importlib
 
 for fullName in modulesFullNames: #.values():
     if fullName in sys.modules:
-        importlib.reload(sys.modules[fullName])
+        try:
+            importlib.reload(sys.modules[fullName])
+        except Exception as mnfe:
+            print(F"### Exception for module: {fullName}. Restarting blender may resolve this. ###")
+            raise mnfe 
     else:
         globals()[fullName] = importlib.import_module(fullName)
         # setattr(globals()[fullName], 'modulesNames', modulesFullNames) # DELME ? FIXME: Do we not need this line? each module gets a copy of moduleFullNames but we don't use this...Did we actually need to use it?
