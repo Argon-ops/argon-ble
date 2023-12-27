@@ -33,7 +33,6 @@ modulesNames = [
     'mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
     'mcd.ui.actionstarterlist.ActionStarterList',
 
-    'mcd.ui.actionstarterlist.OT_TarAnimsList',
     'mcd.util.JsonFromItem',
     'mcd.cduoperator.SetKeyValue',
     'mcd.ui.SelectByKeyMenu',
@@ -83,7 +82,7 @@ modulesNames = [
     'mcd.ui.actionstarterlist.PlusActionStarterPopup',
     'mcd.ui.actionstarterlist.ActionStarterPanel',
     'mcd.objectinfo.ObjectInfo',
-    'mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
+    # 'mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
     'mcd.exporter.ExportOp',
     'mcd.settings.GlobalSettings',
     'mcd.foo.ScratchPad',

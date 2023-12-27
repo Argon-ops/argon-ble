@@ -19,10 +19,9 @@ def _allSelectedHaveKey(key, context):
 
 def _getDisplayKeys(context):
     return [key for key in _getPrefItems(context).keys()] # these are always the keys we want, right?
-    # return [item.key for item in context.scene.custom] # del me
 
 def _setSelectedIndex(context, key : str) -> None:
-    filtered = _getDisplayKeys(context) # _currentFilteredKeys(context)
+    filtered = _getDisplayKeys(context)
     try:
         idx = filtered.index(key)
         context.scene.custom_index = idx

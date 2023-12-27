@@ -51,7 +51,7 @@ class ForcePCWLike(PropertyGroup, AbstractComponentLike):
     def AcceptsKey(key : str):
         return key == ForcePCWLike.GetTargetKey()
 
-    @staticmethod #ccccccccccccccccccccccccccc
+    @staticmethod 
     def Display(box, context) -> None:
         mcl = context.scene.forcePCWLike
         box.row().prop(mcl, "anyMatchingAction", text="Any Matching Action")

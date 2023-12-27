@@ -2,22 +2,16 @@ from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import PlayablesExporte
 from bb.mcd.settings.GlobalSettings import GlobalSettingsExporter 
 from bb.mcd.ui.materiallist.MaterialList import MaterialListExporter
 
-#TODO: we're getting too many animations exported
-#  for each action the action applies to more animations than we intended
-#  Propose a bandaid for this: send Unity a look up with each objects animation data
-#   (since it seems like the animations listed per object are the 'real' ones that we intended)
-
 def PreExport(targetDataHolder):
-  """Make sure that everything is ready to be exported
+  """Prepare for export
       
-      Some data (playables) exists
-        as a list that doesn't read directly from a custom property. 
-        Make sure that the custom property for each playable reflects 
-        the state of the playables list.
-      UNFORTUNATELY: this means the client has to use our export button;
-          can't use the vanilla fbx exporter directly.
+      Some data (e.g. playables) are stored in
+        lists that don't read directly from a custom property. 
+        So, write these lists to a custom property before exporting.
+      (Unfortunately, this means the client has to use our export button;
+          can't use the vanilla fbx exporter directly.)
   """
-
+  
   GlobalSettingsExporter.PreExport(targetDataHolder)
 
   PlayablesExporter.PreExport(targetDataHolder)
@@ -25,17 +19,9 @@ def PreExport(targetDataHolder):
   MaterialListExporter.PreExport(targetDataHolder)
 
 
-  print(F"########################################")
-  print(F"#####Pre export ########################")
-  print(F"########################################")
-  # CUSTOM_PG_AS_Collection.syncPlayables()
-
-  # from bb.mcd.objectinfo import ObjectInfo
-  # ObjectInfo.writeObjectInfo(context)
-
 def PostExport(targetDataHolder):
   pass
-  # sadly we can't do much post export because we don't know 
+  # sadly we can't do much post-export because we don't know 
   #   how to get a call back after a modal, file browser dialog...
   #   We don't have this problem with the Edy J exporter, because we 
   #     have modified the actual exporter in our copy of his module

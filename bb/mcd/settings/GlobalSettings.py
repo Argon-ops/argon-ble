@@ -19,13 +19,13 @@ from bb.mcd.util import ObjectLookupHelper
 class PG_GlobalImportSettings(PropertyGroup):
     '''Argon Global Settings Property Group
 
-        Must match with the C# side for JSON serialization 
+        Must match its C# counterpart for JSON serialization 
     '''
     pcwForAllClips : BoolProperty(
         description= "If true, generate a PlayableClipWrapper for each animation clip in the exported file. \
                 This is useful if you want to use PlayableClipWrappers in your own Unity scripts. \
-                    A PlayableClipWrapper is an argon class that wraps around a Unity PlayableGraph--the PCW builds\
-                         the Unity PlayabeGraph during Start(). ",
+                    Otherwise Argon only generates PlayableClipWrappers as needed. \
+                    A PlayableClipWrapper is an argon class that wraps around a Unity PlayableGraph.",
     )
 
 class GlobalSettingsExporter:

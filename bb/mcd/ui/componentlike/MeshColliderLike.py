@@ -5,13 +5,10 @@ from bpy.props import (IntProperty,
                        BoolProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
-from bb.mcd.util import ObjectLookupHelper
 
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-
-import json
 
 
 def getConvex(self):
@@ -38,7 +35,6 @@ class MeshColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        # AbstractDefaultSetter._SetKeyValOnTargets("mel_mesh_collider", -7, targets) # no need
         default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
         try:
             AbstractDefaultSetter._SetKeyValOnTargets("mel_mesh_collider_is_trigger", default['isTrigger'], targets)
@@ -137,58 +133,3 @@ def unregister():
 
     del bpy.types.Scene.meshColliderLike
 
-
-#BEAUTIFUL NOTES: please ignore
-
-# TODO: require this to exist for clarity
-
-# This feels much more straight forward -- more like the blender way 
-#   the only thing is, its making us rethink the scheme embodied by the ItemKV prop group
-#   Seems more wholesome to merely maintain a list of keys that are present on sel ob[s]
-#  Knowing how to handle them, could be left to the sub classes...
-#  But then again the ItemKV sceme makes it easy to adopt new custom Keys / Value types from a json file
-#  Perhaps there's a big divide between keys that MelCustoData knows how to handle and keys it can only 
-#    handle in default ways...
-
-# JSON based method
-# def getBoolFromSerKey(val_key, component_key):
-#     serval = ObjectLookupHelper._getSharedVal(val_key, bpy.context)
-#     if serval is None or serval == ObjectLookupHelper._MIXED_():
-#         return False
-#     try:
-#         val = json.loads(serval)
-#         result = val[component_key]
-#         if isinstance(result, bool) == False:
-#             raise "won't ever happen"
-#         return result
-#     except BaseException as e:
-#         print(F"something failed: {str(e)}")
-#         return False
-
-# def setBoolWithSerKey(val_key, component_key, value):
-#     serval = ObjectLookupHelper._getSharedVal(val_key, bpy.context)
-#     if serval is None or serval == ObjectLookupHelper._MIXED_():
-#         return
-#     obj = json.loads(serval)
-#     obj[component_key] = value
-#     serialized = json.dumps(obj)
-#     ObjectLookupHelper._setValForKeyOnSelected(val_key, bpy.context, serialized)
-
-# kind of hate the json check in out way
-#   let's go back to the special keys way. it was wonky and beautiful
-#    just need to do a littl special handling when we first add the keys right?
-#   or if its multi-selected, not much of a problem...
-# plus all that json deserialization on the Unity side could be slow
-#  but just make sure you have the means / mechanisms for keeping 
-#   the extra custo prop keys in synch with the main key
-
-# def getBoolFromKey(key_name):
-#     # CONSIDER: possibly we should show a consensus value of all selected objects?
-#     isTrigger = ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
-#     if isTrigger is None:
-#         return False
-#     return isTrigger
-
-# def setBoolAtKey(key_name, value):
-#     AbstractDefaultSetter._SetKeyValOnTargets(key_name, value, bpy.context.selected_objects)
-#     # ObjectLookupHelper._setValForKeyOnSelected(key_name, bpy.context, value)    

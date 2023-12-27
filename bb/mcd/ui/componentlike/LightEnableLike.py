@@ -50,7 +50,6 @@ class LightEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
             AbstractDefaultSetter._RemoveKey(_getSuffixKey(suffix), targets)
 
 
-
 class LightEnableLike(EnableFilterSettings, AbstractComponentLike):
 
     @staticmethod

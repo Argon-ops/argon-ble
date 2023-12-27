@@ -15,12 +15,7 @@ from bpy.types import (Operator,
 import json
 
 from bb.mcd.util import ObjectLookupHelper
-from bb.mcd.shareddataobject import SharedDataObject
-from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
 
-from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from bb.mcd.util import DisplayHelper
-from bb.mcd.ui import Inspector
 from bb.mcd import MelCustomDataUtilBA
 
 ##############################################################
@@ -176,7 +171,7 @@ class CU_OT_InspectorPopup(bpy.types.Operator):
         return wm.invoke_props_dialog(self, width=dialog_size)
 
     def draw(self, context):
-        MelCustomDataUtilBA.drawInspector(self.layout, context, False, False) 
+        MelCustomDataUtilBA._drawInspector(self.layout, context, False, False) 
 
 classes = (
     CU_OT_InspectorPopup,

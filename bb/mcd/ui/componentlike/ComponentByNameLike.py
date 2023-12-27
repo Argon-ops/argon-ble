@@ -32,12 +32,6 @@ class ComponentByNameDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
     def OnAddKey(key : str, val, targets):
         pass
-        # default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
-        # try:
-        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append(), default['default_name'], targets)
-        # except BaseException as e:
-        #     print(F" failed to set default {str(e)}")
-        #     print(F"default keys: {default.keys()}")
 
     @staticmethod
     def OnRemoveKey(key : str, targets):

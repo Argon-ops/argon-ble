@@ -5,7 +5,6 @@ from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 
 def getValueFromKey(key_name):
-    # CONSIDER: possibly we should show a consensus value of all selected objects?
     return ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
 
 def getStringFromKey(key_name, default=""):
@@ -34,7 +33,6 @@ def getFloatArrayFromKey(key):
 
 def getColorArrayFromKey(key):
     fray = getValueFromKey(key)
-    # print(F"colors {', '.join([str(c) for c in fray])}")
     return fray if fray is not None else (0.0, 0.0, 0.0)
 
 def getFloat4ArrayFromKey(key):
@@ -80,30 +78,12 @@ def playableEnumIndexFromName(playableName : str):
 
 def playableEnumIndex(playableKey):
     return  playableEnumIndexFromName(getStringFromKey(playableKey))
-    # playableName = getStringFromKey(playableKey) 
-    # playables = bpy.context.scene.as_custom
-    # # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. (see below if curious)
-    # for i in range(len(playables)):
-    #     if playables[i].name == playableName:
-    #         return i
-    # return 0 # returning -1 spams warnings -1
 
 def playableFromIndex(idx : int) -> str:
     playables = bpy.context.scene.as_custom
     if len(playables) <= idx:
         return ""
-    result = playables[idx]
-    # print(F"got playable: {result}")
-    return result
-
-# @staticmethod
-# def updatePathFromPointer(collectionSelf, pathKey, pointerObject):
-#     if pointerObject is None:
-#         _ASJson.setValueAt(collectionSelf, pathKey, "")
-#         return
-#     parents = ObjectLookupHelper._hierarchyToString(pointerObject)
-#     _ASJson.setValueAt(collectionSelf, pathKey, parents)
-
+    return playables[idx]
 
 
 class GenericDefaultSetter(object):

@@ -379,7 +379,6 @@ class ExportUnityFbx(Operator, ExportHelper):
 			)
 	
 
-
 	
 
 	def draw(self, context):
@@ -443,9 +442,3 @@ def unregister():
 	bpy.utils.unregister_class(ExportUnityFbx)
 	# bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
 
-
-# if __name__ == "__main__":
-# 	register()
-
-# 	# test call
-# 	bpy.ops.export_scene.unity_fbx('INVOKE_DEFAULT')

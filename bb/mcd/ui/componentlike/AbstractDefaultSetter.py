@@ -24,8 +24,6 @@ def _IsEqual(key : str, a : object, b : object) -> bool:
     return False
 
 
-
-
 class AbstractDefaultSetter():
     @staticmethod
     def AcceptsKey(key : str) -> bool:

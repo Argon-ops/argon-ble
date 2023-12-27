@@ -42,9 +42,6 @@ from bb.mcd.ui.export import ExportBox
 
 from bb.mcd.ui.actionstarterlist import ActionStarterPanel
 
-# from more_stuff_here import more
-# more.more_stuff()
-
 # -------------------------------------------------------------------
 #   Operators
 # -------------------------------------------------------------------
@@ -119,7 +116,8 @@ class CDU_UL_PerObjectItems(UIList):
 def _drawInspectorListAndDetails(layout, context):
     scn = bpy.context.scene
     box = layout.box()
-    row = box.row() # layout.row()
+    row = box.row() 
+    
     # draw the key select uilist
     row.template_list("CDU_UL_PerObjectItems", "custom_def_list", scn, "custom", 
         scn, "custom_index", rows=5)
@@ -129,15 +127,13 @@ def _drawInspectorListAndDetails(layout, context):
 
     # no config file? 
     if len(prefs_items.values()) == 0:
-        row.label(text="you need to add some key-value pairs", icon="QUESTION")
-        row = layout.row()
-        row.label(text="see the preferences for this add-on", icon="ERROR")
+        layout.row().label(text="There's a problem", icon="ERROR")
         return
     
     Inspector.drawCurrentItemDetails(row, context)
 
 
-def drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=True):
+def _drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=True):
     box = layout.box()
     row = box.row()
 
@@ -148,11 +144,9 @@ def drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=Tr
             return
 
     box = box.box()
-    row = box.row()
-    row.menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
+    box.row().menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
     if wantSelByKey:
-        row = box.row()
-        row.menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
+        box.row().menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
 
     _drawInspectorListAndDetails(layout, context)
   
@@ -172,15 +166,12 @@ class CDU_PT_CustomPropHelper(Panel):
     def draw(self, context):
         layout = self.layout
 
-        drawInspector(layout, context)
+        _drawInspector(layout, context)
         
         # export box
         box = layout.box()
         ExportBox.Draw(box, context)
         
-        # box = layout.box()
-        # box.prop(context.scene.unityProjectRoot, "file_path", text="Unity Project Root")
-
         box = layout.box()
         MaterialListPanel.Draw(box, context)
 
@@ -191,10 +182,6 @@ class CDU_PT_CustomPropHelper(Panel):
         from bb.mcd.settings import GlobalSettings
         GlobalSettings.DrawGlobalsButton(box)
         
-
-# MORE TODOs:
-#   bring back the load config file button if only for dbug. but maybe not only?
-
 # -------------------------------------------------------------------
 #   Register & Unregister
 # -------------------------------------------------------------------
@@ -214,31 +201,14 @@ def syncDisplayKVs(scene):
         print("scene has no custom attrib bye")
         return
 
-    # FIXME TODO: when we first addKeyToselected 
-    #   we're finding that this list (scene.custom) has no 
-    #    entries.   When was this function supposed to be called??
-    # 
     pref_items = ObjectLookupHelper._getPrefItems(bpy.context) 
-    # spam to show how often
-    # print(F"Hi hi hi from syncDisplayKV. we have {len(pref_items.items())} items to add")
+
     scene.custom.clear()
     for key, defaultValueInfo in pref_items.items():
         dval = scene.custom.add()
         dval.key = key
         dval.relevant_prop_name = ObjectLookupHelper._getPropNameForType(defaultValueInfo.default)
         dval.handlingHint = defaultValueInfo.handlingHint
-
-    def DmessWithTestInt():
-        # works as expected
-        try:
-            ob = bpy.context.selected_objects[0]
-            testint = ob.testint
-            ob.testint = testint + 1 
-            # print(F"TESTING: {ob.testint}")
-        except BaseException as e:
-            pass
-            # print(F"something failed with testint {str(e)}")
-    DmessWithTestInt()
 
 @persistent
 def handleSelectionChanged(scene):
@@ -269,15 +239,10 @@ def register():
     # define a collection of KeyValItems and an index
     bpy.types.Scene.custom = CollectionProperty(type=CUSTOM_PG_KeyValItem)
     bpy.types.Scene.custom_index = IntProperty()
-    
     bpy.types.Scene.show_inspector = BoolProperty(default=True)
 
-    bpy.types.Object.testint = IntProperty()
-
     refreshHandlerCallbacks()
-    # are we allowed to sync
-    # print(F"CALL sync Display from register...")
-    # syncDisplayKVs(bpy.types.Scene)
+    
 
 def unregister():
     from bpy.utils import unregister_class
@@ -288,26 +253,3 @@ def unregister():
     del bpy.types.Scene.custom_index
     del bpy.types.Scene.show_inspector
 
-    del bpy.types.Object.testint
-
-if __name__ == "__main__":
-    register()
-
-if __name__ != "__main__":
-    print(F"This isn't main its: {__name__} . package: {__package__}")
-
-"""
-NOTES:
-  One tricky option for storing data per blend file is apparently
-    storing it in a text data block whose name begins with a dot: ".my-data"
-    CREDIT: https://blender.stackexchange.com/questions/8442/trouble-getting-windowmanager-properties-to-save-its-contents-with-blend-file
-    HOW: https://blender.stackexchange.com/questions/177742/how-do-i-create-a-text-datablock-and-populate-it-with-text-with-python
-    
-
-    # By the way: you can expose single object properties with .prop: 
-            # https://blender.stackexchange.com/questions/148924/add-custom-property-to-panel
-            # but we need to support multi object prop editing. hence this list of keys approach
-
-# credit: GUIList demo by p2or: https://gist.github.com/p2or/30b8b30c89871b8ae5c97803107fd494 
-
-"""

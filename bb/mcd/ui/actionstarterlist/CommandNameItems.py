@@ -2,28 +2,18 @@
 import bpy
 
 from bpy.props import (IntProperty,
-                       BoolProperty,
-                       FloatProperty,
-                       StringProperty,
-                       EnumProperty,
-                       CollectionProperty,
-                       PointerProperty)
+                       EnumProperty,)
+
 
 from bpy.types import (Operator,
-                       Panel,
                        PropertyGroup,
-                       UIList)
+                       UIList,)
 
-from bb.mcd.util import ObjectLookupHelper
-from bb.mcd.shareddataobject import SharedDataObject
-from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
-
-from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from bb.mcd.util import DisplayHelper
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
-#REGION ADD/SUBTRACT
+#region list operators
+
 class OT_CompositeCommandNamesActions(Operator):
     """Move items up and down, add and remove"""
     bl_idname = "composite_command.list_action"
@@ -51,7 +41,7 @@ class OT_CompositeCommandNamesActions(Operator):
             return {"FINISHED"}
         else:
             try:
-                item = cnames[idx] # scn.as_custom[idx]
+                item = cnames[idx] 
             except IndexError:
                 pass
             else:
@@ -68,9 +58,7 @@ class OT_CompositeCommandNamesActions(Operator):
                     self.report({'INFO'}, info)
 
                 elif self.action == 'REMOVE':
-                    # remove the list item
                     cnames.remove(idx)
-                    # update index
                     if scn.compositeCmdCmdNamesIdx > 0:
                         scn.compositeCmdCmdNamesIdx -= 1
 
@@ -84,7 +72,8 @@ class OT_CompositeCommandNamesActions(Operator):
 
         return {"FINISHED"}
 
-
+#endregion
+    
 class PG_AS_CommandName(PropertyGroup):
     """Ble needs the string to be wrapped in a property group to use in a list"""
     commandName : EnumProperty(
@@ -107,7 +96,7 @@ def DrawList(layout, playable):
     row.template_list("CUSTOM_UL_AS_CommandNameItems", "custom_def_list", playable, "commandNames", 
                         bpy.context.scene, "compositeCmdCmdNamesIdx", rows=5)
     col = row.column(align=True)
-    # col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='ADD', text="").action = 'ADD'
+    
     targetIndex = bpy.context.scene.as_custom.keys().index(playable.name)
     addOp = col.operator(OT_CompositeCommandNamesActions.bl_idname, icon='ADD', text="")
     addOp.action = 'ADD'

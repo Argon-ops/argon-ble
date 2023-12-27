@@ -33,7 +33,7 @@ modulesFullNames = [
     'bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
     'bb.mcd.ui.actionstarterlist.ActionStarterList',
 
-    'bb.mcd.ui.actionstarterlist.OT_TarAnimsList',
+    # 'bb.mcd.ui.actionstarterlist.OT_TarAnimsList',
     'bb.mcd.util.JsonFromItem',
     'bb.mcd.cduoperator.SetKeyValue',
     'bb.mcd.ui.SelectByKeyMenu',
@@ -55,7 +55,7 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.RigidbodyLike',
     'bb.mcd.ui.componentlike.LightEnableLike',
     'bb.mcd.ui.componentlike.OffMeshLinkLike',
-    'bb.mcd.ui.componentlike.unityinfo.UnityPaths',
+    # 'bb.mcd.ui.componentlike.unityinfo.UnityPaths',
     'bb.mcd.ui.componentlike.InteractionHandlerLike',
     'bb.mcd.ui.componentlike.InteractionHighlighterLike',
     'bb.mcd.ui.componentlike.LayerCamLockPickableLike',
@@ -77,13 +77,11 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.TextMeshLike',
     'bb.mcd.ui.componentlike.PlayableScalarAdapterLike',
     'bb.mcd.ui.materiallist.MaterialListPanel',
-    'bb.mcd.shareddataobject.SharedDataObject',
-    # 'bb.mcd.ui.materiallist.MaterialListExporter',
-    # 'bb.mcd.ui.componentlike.actionstarters.ActionStarterData',
+    # 'bb.mcd.shareddataobject.SharedDataObject', # RIP
     'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
     'bb.mcd.ui.actionstarterlist.ActionStarterPanel',
     'bb.mcd.objectinfo.ObjectInfo',
-    'bb.mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
+    # 'bb.mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
     'bb.mcd.exporter.ExportOp',
     'bb.mcd.settings.GlobalSettings',
     'bb.mcd.foo.ScratchPad',
@@ -91,17 +89,6 @@ modulesFullNames = [
 
 import sys
 import importlib
-
-# modulesFullNames = {}
-# print(F"DEBUG MODE? {'DEBUG_MODE' in sys.argv }")
-# for currentModuleName in modulesNames:
-#     modulesFullNames[currentModuleName] = ('{}'.format(currentModuleName)) 
-#     # if 'DEBUG_MODE' in sys.argv:
-#     #     modulesFullNames[currentModuleName] = ('{}'.format(currentModuleName))
-#     # else:
-#     #     modulesFullNames[currentModuleName] = ('{}.{}'.format(__name__, currentModuleName))
-#     print(F" FULL NAME: {modulesFullNames[currentModuleName] } | __name__ is {__name__} curModuleName: {currentModuleName}")
- 
 
 for fullName in modulesFullNames: #.values():
     print(F"mod full name {fullName}")
@@ -152,7 +139,7 @@ def _removeFunction(fn_list, fn):
 
 def _deferredSetup_UNIQUENAME_135A(scene, despgraph):
     print(F"deferred setup")
-    for cm in modulesFullNames.values():
+    for cm in modulesFullNames: #.values():
         if cm in sys.modules:
             if hasattr(sys.modules[cm], "defer"):
                 sys.modules[cm].defer()
@@ -166,7 +153,8 @@ scheduleDeferred()
 
 #endregion
  
-if __name__ == "__main__":
+
+if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
     register()
 
 

@@ -50,8 +50,6 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
         #     **last_props)
         return {'FINISHED'}
 
-    # TODO: shouldn't we select the data objects?? 
-    #  pretty sure we had this set up before. not sure what happened
     def execute(self, context):
         from bb.mcd.exporter import ExportOp
 
@@ -70,7 +68,7 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
         #  WORK AROUND: if, during last export, the user chose a scale option other than default (for example: FBX SCALE ALL) 
         #   this time around the script throws an error: 
         #      TypeError: Converting py args to operator properties:  expected a string enum, not int
-        # Therefore presumptuously update the last_props array
+        #       Therefore presumptuously update the last_props array
         if 'apply_scale_options' in last_props and isinstance(last_props['apply_scale_options'], int):
             aso = last_props['apply_scale_options']
             enumstr = 'FBX_SCALE_NONE'
@@ -89,25 +87,14 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
             **last_props)
 
         SharedDataObject.selectSharedDataObjects(False) #TODO: ideally we'd restore the prev selection state
-
-        print(F"After call bpy.ops.export_scene.fbx")
-        #  TODO: this happens to early apparently. 
-        #   the call to bpy.ops.export_ is not synchronous?  TEST
-        # ExportOp.PostExport(targetDataHolder)
+        
         return {'FINISHED'}
-
-
-# Only needed if you want to add into a dynamic menu
-# def menu_func_export(self, context):
-# 	self.layout.operator(CDU_OT_DefaultExportUnityFBX.bl_idname, text="Default Unity FBX (.fbx)")
 
 
 def register():
 	bpy.utils.register_class(CDU_OT_DefaultExportUnityFBX)
-	# bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
 
 
 def unregister():
 	bpy.utils.unregister_class(CDU_OT_DefaultExportUnityFBX)
-	# bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
 

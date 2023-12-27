@@ -100,8 +100,8 @@ def handleRemoveKey(key, context): # target_list):
         if key in target:
             del target[key]
 
-    # let the default setters do their own clean up
-    for clc, default_setter in _components.items(): # default_setters:
+    # let the default setters clean up
+    for clc, default_setter in _components.items(): 
         if default_setter.AcceptsKey(key):
             default_setter.OnRemoveKey(key, targets)
             # if issubclass(clc, EnableFilterSettings):
@@ -117,11 +117,6 @@ def handleSetDefaultValue(key, val, context): # targets):
     for component_like_class, default_setter in _components.items(): 
 
         if component_like_class.AcceptsKey(key):
-
-            # target_list = context.selected_objects if default_setter.IsMultiSelectAllowed() else [context.active_object]
-            # print(F"handle Set Default with targets {len(target_list)}")
-            # if not default_setter.IsMultiSelectAllowed():
-            #     print(F"no multi. target [0] is {target_list[0].name}")
 
             # make sure the base key is set to something. the default setter can overwrite if it wants
             _setPrimitiveValue(key, val, targets) # target_list) 

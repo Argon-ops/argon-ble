@@ -22,11 +22,8 @@ from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
 
 import json
 
-# TODO: option to add a new Playable from an interation handler
-# TODO: option to edit the chosen playable from interaction handler
 
-
-#REGION ADD REMOVE EXTRA PLAYABLES
+#region ADD REMOVE EXTRA PLAYABLES
 
 __MaxExtraPlayables = 5
 
@@ -66,7 +63,7 @@ class CU_OT_NumExtraPlayables(bpy.types.Operator):
         RemoveUnusedPlayableData(context)
         return {'FINISHED'}
 
-#ENDREGION
+#endregion
 
 
 class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
@@ -164,7 +161,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
             spl.prop(mcl, attrName, text="") 
             if attrib: 
                 row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = attrib 
-                # row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableId = context.scene.as_custom[attrib].internalId
+
             plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Playable")
             plusOp.should_insert = True
             plusOp.insert_at_idx = idx 
@@ -208,14 +205,8 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                 elif mcl.exitSignalInputType == 'Playable':
                     row.prop(mcl, "exitSignalPlayable", text="")
 
-        # TODO: looks like we have the ability for playables to be signal providers
-        #  but let clicks inters use this also
-        #   Then one could easily implement a toggle button behaviour right???
-        #     just set the target playable as its own signal provider...
-        #       and invert...
 
         elif mcl.interactionType == 'CLICK':
-            # boxb.row().prop(mcl, "clickFeedback", text="Click Feedback")
             row = boxb.row()
             row.prop(mcl, "isClickHold")
             if mcl.isClickHold:
@@ -225,8 +216,6 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                     row.prop(mcl, "discreteClickFakeHoldTime", text="Discrete Click Hold Time")
 
             # TODO: "useRadius"
-            # row = boxb.row()
-            # row.prop(mcl, "radius")
             row = boxb.row()
             row.prop(mcl, "enterSignal", text="Mouse Down Signal")
             if mcl.isClickHold:
@@ -247,15 +236,6 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
 
             boxc.row().prop(mcl, "sleepBehaviour", text="Sleep Behaviour")
 
-            # TODO: let any click or trigger handler have destroy settings...
-            #  so separate configs: the destroy settings 
-            #    and the destroy when: never, after first interaction
-            
-
-
-# TODO: in InterHandler add playable list. seems to assume
-#   that a playable exists. In any case you don't get full options to add a playable
-#     forced to go down to the playable panel
 
         # sleep also settings
         def dislaySleepAlsoSettings(box_ss):
@@ -272,23 +252,11 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
             box_ss.row().prop(mcl, "sleepColliderAlso", text="Sleep Collider Also")
         
         dislaySleepAlsoSettings(box.box())
-        # mcl.displayEnableSettings(box)
-        
-        # TRIGGER ENTER EXIT
-        # CONSIDER : It starts to make more sense to 
-        #   have click handlers and trigger handlers be separate classes...
-        #    We are getting two layers of conditions with this current scheme...
-
-# TODO: how to pick playableN in python code
-
 
     playable : EnumProperty(
-        # _playablesItemCallback, # TODO: use the CLU version of this. TIDY! # also to. finish designing SliderColliderLike
+
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable")),  # _playableEnumGetter(self, "_playable"),
-        # post mortem: there's probably a way, but trying to store the playable's internalId, while displaying its name is 
-        #   not working. 
-        # set=lambda self, value : CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].internalId),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].name),
     )
     numExtraPlayables : IntProperty(
@@ -403,11 +371,6 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_discrete_click_fake_hold_time"))
     )
 
-    # clickFeedback : BoolProperty(
-    #     description="If true, briefly flash on click",
-    #     get=lambda self : CLU.getBoolFromKey(_Append("_click_feedback")),
-    #     set=lambda self, value : CLU.setValueAtKey(_Append("_click_feedback"), value)
-    # )
 
     # destroy behaviour
     selfDestructBehaviour : EnumProperty (

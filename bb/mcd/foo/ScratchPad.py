@@ -1,9 +1,9 @@
 import bpy
 
-from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
-        PlayablesExporter as PE
-    )
-from bb.mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
+# from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
+#         PlayablesExporter as PE
+#     )
+# from bb.mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
 
 def ObjDictTest():
     import json
@@ -19,9 +19,21 @@ def ObjDictTest():
         print(F"field: {fn} val: {getattr(ob, fn)} serval: {serVal}")
 
 
-def TestWriteCommands():
-    target = GetFirstSelectedObjectOrAny()
-    PE.WriteCommandsToTargetObject(target)
+
+def _D_anyActionNames():
+    for obj in bpy.context.scene.objects:
+        ad = obj.animation_data
+        if ad:
+            if ad.action:
+                print(obj.name,'uses',ad.action.name)
+            for t in ad.nla_tracks:
+                for s in t.strips:
+                    print(obj.name,'uses',s.action.name)
+
+
+# def TestWriteCommands():
+#     target = GetFirstSelectedObjectOrAny()
+#     PE.WriteCommandsToTargetObject(target)
 
 def ShowCommands():
     from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS

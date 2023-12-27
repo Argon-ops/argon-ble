@@ -17,8 +17,7 @@ suffixes = {
     "_component_names" : "",
 }
 
-# TODO: when we supply the suffixes here, all of these DefaultSetter methods
-#  can be generic
+
 class DisableComponentDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
     def AcceptsKey(key : str):
@@ -59,7 +58,7 @@ class DisableComponentLike(PropertyGroup, AbstractComponentLike):
         row = box.row()
         row.prop(mcl, "componentNames", text="Component Name")
 
-    # TODO: we actually want a collection of strings.
+    # TODO: actually want a collection of strings.
     componentNames : StringProperty(
         description="Comma-separated names of the component(s) to disable",
         get=lambda self: CLU.getStringFromKey(_Append("_component_names")),

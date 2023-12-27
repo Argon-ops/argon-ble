@@ -1,14 +1,14 @@
 import bpy
 from bb.mcd.shareddataobject import SharedDataObject
 
-def getProps(obj):
+def DgetProps(obj):
     try:
         for prop, val in vars(obj).items():
             print(prop, " : ", val)
     except:
         print(F"trouble")
 
-def getAnimInfo(lookup):
+def DgetAnimInfo(lookup):
     for ob in bpy.context.scene.objects :
         print(F" %%% {ob.name} %%% ")
         if ob.type not in ['MESH','ARMATURE']:
@@ -27,21 +27,3 @@ def getAnimInfo(lookup):
                     for strip in track.strips:
                         print(F"    strip action: {strip.action.name}")
         
-        
-
-
-# lookup = dict()
-# getAnimInfo(lookup=lookup)
-
-def writeObjectInfo(context):
-    # getAnimInfo()
-    print(F"ob info")
-    stor = dict()
-    for ob in bpy.data.objects:
-        # print(ob.name)
-        # getProps(ob)
-        # print(F"{ob.name} anim: {ob.animation.name}")
-        print(dir(ob))
-
-        # TODO : get / make the shared object and write a big json dictionary that lists the animations
-        #   write more data as needed!

@@ -12,7 +12,6 @@ class EHandlingHint():
 
 class DefaultValueInfo(object):
     default : any
-    # serializableDefault : any # TODO this shouldn't exist?
     handlingHint : str
     help : str
 
@@ -25,7 +24,6 @@ def _parse(val : any) -> DefaultValueInfo:
     def createDefaultValueInfo(default, hint : str, help : str) -> DefaultValueInfo:
         dvi = DefaultValueInfo()
         dvi.default = default
-        # dvi.serializableDefault = serializableDefault
         dvi.handlingHint = hint
         dvi.help = help
         return dvi
@@ -38,9 +36,7 @@ def _parse(val : any) -> DefaultValueInfo:
     if hint == "TAG":
         return createDefaultValueInfo(0, EHandlingHint.TAG, "")
 
-    # object with config directives
-    # TODO: serializbleDefault is pointless and even default is a little awkward.
-    #    figure out what settings are easiest for the clients of this script
+    # CUSTOM_INSPECTOR
     default = 0
     if 'default' in val:
         default = val['default']
@@ -65,7 +61,7 @@ def getDefaultValue(key : str):
     global _storage
     item = _storage[key]
     if item.handlingHint == EHandlingHint.TAG:
-        return -7 # value doesn't matter well never see this. nonetheless just return something
+        return -7 # value doesn't matter; we'll never see this. nonetheless just return something
     return item.default
 
 def getHandlingHint(key: str) -> EHandlingHint:
@@ -84,12 +80,6 @@ def getHelp(key : str) -> str:
     except BaseException as e:
         return ""
 
-# def getSerializableDefaultValue(key : str):
-#     # return getDefaultValue(key)
-#     # # BUT WE ACTUALLY WANT THE BELOW
-#     global _storage
-#     item = _storage[key]
-#     return item.serializableDefault
 
 def getMCDConfig() -> typing.Dict[str, DefaultValueInfo]:
     global _storage
@@ -99,6 +89,3 @@ def getMCDConfig() -> typing.Dict[str, DefaultValueInfo]:
     return _storage
 
 
-
-# TODO: load Mel's defaults from an adjacent str that's json formatted in file
-#  MelDefaults.py

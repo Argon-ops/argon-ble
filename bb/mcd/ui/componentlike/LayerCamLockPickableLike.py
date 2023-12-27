@@ -8,10 +8,8 @@ from bpy.props import (IntProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
 
-from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
-from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 suffixes = {
     "mel_layer" : "CamLockPickable",
@@ -60,7 +58,6 @@ class LayerCamLockPickableLike(PropertyGroup, AbstractComponentLike):
     @staticmethod
     def Display(box, context) -> None:
         pass
-        # mcl = context.scene.layerCamLockPickableLike
 
     
 

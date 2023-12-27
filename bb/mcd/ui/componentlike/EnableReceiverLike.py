@@ -64,7 +64,6 @@ class EnableReceiverLike(PropertyGroup, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_apply_to_children"), value),
     )
 
-    # LAMENT: this initializer stuff should be its own component-like 
     setInitialState : EnumProperty(
         items=(
             ('DONT', 'Don\'t set initial state', 'Do nothing at start up'),
@@ -74,8 +73,6 @@ class EnableReceiverLike(PropertyGroup, AbstractComponentLike):
         get=lambda self : CLU.getIntFromKey(_Append("_set_initial_state")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_set_initial_state"), value)
     )
-
-# TODO: ObjectSwapLike
 
 classes = (
     EnableReceiverLike,

@@ -15,16 +15,14 @@ from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike.util import ObjectPointerMsgbusUtils as MsgbusUtils
 
-from bb.mcd.ui.actionstarterlist import ActionStarterList
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.sharedtypes import TurnOnOffAction
 
-import json
 
 from bpy.app.handlers import persistent
 
-# REGION LoadPost boilerplate
+#region LoadPost boilerplate
 
 @persistent
 def resubAllLoadPostInterHighlighter(dummy):
@@ -33,20 +31,19 @@ def resubAllLoadPostInterHighlighter(dummy):
     fieldsAndPropNames = (
         ("rendererTarget", "_renderer_target"), # for each object PointerProperty that needs updates, add a line here
     )
-    print(F"=== resub all for highlighter ===")
+
     for fieldAndPropName in fieldsAndPropNames:
         MsgbusUtils.resubscribeAll_LP(
             perObjectFieldName, 
             fieldAndPropName[0], 
             _Append(fieldAndPropName[1])) #,  
-            #HighlighterPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
     from bb.mcd.util import AppHandlerHelper
     AppHandlerHelper.RefreshLoadPostHandler(resubAllLoadPostInterHighlighter) 
 
-# END REGION LoadPost boilerplate
+#endregion LoadPost boilerplate
 
 
 class InteractionHighlighterDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
@@ -99,7 +96,6 @@ class HighlighterPerObjectData(PropertyGroup, AbstractPerObjectData):
         )
     )
 
-# TODO: not here: bug where the program renames one of your objects to z_Duks_sharedDataRoot ???
 
 class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
 
@@ -120,7 +116,7 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
         if mcl.mode == "HighlightMaterial":
             boxb.row().prop(mcl, "highlightMat", text="Highlight Material")
 
-            # fend off a None error. although not sure how we get here when active_object is None (guess: copy pasting an object that has this?)
+            # fend off an error. although not sure how we get here when active_object is None (guess: copy pasting an object that has this?)
             if context.active_object is not None:
                 # per obje
                 hlpo = context.active_object.highlighterPerObjectData
@@ -196,7 +192,6 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_downtime_seconds"), value)
     )
 
-    # TODO: decide if this is the same thing as enableRadius
     visibleRadius : FloatProperty(
         description="When the camera is further than this radius from the beacon, the beacon will be hidden. \
                         If zero or less, the beacon will never be hidden",

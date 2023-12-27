@@ -17,10 +17,6 @@ class CUSTOM_OT_SetDefaultValue(Operator):
         default = ObjectLookupHelper._guessReasonableValue(self.target_key, context) 
         from bb.mcd.ui.componentlike import StorageRouter
         StorageRouter.handleSetDefaultValue(self.target_key, default, context)
-
-        # ObjectLookupHelper._setValForKeyOnSelected(self.target_key, context, default)
-        # no need to update the state of our display list. it reads from the objects themselves
-        
         return {'FINISHED'}
 
 def register():

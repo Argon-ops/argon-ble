@@ -10,17 +10,9 @@ import json
 class CUSTOM_PG_PrefsKV(PropertyGroup):
     """ Key value type for use with prefs. 
     
-        Duplicates the fields in CUSTOM_PG_KeyValItem.
-        But without the val/vint/vfloat getter and setter functions """
+        Matches the fields in CUSTOM_PG_KeyValItem."""
 
-    # CONSIDER: can a property group own another property group?
-    #  So we could define a PG_MultiType? In this way, we'd remove
-    #   the duplicate code? The MultiType decides what type exists and HOW one could read/write them (to an object)
-    #    This class and its sibling KeyValItem class decide WHETHER to read/write them??? 
-    #  BASICALLY feels like we need deeper knowledge of the question 'what are prop group getters and setters'.
-    #    do 'getters and setters' change the location where data is stored? 
-    #   Also, deeper knowledge of what Blender can store and persist as a pref
-    
+ 
     key: StringProperty(
         name="key",
         default="")

@@ -17,7 +17,6 @@ _suffixes = {
     "_threshold" : .5
 }
 
-# a default setter equivalent for EFSs
 class EnableFilterDefaultSetter(object):
     @staticmethod 
     def OnAddKey(enableClass, key, targets):
@@ -26,25 +25,17 @@ class EnableFilterDefaultSetter(object):
 
     @staticmethod
     def OnRemoveKey(enableClass, targets):
-        print(F"on rm keys EFDS")
         for suffix in _suffixes.keys():
-            print(F" will rm key: {enableClass.Append(suffix)}")
             AbstractDefaultSetter._RemoveKey(enableClass.Append(suffix), targets)
 
 
-class EnableFilterSettings(PropertyGroup): # or is it an operator
+class EnableFilterSettings(PropertyGroup):
 
     IS_ENABLEABLE_CLASS = True
-    
-    # filterType : EnumProperty(
-    #     items=(
-    #         ('No filter', 'No filter', 'Do not mess with'), # DECIDE: or should we filter the signal (float 01) value at this point?? and then scalars could use the same filters??? no destroying info?
-    #     )
-    # )
-
+   
     clamp01 : BoolProperty(
         description="If true, clamp the signal between 0 and 1. Don't clamp otherwise",
-        # NOTE: using self.Append. We require (fervently hope) that the sub-class mix-in inherits from AbstractComponentLike
+        # NOTE: using self.Append. We require (hope) that the sub-class mix-in inherits from AbstractComponentLike
         get=lambda self : CLU.getBoolFromKey(self.Append("_clamp01"), True), 
         set=lambda self, value : CLU.setValueAtKey(self.Append("_clamp01"), value)
     )
@@ -86,16 +77,16 @@ class EnableFilterSettings(PropertyGroup): # or is it an operator
         #   then the classes don't even need to call it from their Display methods
         #    can be called by Inspector.py
 
-        # Mild evil: this relies on the child class being an instance of AbstractComponentLike 
-        #    (i.e. AbstractComponentLike is it's other parent)
-        #  why are we dabbling in evil: so that child classes can be spared calling this method from their Display methods manually
+        # Mild evil: GetSceneInstance() is an AbstractComponentLike classmethod
+        #  We are assuming that this class also descends from AbstactComponentLike
+        #  why do we need this: so that child classes can be spared calling this method from their Display methods manually
         self = cls.GetSceneInstance() 
 
         box = box.box()
         row = box.row()
         row.prop(bpy.context.scene, "showEnableSettings", 
             icon="TRIA_DOWN" if bpy.context.scene.showEnableSettings else "TRIA_UP",
-            icon_only=True, emboss=False )
+            icon_only=True, emboss=False)
         row.label(text="Enable Filter")
         if not bpy.context.scene.showEnableSettings:
             return

@@ -53,3 +53,216 @@
             #    since it may also enable us to be helpful when prompting the user to make other mappings
             # 
             #   Also, we could potentially warn the user, if the name in the field isn't in their project. b/c e.g. they renamed the material
+
+
+
+""" NOTES:
+    We can envision one scheme where: Each playable type adds a pointer instance of itself to the scene.
+    Somehow...given a string, someone knows which of these types to ask to draw but how...
+"""
+
+"""
+NOTES:
+  One tricky option for storing data per blend file is apparently
+    storing it in a text data block whose name begins with a dot: ".my-data"
+     https://blender.stackexchange.com/questions/8442/trouble-getting-windowmanager-properties-to-save-its-contents-with-blend-file
+    HOW: https://blender.stackexchange.com/questions/177742/how-do-i-create-a-text-datablock-and-populate-it-with-text-with-python
+    
+
+    # By the way: you can expose single object properties with .prop: 
+            # https://blender.stackexchange.com/questions/148924/add-custom-property-to-panel
+            # but we need to support multi object prop editing. hence this list of keys approach
+
+# credit: GUIList demo by p2or: https://gist.github.com/p2or/30b8b30c89871b8ae5c97803107fd494 
+
+"""
+
+   # CONSIDER: can a property group own another property group?
+    #  So we could define a PG_MultiType? In this way, we'd remove
+    #   the duplicate code? The MultiType decides what type exists and HOW one could read/write them (to an object)
+    #    This class and its sibling KeyValItem class decide WHETHER to read/write them??? 
+    #  BASICALLY feels like we need deeper knowledge of the question 'what are prop group getters and setters'.
+    #    do 'getters and setters' change the location where data is stored? 
+    #   Also, deeper knowledge of what Blender can store and persist as a pref
+
+
+     # TODO CUSTOM_PG_AS_Collection has a nonsenscical name. But moreover
+    #  we need to figure out how to subclass it. Is that OK? Collection prop
+    #   but the members of the collection are actually sub classes?
+    #  One snare is that Cprop's .add method doesn't take parameters?? or does it
+    #  can we specify what it adds? Or could we work around by...
+    #   having a wrapper object. that owns the actual CUSTOM_PG_AS_Collection sub-class object?
+    #  (This would be as a pointer property...)
+    #   Or some scheme using a hierarchy of objects, one for each playable.
+    #  Each object is assigned a collection prop?
+    #   It'd be great to learn the what and how of pointers to custom props in blender scripting
+    #  Like what does it mean to assign an IntProperty or PointerProperty to the type Object
+    #   Does each object get a ref to that type??
+    #  Or are we allowed to assign a pointer property to an object using: ob['myPointerKey'] PointerProperty(etc..)?
+    # Maybe make a button to test this stuff
+   
+
+###########################################################    
+###########################################################    
+   # HOW TO KEY MAP
+
+addon_keymaps = []
+
+def register()
+   
+    # addon_keymaps.clear()
+    # handle the keymap
+    # wm = bpy.context.window_manager
+    # kc = wm.keyconfigs.addon
+    # if kc:
+    #     km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+    #     kmi = km.keymap_items.new(CU_OT_PlayableCreate.bl_idname, type='R', value='PRESS', ctrl=True)
+    #     addon_keymaps.append((km, kmi))
+
+def unregister():
+
+    # for km, kmi in addon_keymaps:
+    #     km.keymap_items.remove(kmi)
+    # addon_keymaps.clear()
+
+###########################################################    
+###########################################################    
+
+# Object Pointer Msg bus
+
+## RETREAT: multi-select version of onObjectUpdate that might work but then we remembered 
+##  we can't directly assign to PointerProperties.
+##   So, just revert to only dealing with the active_object. no multi selection
+# def onObjectUpdate(referenceTarget, targets, perObjectFieldName, ptrPropName, propertyKey, ownerTokenKey : str) : # callbackOwner):
+#     for target in targets:
+#         perObjectSelf = getattr(target, perObjectFieldName)
+#         ptrPropObject = getattr(perObjectSelf, ptrPropName)
+#         callbackOwner = OwnerTokens.GetOrAddToken(perObjectSelf.ownerTokens, ownerTokenKey)
+#         updateMsgbus([target], ptrPropObject, propertyKey, callbackOwner) # TODO: target doesn't need to be in a list. 
+    
+#     # also update the values that the ptrPropObjects point to
+#     #  so that they match that the value set on the active object (referenceTarget)
+#     #  separate for loop for clarity? (wait... are we allowed to do that??)
+
+#     #  write to this object's properties 
+#     AbstractDefaultSetter._SetKeyValOnTargets(
+#         propertyKey, 
+#         ptrPropObject.name if ptrPropObject is not None else "", 
+#         targets)
+
+# TODO: array-ize everything. meaning, for each target. clear by THAT target's owner (need a list of owners)
+# also, array-ize the callback: each target gets its own personal callback with its personal owner object
+#  WHY: this way, we'll avoid scenarios where a callback attached to an objects owner doesn't decide to meddle with
+#   the data on another object--especially after that object has (potentially) reassigned its object pointer; so the
+#   first object has no business.
+
+# FROM CAMLOCK 
+
+# Since Cam Lock data wants to have object pointer properties
+#  it makes sense to store a property group per object...
+#  Extended reminder notes below
+
+# REMINDER/GUIDE: how to do PointerProperties to blender Objects (when you need to use their update callbacks):
+#  Define a PropertyGroup class that mixin-inherits AbstractPerObjectData (e.g. CamLockPerObjectData)
+#   In the class, define some fields that are pointer-properties to objects. 
+#    Use the MsgbusUtils.onObjectUpdate as shown in CamLockPerObjectData
+#  The goal is to have an object reference that also writes its name to the 
+#    owner object's (i.e. selected object's) custom props when the user chooses an object in the picker UI
+#    If users never renamed objects this would be simple. But, since they do rename objects,
+#       we also need to respond when they rename the pointed-to object. Otherwise the custom props key could
+#         become out of sync when/if they rename.
+#   So...
+#  the onObjectUpdate function does two things: 
+#    1. writes the new object's name to a custom props key
+#    2. refreshes a msgbus callback to target the newly picked reference object (and remove any no-longer-relevant callbacks.)
+#
+#  Then...there's a next problem
+#    next problem is that these msgbus callbacks don't persist when a new file loads.
+#    So define a function (e.g. 'resubscribeAllLoadPost') that iterates over all objects in the scene and checks
+#      whether they own a non-None reference to the per object data object. 
+#       If they do, refresh the msgbus callback for each field of the object that refers to another object
+#            (and that requires custom prop updating).
+#     You want this function to get called on file load, so use the AppHandlerHelper.RefreshLoadPostHandlers function
+#       providing the function and its name as a string (TODO: just use .__name__ and spare the extra parameter)
+
+
+#NOTES
+   
+    # Need an object per target-hideRoot pair. i.e. an owner object per target-per variable.
+    #   can we use a static dictionary. together with object scoped variables...
+
+    # Alternative, use an object scoped property group? With this scheme...do we need to add a msg_bus? Yes, for re-name.
+    #  So in this case...we use the Object pointer 
+    #    Basically the same idea, but it might
+    #   look more comprehensible? 
+
+    # TODO: hide root object / show root objects
+    #  How to msgBus again?? Want to know when object's name changes right?
+    #   Keep track of any CamLockSessionLike owners
+    #    Subscribe to name changes for::
+    #     all objects? Then, just iterate over the owners and re-write their names to the props?
+    #  
+
+        #  FORGOT WHAT THIS MEANS
+        # TODO: looks like we have the ability for playables to be signal providers
+        #  but let clicks inters use this also
+        #   Then one could easily implement a toggle button behaviour right???
+        #     just set the target playable as its own signal provider...
+        #       and invert...
+
+
+
+#BEAUTIFUL NOTES: please ignore
+
+# TODO: require this to exist for clarity
+
+# This feels much more straight forward -- more like the blender way 
+#   the only thing is, its making us rethink the scheme embodied by the ItemKV prop group
+#   Seems more wholesome to maintain a list of keys that are present on sel ob[s]
+#  Knowing how to handle them, could be left to the sub classes...
+#  But then again the ItemKV sceme makes it easy to adopt new custom Keys / Value types from a json file
+#  Perhaps there's a big divide between keys that MelCustoData knows how to handle and keys it can only 
+#    handle in default ways...
+
+# JSON based method
+# def getBoolFromSerKey(val_key, component_key):
+#     serval = ObjectLookupHelper._getSharedVal(val_key, bpy.context)
+#     if serval is None or serval == ObjectLookupHelper._MIXED_():
+#         return False
+#     try:
+#         val = json.loads(serval)
+#         result = val[component_key]
+#         if isinstance(result, bool) == False:
+#             raise "won't ever happen"
+#         return result
+#     except BaseException as e:
+#         print(F"something failed: {str(e)}")
+#         return False
+
+# def setBoolWithSerKey(val_key, component_key, value):
+#     serval = ObjectLookupHelper._getSharedVal(val_key, bpy.context)
+#     if serval is None or serval == ObjectLookupHelper._MIXED_():
+#         return
+#     obj = json.loads(serval)
+#     obj[component_key] = value
+#     serialized = json.dumps(obj)
+#     ObjectLookupHelper._setValForKeyOnSelected(val_key, bpy.context, serialized)
+
+# kind of hate the json check in out way
+#   let's go back to the special keys way. it was wonky and beautiful
+#    just need to do a littl special handling when we first add the keys right?
+#   or if its multi-selected, not much of a problem...
+# plus all that json deserialization on the Unity side could be slow
+#  but just make sure you have the means / mechanisms for keeping 
+#   the extra custo prop keys in synch with the main key
+
+# def getBoolFromKey(key_name):
+#     # CONSIDER: possibly we should show a consensus value of all selected objects?
+#     isTrigger = ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
+#     if isTrigger is None:
+#         return False
+#     return isTrigger
+
+# def setBoolAtKey(key_name, value):
+#     AbstractDefaultSetter._SetKeyValOnTargets(key_name, value, bpy.context.selected_objects)
+#     # ObjectLookupHelper._setValForKeyOnSelected(key_name, bpy.context, value)    

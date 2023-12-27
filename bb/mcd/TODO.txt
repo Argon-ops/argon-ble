@@ -27,4 +27,11 @@
 
 # FIXME: items don't remove from list when materials are deleted
 
+# TODO: BoxColliders should have enableables? (Yes, but too much; save it for the next ship)
+
+            # TODO: let any click or trigger handler have destroy settings...
+            #  so separate configs: the destroy settings 
+            #    and the destroy when: never, after first interaction
+
+
 

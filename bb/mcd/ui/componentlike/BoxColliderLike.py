@@ -11,8 +11,6 @@ from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
-# TODO: BoxColliders should have enableables? (Yes, but too much; save it for the next ship)
-
 class BoxColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
     def AcceptsKey(key : str):

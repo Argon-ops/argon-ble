@@ -12,14 +12,9 @@ from bpy.types import (Operator,
                        Panel,
                        PropertyGroup,
                        UIList)
-import json
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.shareddataobject import SharedDataObject
-from bb.mcd.ui.actionstarterlist import OT_TarAnimsList
-
-from bb.mcd.ui.componentlike.enablereceiverbutton import EnableReceiverButton
-from bb.mcd.util import DisplayHelper
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.actionstarterlist import CommandNameItems
@@ -137,128 +132,6 @@ class ASSharedDataUtil:
         # prefix must match the import script in unity addon
         return F"{ASSharedDataUtil.__DATA_KEY_PREFIX__}{playableName}"
     
-    # def SharedASObjectExists():
-    #     return SharedDataObject.objectExists("zDuksGames_AS_SharedObject")
-
-    # @staticmethod
-    # def _getDataKey(actionName : str):
-    #     return F"{_ASJson._getASBaseKey(actionName)}{_ASJson.__DATA_KEY_SUFFIX__}"
-
-    # @staticmethod
-    # def _getJSONString(actionName : str, sharedDataObj):
-    #     dataKey = _ASJson._getDataKey(actionName)
-    #     if dataKey in sharedDataObj:
-    #         return sharedDataObj[dataKey]
-    #     return ""
-
-    # @staticmethod
-    # def _getData(actionName : str, ob):
-    #     jsonStr = _ASJson._getJSONString(actionName, ob)
-    #     if not jsonStr:
-    #         return None
-    #     return json.loads(jsonStr)
-
-    # @staticmethod
-    # def _getValueAt(actionName : str, key, ob):
-    #     data = _ASJson._getData(actionName, ob)
-    #     if not data:
-    #         return None
-    #     if key not in data.keys():
-    #         return None
-    #     return data[key]
-    
-    # @staticmethod
-    # def _copyFromTo(fromActionName : str, toActionName : str, ob):
-    #     jsonStr = _ASJson._getJSONString(fromActionName, ob)
-    #     ob[_ASJson._getDataKey(toActionName)] = jsonStr
-
-    # @staticmethod
-    # def getValueAt(collectionSelf, jsonkey):
-    #     ob = _ASJson.GetActionStarterSharedObject()
-    #     return _ASJson._getValueAt(collectionSelf.name, jsonkey, ob)
-
-    # @staticmethod
-    # def getStringAt(collectionSelf, jsonkey):
-    #     result = _ASJson.getValueAt(collectionSelf, jsonkey)
-    #     return result if result else ""
-    
-    # @staticmethod
-    # def getFloatAt(collectionSelf, jsonkey, default=0.0):
-    #     result = _ASJson.getValueAt(collectionSelf, jsonkey)
-    #     return result if isinstance(result, float) else default
-    
-    # @staticmethod
-    # def getIntAt(collectionSelf, jsonkey, default=-1):
-    #     result = _ASJson.getValueAt(collectionSelf, jsonkey)
-    #     return result if isinstance(result, int) else default
-    
-    # @staticmethod 
-    # def getBoolAt(collectionSelf, jsonKey, default=False):
-    #     result = _ASJson.getValueAt(collectionSelf, jsonKey)
-    #     return result if isinstance(result, bool) else default
-
-    # @staticmethod
-    # def _setValueAt(playableName : str, key, value, sharedDataObj):
-    #     data = _ASJson._getData(playableName, sharedDataObj)
-    #     if data is None:
-    #         data = {}
-    #     data[key] = value
-    #     dataKey = _ASJson._getDataKey(playableName)
-    #     sharedDataObj[dataKey] = json.dumps(data)
-
-    # @staticmethod
-    # def setValueAt(collectionSelf, key, value):
-    #     collectionSelf[key] = value
-    #     # _ASJson.setValueWithPlayableName(collectionSelf.name, key, value)
-
-    # @staticmethod
-    # def setValueWithPlayableName(playableName, key, value):
-    #     ob = _ASJson.GetActionStarterSharedObject() 
-    #     _ASJson._setValueAt(playableName, key, value, ob)
-
-    # @staticmethod
-    # def updateFromPointer(collectionSelf, key, pointerObject):
-    #     if pointerObject is None:
-    #         _ASJson.setValueAt(collectionSelf, key, "")
-    #         return
-    #     _ASJson.setValueAt(collectionSelf, key, pointerObject.name)
-  
-    # @staticmethod
-    # def updatePathFromPointer(collectionSelf, pathKey, pointerObject):
-    #     if pointerObject is None:
-    #         _ASJson.setValueAt(collectionSelf, pathKey, "")
-    #         return
-    #     parents = ObjectLookupHelper._hierarchyToString(pointerObject)
-    #     _ASJson.setValueAt(collectionSelf, pathKey, parents)
-
-    # @staticmethod
-    # def updateObjectAndPath(collectionSelf, objkey, pathKey, pointerObject):
-    #     _ASJson.updateFromPointer(collectionSelf, objkey, pointerObject)
-    #     _ASJson.updatePathFromPointer(collectionSelf, pathKey, pointerObject)
-
-    # @staticmethod
-    # def updateExtraTargets(collectionSelf):
-    #     extraPaths = [(ObjectLookupHelper._hierarchyToStringStrange(target.object) if target.object is not None else "") for target in collectionSelf.targets]
-    #     _ASJson.setValueAt(collectionSelf, "target_paths", extraPaths)
-    
-    # @staticmethod
-    # def updateAllPlayableExtraTargets(context):
-    #     # print(F"update all ex targs")
-    #     for playable in context.scene.as_custom:
-    #         _ASJson.updateExtraTargets(playable)
-
-    # @staticmethod 
-    # def setNextName(collectionSelf, value):
-    #     if not value:
-    #         print(F"not value")
-    #         return
-    #     shared = _ASJson.GetActionStarterSharedObject()
-    #     _ASJson._copyFromTo(collectionSelf.name, value, shared)
-    #     dataKey = _ASJson._getDataKey(collectionSelf.name)
-    #     if dataKey in shared:
-    #         del shared[_ASJson._getDataKey(collectionSelf.name)]
-    #     collectionSelf.name = value
-    #     _ASJson.setValueAt(collectionSelf, "playableId", value)
 
 class PG_AS_TargetsPropGroup(PropertyGroup):
     """ The type of the command target collection. Ble needs the targets to be wrapped in a property group"""
@@ -275,7 +148,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     @staticmethod
     def InitPlayable(playable):
         return 
-        ### ALL GOOD...
+        ### TODO: do we need to set these defaults elsewhere
         """Make sure a few defaults are written to the storage object"""
         _ASJson.setValueAt(playable, "playableId", playable.name)
         _ASJson.setValueAt(playable, "playableType", int(playable.playableType))
@@ -574,7 +447,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         for targ in playable.targets:
             rowb = box.row()
             rowb.prop(targ, "object", text='target')
-            # TODO: operator to select the target
+
             rowb.operator(CU_OT_Select.bl_idname, icon='RESTRICT_SELECT_OFF', text="").target=targ.object.name if targ.object else ""
             rowb.operator(AS_OT_RemoveFromTargets.bl_idname, icon='X', text="").playableNameConcatTargetName=F"{playable.name},,,{targ.name}"
             if targ.object:
@@ -696,71 +569,6 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
         
-# === Good news: we no longer write commands to a shared object so none of this syncing machinery is needed ===
-# def cleanUpPostExport(dataMuleObject ):
-#     pass
-#     # print("clean up post export")
-#     # TODO: remove playable data from object[0]
-
-# def syncPlayables():
-#     # lament: if we could capture the action whose name was edited, we could update only 
-#     #   playables that use that action. Instead, we're updating all of them.
-#     playables = bpy.context.scene.as_custom
-#     for playable in playables:
-#         break # TODO del me
-#         # _ASJson.updateFromPointer(playable, "anim_name", playable.animAction)
-#         # _ASJson.updateObjectAndPath(playable, "target", "target_path", playable.target)
-#         # _ASJson.updateFromPointer(playable, "target", playable.target)
-    
-#     # extra targets
-#     # for playable in playables:
-#     #     _ASJson.updateExtraTargets(playable)
-
-# from bpy.app.handlers import persistent
-
-# @persistent
-# def syncPlayablesOnLoadPost(dummy):
-#     print(F"LOAD POST for CUSTOM PG_AS")
-#     syncPlayables()
-
-# @persistent
-# def onActionNameMsgbus(*arsg):
-#     """callback on the user changing the name of an action.
-#         ensure that the json data is in sync with the new name"""
-#     syncPlayables()
-
-# @persistent
-# def onObjectNameMsgbus(*args):
-#     """callback on an object rename.
-#         ensure the json data is in sync with any name change"""
-#     # Complaint: this will get called in many cases where it's not needed.
-#     # Also interesting: gets called about 20 times per rename
-#     print(F"**onObjectNameMSGBUS")
-#     syncPlayables()
-#     # _ASJson.updateAllPlayableExtraTargets(bpy.context)
-
-# def setupActionMsgBusSubscription():
-#     owner = object()
-#     # https://docs.blender.org/api/current/bpy.msgbus.html
-#     subscribe_to = (bpy.types.Action, "name") 
-  
-#     bpy.msgbus.subscribe_rna(
-#         key=subscribe_to,
-#         owner=owner,
-#         args=(),
-#         notify=onActionNameMsgbus,)
-    
-#     subscribe_to_ob = (bpy.types.Object, "name")
-#     bpy.msgbus.subscribe_rna(
-#         key=subscribe_to_ob,
-#         owner=owner,
-#         args=(),
-#         notify=onObjectNameMsgbus,)
-
-# def setupSyncPostLoad():
-#     from bb.mcd.util import AppHandlerHelper
-#     AppHandlerHelper.RefreshLoadPostHandler(syncPlayablesOnLoadPost) 
-
 classes = (
     PG_AS_TargetsPropGroup,
     CUSTOM_PG_AS_Collection,
@@ -775,14 +583,7 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    # setupActionMsgBusSubscription()
-    # setupSyncPostLoad()
-
-    # bpy.types.Scene.ShowExtraTargets = BoolProperty(name="Extra Targets")
-
 def unregister():
     from bpy.utils import unregister_class
     for cls in reversed(classes):
         unregister_class(cls)
-    
-    # del bpy.types.Scene.ShowExtraTargets

@@ -20,7 +20,7 @@
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 import bpy
-import re
+
 from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
 from bb.mcd.ui.componentlike.adjunct import NumExtraPlayables
 
@@ -98,7 +98,6 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         row.row()
         row.prop(self, "new_name", text="Name")
         row.prop(self, "playableType", text="Playable Type")
-        # row.prop(self, "data_flag")
         row.row()
 
 
@@ -106,28 +105,12 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
 #    register, unregister and hotkey
 # ------------------------------------------------------------------------
 
-addon_keymaps = []
 
 def register():
     from bpy.utils import register_class
-
-    addon_keymaps.clear()
     register_class(CU_OT_PlayableCreate)
-
-    # handle the keymap
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs.addon
-    if kc:
-        km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        kmi = km.keymap_items.new(CU_OT_PlayableCreate.bl_idname, type='R', value='PRESS', ctrl=True)
-        addon_keymaps.append((km, kmi))
 
 def unregister():
     from bpy.utils import unregister_class
-
-    for km, kmi in addon_keymaps:
-        km.keymap_items.remove(kmi)
-    addon_keymaps.clear()
-
     unregister_class(CU_OT_PlayableCreate)
 
