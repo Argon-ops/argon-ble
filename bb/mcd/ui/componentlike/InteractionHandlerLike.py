@@ -19,30 +19,27 @@ from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
 from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
-
-import json
-
+from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
 
 #region ADD REMOVE EXTRA PLAYABLES
 
-__MaxExtraPlayables = 5
+# __MaxExtraPlayables = 5
 
-def AddSubtractNumExtraPlayables(should_add, context):
-    hl = context.scene.interactionHandlerLike
-    if should_add and hl.numExtraPlayables < __MaxExtraPlayables:
-        hl.numExtraPlayables = hl.numExtraPlayables + 1
-    if not should_add and hl.numExtraPlayables > 0:
-        hl.numExtraPlayables = hl.numExtraPlayables - 1
+# def AddSubtractNumExtraPlayables(should_add, context):
+#     hl = context.scene.interactionHandlerLike
+#     if should_add and hl.numExtraPlayables < __MaxExtraPlayables:
+#         hl.numExtraPlayables = hl.numExtraPlayables + 1
+#     if not should_add and hl.numExtraPlayables > 0:
+#         hl.numExtraPlayables = hl.numExtraPlayables - 1
 
-    return hl.numExtraPlayables
+#     return hl.numExtraPlayables
 
 def RemoveUnusedPlayableData(context):
     hl = context.scene.interactionHandlerLike
-    if hl.numExtraPlayables >= __MaxExtraPlayables:
+    if hl.numExtraPlayables >= AddSubtractExtraPlayables.MaxExtraPlayables:
         return
-    for i in range(hl.numExtraPlayables + 1, __MaxExtraPlayables):
+    for i in range(hl.numExtraPlayables + 1, AddSubtractExtraPlayables.MaxExtraPlayables):
         key = _Append(F"_playable{i}")
-        print(F"try to del {key}")
         ObjectLookupHelper._removeKeyFromSelected(key, context)
 
 class CU_OT_NumExtraPlayables(bpy.types.Operator):
@@ -59,7 +56,7 @@ class CU_OT_NumExtraPlayables(bpy.types.Operator):
         return True 
     
     def invoke(self, context, event):
-        AddSubtractNumExtraPlayables(self.should_add, context)
+        AddSubtractExtraPlayables.AddSubtractNumExtraPlayables(self.should_add, context)
         RemoveUnusedPlayableData(context)
         return {'FINISHED'}
 
@@ -152,7 +149,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         row.label(text="Commands")
 
         def drawPlayableRow(attrName, idx):
-            # TODO: handle the case where no playables exist in the blend file's as_custom (not even 1!)
+            # TODO: handle the case where no playables exist in the blend file's as_custom (not even 1)
             #  We are getting this warning:
             # WARN (bpy.rna): C:\Users\blender\git\blender-v320\blender.git\source\blender\python\intern\bpy_rna.c:1339 pyrna_enum_to_py: current value '0' matches no enum in 'InteractionHandlerLike', '', 'playable'
             attrib = getattr(mcl, attrName)
@@ -413,7 +410,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     sleepHighlighterAlso : BoolProperty(
         description="When this handler receives a sleep signal, send the same signal (sleep or wake up) to the attached highlighter ",
         get=lambda self : CLU.getBoolFromKey(_Append("_sleep_highlighter_also")),
-        set=lambda   self, value : CLU.setValueAtKey(_Append("_sleep_highlighter_also"), value)
+        set=lambda self, value : CLU.setValueAtKey(_Append("_sleep_highlighter_also"), value)
     )
     sleepColliderAlso : BoolProperty(
         description="When this handler receives a sleep signal, enable or disable the attached collider (enable on awake, disable on sleep)",

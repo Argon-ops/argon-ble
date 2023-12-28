@@ -139,7 +139,6 @@ def register():
     for c in classes:
         register_class(c)
     
-    # bpy.types.Object.staticFlagsLike = bpy.props.PointerProperty(type=StaticFlagsLike)
     bpy.types.Scene.staticFlagsLike = bpy.props.PointerProperty(type=StaticFlagsLike)
 
 def unregister():

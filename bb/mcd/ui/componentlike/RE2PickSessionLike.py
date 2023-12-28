@@ -105,12 +105,7 @@ the picking behaviour yourself, as needed.",
         get=lambda self : CLU.getStringFromKey(_Append("_cancel_button_1"), "AltCancel"),
         set=lambda self, value : CLU.setValueAtKey(_Append("_cancel_button_1"), value)
     )
-        
-
-# TODO: RE Two session should handle optionally keyboard input
-#   and can opt into paying attention to clicks also
-#   Can do both keyboard and mouse clicks or either one (or none? even but not sure why you'd want)
-    
+  
 
 classes = (
     RE2PickSessionLike,

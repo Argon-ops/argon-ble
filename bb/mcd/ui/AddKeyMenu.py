@@ -17,6 +17,7 @@ class CDU_MT_AddKeyMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         for key in ObjectLookupHelper._getAllPrefsKeys(context): 
+            # if all selected have this key, just draw a label don't provide an operator
             if ObjectLookupHelper._allSelectedHaveKey(key, context):
                 layout.label(text=F"{DisplayHelper._trimMelPrefix(key)}")
                 continue

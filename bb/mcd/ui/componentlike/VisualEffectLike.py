@@ -28,7 +28,6 @@ class VisualEffectDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        # EnableFilterDefaultSetter.OnAddKey(VisualEffectLike, key, targets)
         default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
         try:
             AbstractDefaultSetter._SetKeyValOnTargets(_Append(), default['default_name'], targets)

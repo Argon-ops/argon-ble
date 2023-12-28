@@ -16,19 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# bl_info = {
-#     "name": "material-pointer-uilist-dev",
-#     "description": "",
-#     "author": "p2or",
-#     "version": (0, 2),
-#     "blender": (2, 80, 0),
-#     "location": "Text Editor",
-#     "warning": "", # used for warning icon and text in addons panel
-#     "wiki_url": "",
-#     "tracker_url": "",
-#     "category": "Development"
-# }
-
 import bpy
 
 from bpy.props import (IntProperty,
@@ -75,18 +62,12 @@ class CUSTOM_OT_actions(Operator):
             pass
         else:
             if self.action == 'DOWN' and idx < len(scn.ml_custom) - 1:
-                # item_next = scn.ml_custom[idx+1].name
                 scn.ml_custom.move(idx, idx+1)
                 scn.ml_custom_index += 1
-                # info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
-                # self.report({'INFO'}, info)
 
             elif self.action == 'UP' and idx >= 1:
-                # item_prev = scn.ml_custom[idx-1].name
                 scn.ml_custom.move(idx, idx-1)
                 scn.ml_custom_index -= 1
-                # info = 'Item "%s" moved to position %d' % (item.name, scn.ml_custom_index + 1)
-                # self.report({'INFO'}, info)
 
             elif self.action == 'REMOVE':
                 scn.ml_custom.remove(idx)
@@ -111,20 +92,18 @@ def _GetMaterialIndexInList(scene, mat : bpy.types.Material) -> int:
     for i in range(len(scene.ml_custom)):
         item = scene.ml_custom[i]
         if item.material.name == mat.name:
-            print(F"^^^ Found idx: {i} for {item.material.name}")
             return i
     return -1
 
 def AddMaterial(scene, mat : bpy.types.Material) -> None:
     mat_list = scene.ml_custom
 
-    if _GetMaterialIndexInList(scene, mat) == -1: # mat_list.get doesn't always work. sometimes item.name != mat.name (FIXME) ! # not mat_list.get(mat.name):
+    if _GetMaterialIndexInList(scene, mat) == -1: 
         item = mat_list.add()
         item.id = len(mat_list)
         item.material = mat
         item.name = item.material.name
         scene.ml_custom_index = (len(mat_list)-1)
-        print(F"%% {mat.name} was not in room. now added at idx: {scene.ml_custom_index} item.name: {item.name} ID: {item.id}")
 
 def SelectMaterial(scene, mat : bpy.types.Material) -> int:
     if mat is None:
@@ -277,7 +256,6 @@ class CUSTOM_OT_clearList(Operator):
                 if i.material:
                     mat_obj = bpy.data.materials.get(i.material.name, None)
                     if mat_obj:
-                        info = 'Item %s removed from scene' % (i.material.name)
                         bpy.data.materials.remove(mat_obj, do_unlink=True)
                         
             # Clear the list
@@ -384,13 +362,6 @@ class CUSTOM_PG_materialCollection(PropertyGroup):
         description="the name of the material. no need to include '.mat' ",
         )
 
-def MaterialMapToDictionary(context):
-    raise BaseException("no one is using this rn")
-    d = dict()
-    items = context.scene.ml_custom
-    for item in items:
-        d[item.material.name] = item.unityMaterial
-    return d
 
 # -------------------------------------------------------------------
 #   Msgbus for deleted materials
@@ -439,7 +410,7 @@ def register():
 
 
 # this will be called slightly later than register 
-# because we don't have access to some variables during register
+# because we don't have access to some types during register
 def defer(): 
     _subscribe()
 

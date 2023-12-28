@@ -62,10 +62,6 @@ class RigidbodyDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
 class RigidbodyLike(EnableFilterSettings, AbstractComponentLike):
 
-    # @classmethod # TODO: wait this doesn't need to be a class method??
-    # def _append(cls, suffix: str = "") -> str:
-    #     return F"{RigidbodyLike.GetTargetKey()}{suffix}"
-
     @staticmethod
     def GetTargetKey() -> str:
         return _baseKey 
@@ -95,8 +91,6 @@ class RigidbodyLike(EnableFilterSettings, AbstractComponentLike):
         row.prop(rbl, "freezePosition", text="freeze position")
         row = box.row()
         row.prop(rbl, "freezeRotation", text="freeze rotation")
-
-        # rbl.displayEnableSettings(box)
 
 
     mass : FloatProperty(

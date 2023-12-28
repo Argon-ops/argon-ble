@@ -24,7 +24,7 @@ modulesFullNames = [
     'bb.mcd.cduoperator.SelectByKey',
     'bb.mcd.cduoperator.AddKeyToSelected',
     'bb.mcd.util.DisplayHelper',
-    'bb.mcd.ui.componentlike.adjunct.NumExtraPlayables',
+    'bb.mcd.ui.componentlike.adjunct.AddSubtractExtraPlayables',
 
     # scene level var declarations
     'bb.mcd.ui.export.ExportBox',

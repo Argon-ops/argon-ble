@@ -24,7 +24,7 @@ def resubAllLoadPostSliderCollider(dummy):
     perObjectFieldName = "sliderColliderPerObjectData"
 
     fieldsAndPropNames = (
-        ("target", "_target"), # for each object PointerProperty that needs updates, add a line here
+        ("target", "_target"), 
         ("action", "_action"),
     )
     print(F"=== resub all for slider collider ===")
@@ -33,7 +33,6 @@ def resubAllLoadPostSliderCollider(dummy):
             perObjectFieldName, 
             fieldAndPropName[0], 
             _Append(fieldAndPropName[1])) #,  
-            # SliderColliderPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
@@ -72,19 +71,14 @@ def _Append(suffix : str) -> str:
     return F"{SliderColliderLike.GetTargetKey()}{suffix}"
 
 class SliderColliderPerObjectData(PropertyGroup, AbstractPerObjectData):
-    #  per new thinking regarding ColliderSliders and (tb created) ANimSliders
-    #    the Slider just targets an object, not a Playable. (which never made sense)
-    #  Infact: COllider and ANim sliders could be the same 'Like' class. Just with an option
-    #    is it Collider type or ANim type
     target : PointerProperty(
         type=bpy.types.Object,
-        description="TODO:MORE ACCURATE: Defines the object whose components should receive slider updates",
+        description="Defines the object whose components should receive slider updates ",
         update=lambda self, context : MsgbusUtils.onObjectUpdate(
             context.active_object,
             self,
             "target",
             _Append("_target")
-            # MsgbusUtils.GetOwnerToken(context.active_object, SliderColliderPerObjectData.OwnerKey("_target"))
         )
     )
 
@@ -96,7 +90,6 @@ class SliderColliderPerObjectData(PropertyGroup, AbstractPerObjectData):
             self,
             "action",
             _Append("_action")
-            # MsgbusUtils.GetOwnerToken(context.active_object, SliderColliderPerObjectData.OwnerKey("_action"))
         )
     )
 
@@ -116,17 +109,13 @@ class SliderColliderLike(PropertyGroup, AbstractComponentLike):
         scpo = context.active_object.sliderColliderPerObjectData
         mcl = context.scene.sliderColliderLike
 
-        # TODO: bool: either target or playable
-        # target is presumably something with IScalarHandlers (at least one)
         boxb = box.box()
         boxb.row().prop(mcl, "targetType", text="Target Type")
         if mcl.targetType != "None":
             boxb.row().prop(scpo, "target", text="Target")
             if mcl.targetType == "Animation":
-                # boxb.row().prop(mcl, "actionName")
                 boxb.row().prop(scpo, "action")
 
-        # box.row().prop(mcl, "playable", text="Playable")
         row = box.row()
         row.prop(mcl, "axis", text="Unity Axis")
         row = box.row()
@@ -142,25 +131,13 @@ class SliderColliderLike(PropertyGroup, AbstractComponentLike):
         set=lambda self, value : CLU.setValueAtKey(_Append("_target_type"), value)
     )
 
-    # actionName : StringProperty( # TODO: convert to enum
-    #     get=lambda self : CLU.getStringFromKey(_Append("_action_name")),
-    #     set=lambda self, value : CLU.setValueAtKey(_Append("_action_name"), value)
-    # )
-
-    # playable : EnumProperty(
-    #     description="The playable whose position should be set according to the slide distance",
-    #     items=lambda self, context : CLU.playablesItemCallback(context),
-    #     get=lambda self: CLU.playableEnumIndex(_Append("_playable")),
-    #     set=lambda self, value: CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].name)
-    # )
-
     axis : EnumProperty(
         items=(
             ('x', 'x', 'x'),
             ('y', 'y', 'y'),
             ('z', 'z', 'z'),
         ),
-        description="The axis to use when measuring the linear slide distance. Unity space; so Y is up and Blender +Y is Unity -Z",
+        description="The axis to use when measuring the linear slide distance. In Unity space: Y is up and Blender +Y is Unity -Z",
         get=lambda self: CLU.getIntFromKey(_Append("_axis")),
         set=lambda self, value: CLU.setValueAtKey(_Append("_axis"), value)
     )

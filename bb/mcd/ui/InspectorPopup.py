@@ -148,8 +148,6 @@ class CU_OT_InspectorPopup(bpy.types.Operator):
         if _open_popup_instances == 0:
             _rehide(self.objectName)
             ObjectLookupHelper.selectObjectsInScene(_prev_sel, _prev_active)
-        info = '%s bye. Inspector Popup is done with its pop up work' % ("BYE")
-        self.report({'INFO'}, info)
         return {'FINISHED'}
 
 

@@ -12,8 +12,6 @@ from bpy.props import (IntProperty,
 from bpy.types import (PropertyGroup,)
 from bb.mcd.util import ObjectLookupHelper
 
-# TODO: red button: export with no dialogue
-
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
@@ -70,7 +68,7 @@ class TextMeshLike(PropertyGroup, AbstractComponentLike):
     def Display(box, context) -> None:
         oml = context.scene.textMeshLike
         box.row().prop(oml, "content", text="Text")
-        # box.row().prop(oml, "fontName", text="Font (Optional)")
+        # box.row().prop(oml, "fontName", text="Font (Optional)") # WANT / TODO
         box.row().prop(oml, "fontSize", text="Font Size")
         box.row().prop(oml, "useTMPro", text="Text Mesh Pro")
         if not oml.useTMPro:
@@ -187,7 +185,6 @@ class TextMeshLike(PropertyGroup, AbstractComponentLike):
         soft_min=0,
     )
 
-    # TODO: add the other suffixes
 
     color : FloatVectorProperty(
         subtype='COLOR_GAMMA',

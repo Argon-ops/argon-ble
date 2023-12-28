@@ -22,10 +22,10 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 import bpy
 
 from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
-from bb.mcd.ui.componentlike.adjunct import NumExtraPlayables
+from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
 
 def AppendNewPlayableToInteractionHandlerLike(playableName : str):
-    neps = NumExtraPlayables.AddSubtractNumExtraPlayables(True, bpy.context)
+    neps = AddSubtractExtraPlayables.AddSubtractNumExtraPlayables(True, bpy.context)
     print(F"Will INSERT at IDX {neps} name: {playableName}")
     CLU.setValueAtKey(F"mel_interaction_handler_playable{neps}", playableName)
 

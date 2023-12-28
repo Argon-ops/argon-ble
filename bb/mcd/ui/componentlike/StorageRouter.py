@@ -64,20 +64,20 @@ def _defaultEquality(key : str, a : object, b : object) -> bool:
     return False
 
 def evaluateEqual(key : str, a : object, b : object) -> bool:
-    for cl in _components.values(): # default_setters:
-        if cl.AcceptsKey(key):
-            return cl.EqualValues(a, b)
+    for defaultSetter in _components.values(): # default_setters
+        if defaultSetter.AcceptsKey(key):
+            return defaultSetter.EqualValues(a, b)
     return _defaultEquality(key, a, b)
 
 def displayItem(key, box, context):
-    for component_like in _components.keys(): #  component_likes:
-        if component_like.AcceptsKey(key):
-            component_like.Display(box, context)
+    for componentLike in _components.keys(): #  component_likes
+        if componentLike.AcceptsKey(key):
+            componentLike.Display(box, context)
 
-            if hasattr(component_like, "IS_ENABLEABLE_CLASS"):
-                component_like.displayEnableSettings(box)
-            if hasattr(component_like, "IS_SLEEPSTATE_CLASS"):
-                component_like.displaySleepSettings(box)
+            if hasattr(componentLike, "IS_ENABLEABLE_CLASS"):
+                componentLike.displayEnableSettings(box)
+            if hasattr(componentLike, "IS_SLEEPSTATE_CLASS"):
+                componentLike.displaySleepSettings(box)
                 
             return True
     return False
@@ -101,10 +101,10 @@ def handleRemoveKey(key, context): # target_list):
             del target[key]
 
     # let the default setters clean up
-    for clc, default_setter in _components.items(): 
-        if default_setter.AcceptsKey(key):
-            default_setter.OnRemoveKey(key, targets)
-            # if issubclass(clc, EnableFilterSettings):
+    for clc, defaultSetter in _components.items(): 
+        if defaultSetter.AcceptsKey(key):
+            defaultSetter.OnRemoveKey(key, targets)
+
             if hasattr(clc, "IS_ENABLEABLE_CLASS"): 
                 EnableFilterDefaultSetter.OnRemoveKey(clc, targets)
             if hasattr(clc, "IS_SLEEPSTATE_CLASS"):

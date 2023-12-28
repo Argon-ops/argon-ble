@@ -19,7 +19,6 @@ def ObjDictTest():
         print(F"field: {fn} val: {getattr(ob, fn)} serval: {serVal}")
 
 
-
 def _D_anyActionNames():
     for obj in bpy.context.scene.objects:
         ad = obj.animation_data

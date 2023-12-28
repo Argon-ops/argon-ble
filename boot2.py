@@ -1,32 +1,42 @@
 import os
 import sys
 
-# USE THIS BOOT FILE:
-#  To 'hot reload' your multi-file blender addon. 
+############################################################
+############################################################
+# WHEN TO USE THIS BOOT FILE:
+#  This boot script (along with __init__.py) enables 'hot reloading' multi-file blender addons. 
+#   
 #   Follows techniques found here: https://b3d.interplanety.org/en/creating-multifile-add-on-for-blender/
 #    See also the top level __init__.py
+#
+# TO USE: load this file into Blender's script window and hit play
+############################################################
 
 
 def get_project_dir():
     # should return the parent folder of the project folder.
-    #  want to add specifically this folder to systhem path.
+    #  want to add specifically this folder to system path.
     #   edit as needed
 
-    # in our set up the folder containing this boot script is the one we want
+    # the folder containing this boot script happens to be the one we want
     import bpy
     from pathlib import Path
     path = Path(bpy.context.space_data.text.filepath)
     return path.parent.absolute().__str__()
 
-    # But something like this is fine also
-    return "E:\\temp\\checktwo\\argon-blender"  
-
+    # But no need to provide the path dynamically if this file moved somewhere.
+    #  I.e. something like this would be fine:
+    # return "E:\\temp\\checktwo\\argon-blender"  
 
 
 
 containing = get_project_dir() 
 
-init_file = os.path.join("bb", "__init__.py")
+# The name of the top parent module inside of the containing folder 
+#  Changing the folder name requires renaming all import statements project-wide
+root_module = "bb"
+
+init_file = os.path.join(root_module, "__init__.py")
  
 if containing not in sys.path:
     sys.path.append(containing)
