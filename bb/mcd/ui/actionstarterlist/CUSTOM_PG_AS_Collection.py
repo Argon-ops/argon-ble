@@ -179,7 +179,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         elif fieldName == "animAction":
             return val.name if val is not None else ""
         elif fieldName == "commandNames":
-            return [wrapper.commandName for wrapper in val]
+            return [wrapper.commandNameStor for wrapper in val]
+            # return [wrapper.commandName for wrapper in val]
         return val
 
     name : StringProperty(
@@ -269,6 +270,9 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     runIndefinitely : BoolProperty(
         description="If true, the signal will broadcast for an indefinite length of time. If false, the signal will stop after the specified interval"
     )
+    # loopTime : BoolProperty(
+    #     description="If true, set time to zero once it reaches totalRangeSeconds"
+    # )
     pickUpFromLastState : BoolProperty(
         description="If true, commands will pick up where they left off during the last command. In other words, the first signal sent will equal the last signal sent during the previous invocation of the command"
     )
@@ -282,7 +286,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         default=1.0,
     )
     periodSeconds : FloatProperty(
-        description="Defines the period in seconds when the function is periodic; e.g. SawTooth. ",
+        description="Defines the period in seconds when the function is periodic; e.g. SawTooth. For linear function: \
+f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = highValue",
         default=0.5,
     )
     broadcastIntervalSeconds : FloatProperty(
@@ -324,6 +329,9 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     overlayName : StringProperty(
         description="The name of the UIDocument element to overlay. (Classic GUI not supported at the moment sorry)",
     )
+    overlayHasDuration : BoolProperty(
+        description="If true, display the overlay for a certain time interval and then hide it again. If false, turn the overlay on indefinitely (or off indefinitely if the signal is less than .5)"
+    )
     #endregion
 
     #region camera shake
@@ -355,8 +363,26 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         description="Defines the number of seconds to wait after the end of this command before starting the next command",
     )
 
+    def setPlayAfter(self, val : int):
+        playable = CLU.playableFromIndex(val)
+        if playable is None:
+            self.playAfterStor = ""
+            return
+        
+        playableAfterName = playable.name
+        print(F"playAfterStor was: {self.playAfterStor} WILL SET TO : {playableAfterName} TYPE: {type(playableAfterName)}")
+        # self.playAfterStor = playable.name
+        setattr(self, "playAfterStor", playable.name)
+        print(F"playAfterStor is now: {self.playAfterStor}")
+
     playAfter : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
+        get=lambda self : CLU.playableEnumIndexFromName(self.playAfterStor),
+        set=lambda self, value: CLU.storePlayableName(self, value, "playAfterStor") # self.setPlayAfter(value) 
+    )
+
+    playAfterStor : StringProperty(
+        description="'Private' string used to store the name of the play after command"
     )
 
     playAfterDeferToLatest : BoolProperty(
@@ -503,25 +529,36 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             if playable.overTime:
                 boxt.row().prop(playable, "overTimeFunction")
                 boxt.row().prop(playable, "runIndefinitely", text="Run Indefinetly")
-                boxt.row().prop(playable, "pickUpFromLastState", text="Pick-up from Last State")
-                if not playable.runIndefinitely:
-                    boxt.row().prop(playable, "totalRangeSeconds", text="Duration Seconds")
-                boxt.row().prop(playable, "lowValue")
-                boxt.row().prop(playable, "highValue")
                 if playable.overTimeFunction != "StartValueEndValue":
-                    boxt.row().prop(playable, "periodSeconds", text="Period Seconds")
-                    boxt.row().prop(playable, "broadcastIntervalSeconds", text="Broadcast Tick Seconds")
-                    boxt.row().prop(playable, "shouldClampFunction", text="Clamp Function Output")
+                    boxt.row().prop(playable, "pickUpFromLastState", text="Pick-up from Last State")
+                
+                # broadcast settings
+                if not playable.runIndefinitely or playable.overTimeFunction != "StartValueEndValue":
+                    boxg = boxt.box()
+                    boxg.label(text="Broadcast Settings")
+                    if not playable.runIndefinitely:
+                        boxg.row().prop(playable, "totalRangeSeconds", text="Duration Seconds")
+                    if playable.overTimeFunction != "StartValueEndValue":
+                        boxg.row().prop(playable, "broadcastIntervalSeconds", text="Broadcast Tick Seconds")
 
-                boxt.row().prop(playable, "outroBehaviour", text="Outro")
+                boxh = boxt.box()
+                boxh.label(text="Function Settings")
+                boxh.row().prop(playable, "lowValue")
+                boxh.row().prop(playable, "highValue")
+                if playable.overTimeFunction != "StartValueEndValue":
+                    boxh.row().prop(playable, "periodSeconds", text="Period Seconds")
+                    boxh.row().prop(playable, "shouldClampFunction", text="Clamp Function Output")
+
+                boxx=boxt.box()
+                boxx.row().prop(playable, "outroBehaviour", text="Outro")
                 if playable.outroBehaviour != "None":
                     if playable.outroBehaviour == "Constant":
-                        boxt.row().prop(playable, "outroDestinationValue", text="Outro Destination Value")
+                        boxx.row().prop(playable, "outroDestinationValue", text="Outro Destination Value")
                     if playable.outroBehaviour == "ThresholdCondition":
-                        boxt.row().prop(playable, "outroThreshold", text="Outro Threshold")
-                        boxt.row().prop(playable, "outroDestinationValue", text="Over Threshold Destination")
-                        boxt.row().prop(playable, "outroDestinationValueB", text="Under Threshold Destination")
-                    boxt.row().prop(playable, "outroSpeedMultiplier", text="Outro Speed Multiplier")
+                        boxx.row().prop(playable, "outroThreshold", text="Outro Threshold")
+                        boxx.row().prop(playable, "outroDestinationValue", text="Over Threshold Destination")
+                        boxx.row().prop(playable, "outroDestinationValueB", text="Under Threshold Destination")
+                    boxx.row().prop(playable, "outroSpeedMultiplier", text="Outro Speed Multiplier")
                     
                 self.layout.row().prop(playable, "allowsInterrupts", text="Allows Interrupts")
                 
@@ -532,6 +569,9 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
         elif playableType == 5: # camera overlay
             self.layout.row().prop(playable, "overlayName", text="Overlay Name")
+            self.layout.row().prop(playable, "overlayHasDuration", text="Has Duration")
+            if playable.overTime:
+                self.layout.row().prop(playable, "shakeDuration", text="Duration Seconds") 
 
         elif playableType == 6: # sleep signal
             self.drawTargetsList(playable, self.layout.box())
@@ -562,6 +602,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         self.layout.row().prop(playable, "shouldPlayAfter", text="Play A Command After")
         if playable.shouldPlayAfter:
             row = self.layout.row()
+            row.label(text=playable.playAfterStor)
             row.prop(playable, "playAfter", text="Play After")
             row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = playable.playAfter 
             self.layout.row().prop(playable, "playAfterAdditionalDelay", text="Delay Seconds")

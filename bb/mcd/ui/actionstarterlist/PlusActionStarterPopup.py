@@ -36,9 +36,9 @@ def SetNewPlayableAtInteractionHandlerLike(playableName : str, playableIdx : int
 
 
 class CU_OT_PlayableCreate(bpy.types.Operator):
-    """Add a Playable"""
+    """Add a Command."""
     bl_idname = "view3d.viewport_rename"
-    bl_label = "Add a Playable"
+    bl_label = "Add a Command"
     bl_options = {'REGISTER', 'UNDO'}
     bl_property = "new_name"
 

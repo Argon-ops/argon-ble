@@ -1,0 +1,3 @@
+Pylance / Pyright can get overzealous: Nate Anderson's answer describes how to configure it in workspace settings.
+We chose just to suppress the error that Pyright was highlighting 
+https://stackoverflow.com/questions/67931905/suppress-pylance-type-annotation-warning-in-vs-code

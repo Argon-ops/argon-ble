@@ -3,6 +3,7 @@ import bpy
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
+from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
 
 def getValueFromKey(key_name):
     return ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
@@ -70,7 +71,7 @@ def playablesItemCallback(context):
 
 def playableEnumIndexFromName(playableName : str):
     playables = bpy.context.scene.as_custom
-    # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. (see below if curious)
+    # iterate with an index instead of using enumerate. Enumerate leads to glitchy behavior. 
     for i in range(len(playables)):
         if playables[i].name == playableName:
             return i
@@ -79,11 +80,25 @@ def playableEnumIndexFromName(playableName : str):
 def playableEnumIndex(playableKey):
     return  playableEnumIndexFromName(getStringFromKey(playableKey))
 
-def playableFromIndex(idx : int) -> str:
+def playableFromIndex(idx : int) -> CUSTOM_PG_AS_Collection:
     playables = bpy.context.scene.as_custom
     if len(playables) <= idx:
-        return ""
+        return None # type: ignore
     return playables[idx]
+
+
+def storePlayableName(targetObject, idx : int, storeStrAttr : str = "playAfterStor"):
+    playable = playableFromIndex(idx)
+    if playable is None:
+        setattr(targetObject, storeStrAttr, "")
+        # self.playAfterStor = ""
+        return
+    
+    print(F"CLU playAfterStor was: {getattr(targetObject, storeStrAttr)} WILL SET TO : {playable.name} TYPE: {type(playable.name)}")
+    # self.playAfterStor = playable.name
+    setattr(targetObject, storeStrAttr, playable.name)
+    print(F"playAfterStor is now: {getattr(targetObject, storeStrAttr)}")
+
 
 
 class GenericDefaultSetter(object):

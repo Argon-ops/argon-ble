@@ -30,13 +30,14 @@ def resubAllLoadPostInterHighlighter(dummy):
 
     fieldsAndPropNames = (
         ("rendererTarget", "_renderer_target"), # for each object PointerProperty that needs updates, add a line here
+        ("forwardFaceReference", "_forward_face_reference"),
     )
 
     for fieldAndPropName in fieldsAndPropNames:
         MsgbusUtils.resubscribeAll_LP(
             perObjectFieldName, 
             fieldAndPropName[0], 
-            _Append(fieldAndPropName[1])) #,  
+            _Append(fieldAndPropName[1]))   
 
 # add a load post handler so that we resubscribeAll upon loading a new file         
 def setupLoadPost():
@@ -96,6 +97,19 @@ class HighlighterPerObjectData(PropertyGroup, AbstractPerObjectData):
         )
     )
 
+    forwardFaceReference : PointerProperty(
+        type=bpy.types.Object,
+        description="Optional: specify an object that defines the forward normal for the highlighter. \
+The forward face reference object's position relative to the highlighter will define a forward facing normal vector. If \
+a forward normal is defined, the highlighter will only activate when the player is positioned in front of the highlighter.",
+        update=lambda self, context : MsgbusUtils.onObjectUpdate(
+            context.active_object,
+            self,
+            "forwardFaceReference",
+            _Append("_forward_face_reference")
+        )
+    )
+
 
 class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
 
@@ -121,12 +135,19 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
                 # per obje
                 hlpo = context.active_object.highlighterPerObjectData
                 box.row().prop(hlpo, "rendererTarget", text="Renderer Target (Optional)")
+
         elif mcl.mode == "ClickBeacon":
             boxb.row().prop(mcl, "clickBeaconPrefab", text="Click Beacon Prefab")
             boxb.row().prop(mcl, "beaconPlacementOption", text="Beacon Placement Option")
             boxb.row().prop(mcl, "beaconNudgeVector", text="Beacon Nudge")
             boxb.row().prop(mcl, "beaconShouldRotateNinety", text="Rotate Ninety")
-            boxb.row().prop(mcl, "visibleRadius", text="Visible Radius")
+            # boxb.row().prop(mcl, "visibleRadius", text="Visible Radius")
+
+        if context.active_object is not None:
+            # per object: forward facing ref
+            hlpo = context.active_object.highlighterPerObjectData
+            box.row().prop(hlpo, "forwardFaceReference", text="Forward Face Object (Optional)")
+
 
         box.row().prop(mcl, "downtimeSeconds", text="Downtime Seconds")
         box.row().prop(mcl, "onSleepAction", text="On Sleep Action")
@@ -200,10 +221,10 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
     )
 
     isInvisibleToProximity : BoolProperty (
-        description="Highlighters are automatically found and toggled visible/active/off by the proximity detection \
-                        system--but not if this is set to true. If true, the detection system will ignore this highlighter. \
-                            Use when you want to interact with the highlighters in some other way. \
-                                For example, use this on highlighters that should only activate during a cam lock session.",
+        description="Highlighters are automatically found and toggled visible/active/off by Argon's proximity detection \
+system--but not if this is set to true. If true, the detection system will ignore this highlighter. \
+Use when you want to interact with the highlighters in some other way. \
+For example, use this on highlighters that should only activate during a cam lock session.",
         get=lambda self : CLU.getBoolFromKey(_Append("_is_invisible_to_proximity"), False),
         set=lambda self, value : CLU.setValueAtKey(_Append("_is_invisible_to_proximity"), value)
     )

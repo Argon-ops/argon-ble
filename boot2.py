@@ -3,13 +3,13 @@ import sys
 
 ############################################################
 ############################################################
-# WHEN TO USE THIS BOOT FILE:
+# WHY THIS BOOT FILE:
 #  This boot script (along with __init__.py) enables 'hot reloading' multi-file blender addons. 
 #   
 #   Follows techniques found here: https://b3d.interplanety.org/en/creating-multifile-add-on-for-blender/
 #    See also the top level __init__.py
 #
-# TO USE: load this file into Blender's script window and hit play
+# TO USE: run this file from Blender's script window 
 ############################################################
 
 

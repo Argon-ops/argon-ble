@@ -39,7 +39,7 @@ config = """
         "default" : {
             "meaningless-key" : 41
         },
-        "help" : "Force the import script to add PlayableClipWrappers for any animation clips that associated with this object"
+        "help" : "Force the import script to add PlayableClipWrappers for any animation clips associated with this object"
     },
     "mel_tag" : {
         "default" : "",

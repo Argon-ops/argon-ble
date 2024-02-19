@@ -45,7 +45,7 @@ def RemoveUnusedPlayableData(context):
 class CU_OT_NumExtraPlayables(bpy.types.Operator):
     """Num Extra Playables"""
     bl_idname = "view3d.num_extra_playables"
-    bl_label = "Change the number of playables"
+    bl_label = "Add or delete command slots"
     bl_options = {'REGISTER', 'UNDO'}
     bl_property = "num_extra_playables"
 
@@ -159,7 +159,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
             if attrib: 
                 row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = attrib 
 
-            plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Playable")
+            plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
             plusOp.should_insert = True
             plusOp.insert_at_idx = idx 
 
@@ -262,27 +262,27 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     )
     playable1 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable1")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable1")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable1"), bpy.context.scene.as_custom[value].name),
     )
     playable2 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable2")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable2")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable2"), bpy.context.scene.as_custom[value].name),
     )
     playable3 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable3")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable3")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable3"), bpy.context.scene.as_custom[value].name),
     )
     playable4 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable4")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable4")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable4"), bpy.context.scene.as_custom[value].name),
     )
     playable5 : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndex(_Append("_playable5")),  # _playableEnumGetter(self, "_playable"),
+        get=lambda self : CLU.playableEnumIndex(_Append("_playable5")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable5"), bpy.context.scene.as_custom[value].name),
     )
     
@@ -373,8 +373,9 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     selfDestructBehaviour : EnumProperty (
         description="When (if ever) should this handler self destruct",
         items=(
-            ('NeverSelfDestruct', 'Never Self Destruct', 'Never Self Destruct'),
+            ('On Receive Destroy Message', 'On Receive Destroy Message', 'On Receive Destroy Message'),
             ('AfterFirstInteraction', 'After First Interaction', 'After First Interaction'),
+            ('NeverSelfDestruct', 'Never Self Destruct', 'Never Self Destruct'),
         ),
         get=lambda self : CLU.getIntFromKey(_Append("_self_destruct_behaviour")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_self_destruct_behaviour"), value)

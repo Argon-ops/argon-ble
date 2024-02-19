@@ -1,6 +1,6 @@
 bl_info = {
-    "name": "BMelCustomDataUtilBAB",
-    "location": "View3D > Sidebar > MelPropHelper",
+    "name": "Argon",
+    "location": "View3D > Sidebar > Argon",
     "blender": (2, 80, 0), # Don't use 2, 78 or register won't be called
     "category": "3D View", 
     'version': (0, 0, 1),
@@ -77,7 +77,7 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.TextMeshLike',
     'bb.mcd.ui.componentlike.PlayableScalarAdapterLike',
     'bb.mcd.ui.materiallist.MaterialListPanel',
-    # 'bb.mcd.shareddataobject.SharedDataObject', # RIP
+    'bb.mcd.shareddataobject.SharedDataObject', 
     'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
     'bb.mcd.ui.actionstarterlist.ActionStarterPanel',
     'bb.mcd.objectinfo.ObjectInfo',
@@ -158,10 +158,15 @@ if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
     register()
 
 
+#########################################################################################################
+## QUICK GUIDE ##########################################################################################
+#########################################################################################################
+        
 # HOW TO ZIP FOR DISTRIBUTION AS AN ADDON:
     #   
-    #  use this zip command (just using built in Windows compress didn't work for us)
+    #  run this command (just using built in Windows compress didn't work for us.) 
     #   7z a -tzip bb.zip -w .\bb\
+    #   (Also, used this terminal https://github.com/microsoft/terminal not the default PowerShell)
     #  
      
 # THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>

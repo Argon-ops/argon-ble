@@ -121,6 +121,12 @@ def GetOrAdd(name :str):
     ListArmas()
     print(F"DONE")
 
+def CommandNames():
+    import bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection as AS
+    cmds = [s[1] for s in AS.getPlayableTypes()]
+    for c in sorted(cmds):
+        print(F"## {c}")
+
 
 def TestR():
     print("scratch")
@@ -128,3 +134,13 @@ def TestR():
     for prop in mat_door.keys():
         print(F"{prop}")
     print("done")
+
+
+def ListPropKeys():
+    c = bpy.context.scene.custom
+    print("hello")
+    for k in sorted([k.key for k in c]):
+        k = k[4:].replace("_", " ")
+        k = k.title()
+        print(F"## {k}")
+    print("hi")

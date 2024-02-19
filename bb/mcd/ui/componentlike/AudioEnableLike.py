@@ -61,6 +61,7 @@ class AudioEnableLike(EnableFilterSettings, AbstractComponentLike):
         row.prop(mcl, "clipName", text="Clip Name")
         row = box.row()
         row.prop(mcl, "loop", text="Loop")
+        row.prop(mcl, "onSignalAlwaysRestarts", text="On Signal Always Restarts") 
 
     clipName : StringProperty(
         get=lambda self : CLU.getStringFromKey(_Append("_clip_name")),
@@ -69,6 +70,13 @@ class AudioEnableLike(EnableFilterSettings, AbstractComponentLike):
     loop : BoolProperty(
         get=lambda self : CLU.getBoolFromKey(_Append("_loop")),
         set=lambda self, value : CLU.setValueAtKey(_Append("_loop"), value)
+    )
+
+    onSignalAlwaysRestarts : BoolProperty(
+        description="If true, audio will always restart when this enablable receives an enable signal; even when audio is \
+already playing. Otherwise, audio will only restart if it was not playing",
+        get=lambda self : CLU.getBoolFromKey(_Append("_on_signal_always_restarts")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_on_signal_always_restarts"), value)
     )
 
 classes = (

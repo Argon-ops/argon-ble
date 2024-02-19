@@ -1,5 +1,5 @@
 
-# import bpy
+import bpy
 
 # __SHARED_DATA_ROOT__="z_Duks_SharedDataRoot"
 
@@ -141,53 +141,52 @@
 #     raise "won't happen"
 
 
-# def getSharedDataObjectWithName(name : str):
+def getSharedDataObjectWithName(name : str):
     
-#     # is the object in the scene already?
-#     __dataObject = bpy.context.scene.objects.get(name)
-#     # updateMsgbusShared(__dataObject, name) # RETREAT: do nothing to fend off renaming. Trust users to not rename
+    # is the object in the scene already?
+    __dataObject = bpy.context.scene.objects.get(name)
+    # updateMsgbusShared(__dataObject, name) # RETREAT: do nothing to fend off renaming. Trust users to not rename
 
-#     # do we need to make a new one?    
-#     if __dataObject is None:
+    # do we need to make a new one?    
+    if __dataObject is None:
 
-#         print(F"CREATE shared data obj: {name}")
-#         # FBX exporter might ignore an empty; so add a hard-to-see cube
-#         bpy.ops.mesh.primitive_cube_add(location=(0,0,0), size=0.0001) 
-#         # actually use an armature
-#         __dataObject = bpy.context.view_layer.objects.active
-#         # __dataObject = addNewArmatureAndGet() # bpy.context.view_layer.objects.active
+        print(F"CREATE shared data obj: {name}")
+        # FBX exporter might ignore an empty; so add a hard-to-see cube
+        bpy.ops.mesh.primitive_cube_add(location=(0,0,0), size=0.0001) 
+        # actually use an armature
+        __dataObject = bpy.context.view_layer.objects.active
+        # __dataObject = addNewArmatureAndGet() # bpy.context.view_layer.objects.active
 
-#         __dataObject.name = name
+        __dataObject.name = name
 
-#         # __dataObject.parent = getSharedRoot()
+        # __dataObject.parent = getSharedRoot()
 
-#         # add a destroy tag
-#         __dataObject['mel_destroy']=0
-#         _zeroOutUVs(__dataObject)
+        # add a destroy tag
+        __dataObject['mel_destroy']=0
+        _zeroOutUVs(__dataObject)
 
-#     return __dataObject
+    return __dataObject
 
-# def GetFirstSelectedObjectOrAny():
-#     if len(bpy.context.selected_objects) > 0:
-#         return bpy.context.selected_objects[0]
-#     return bpy.context.scene.objects[0]
+def GetFirstSelectedObjectOrAny():
+    if len(bpy.context.selected_objects) > 0:
+        return bpy.context.selected_objects[0]
+    return bpy.context.scene.objects[0]
     
 
+def objectExists(name : str):
+    return bpy.context.scene.objects.get(name) is not None
 
+def emptySharedDataObjectExists():
+    return bpy.context.scene.objects.get(__DATA_OBJECT_NAME__) is not None
 
-# def objectExists(name : str):
-#     return bpy.context.scene.objects.get(name) is not None
+def getEmptySharedDataOject():
+    return getSharedDataObjectWithName(__DATA_OBJECT_NAME__)
 
-# def emptySharedDataObjectExists():
-#     return bpy.context.scene.objects.get(__DATA_OBJECT_NAME__) is not None
-
-# def getEmptySharedDataOject():
-#     return getSharedDataObjectWithName(__DATA_OBJECT_NAME__)
-
-# def selectSharedDataObjects(select : bool):
-#     return # ## armature TODO: get the associated object
-#     root = getSharedRoot()
-#     root.select_set(select)
-#     for child in root.children:
-#         child.select_set(select)
+# TODO: check if anything is using this.
+def     selectSharedDataObjects(select : bool):
+    return # ## armature TODO: get the associated object
+    root = getSharedRoot()
+    root.select_set(select) 
+    for child in root.children:
+        child.select_set(select)    
 

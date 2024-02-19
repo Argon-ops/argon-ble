@@ -27,19 +27,19 @@ def _parse(val : any) -> DefaultValueInfo:
         dvi.handlingHint = hint
         dvi.help = help
         return dvi
-    
-    hint = val['hint']
 
-    if hint == "PRIMITIVE":
-        return createDefaultValueInfo(val, EHandlingHint.PRIMITIVE, "")
- 
-    if hint == "TAG":
-        return createDefaultValueInfo(0, EHandlingHint.TAG, "")
-
-    # CUSTOM_INSPECTOR
     default = 0
     if 'default' in val:
         default = val['default']
+    hint = val['hint']
+
+    if hint == "PRIMITIVE":
+        return createDefaultValueInfo(default, EHandlingHint.PRIMITIVE, "")
+ 
+    if hint == "TAG":
+        return createDefaultValueInfo(0, EHandlingHint.TAG, "")
+    
+    # CUSTOM_INSPECTOR
     hint = hint if hint else EHandlingHint.CUSTOM_INSPECTOR
     help = val['help']
     return createDefaultValueInfo(default, hint, help)

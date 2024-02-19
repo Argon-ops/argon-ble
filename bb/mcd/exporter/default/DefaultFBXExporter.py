@@ -53,6 +53,7 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
     def execute(self, context):
         from bb.mcd.exporter import ExportOp
 
+        print("hi debug")
         targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny()
         print(F"DEFAULt COmmand data holder: {targetDataHolder.name}")
 

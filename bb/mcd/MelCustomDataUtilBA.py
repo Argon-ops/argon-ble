@@ -31,12 +31,7 @@ from bb.mcd.ui.SelectByKeyMenu import CDU_MT_SelectByKeyMenu
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.util import DisplayHelper
 from bb.mcd.ui.AddKeyMenu import CDU_MT_AddKeyMenu
-# from bb.mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
 from bb.mcd.ui import Inspector
-# from bb.mcd.lookup import KeyValDefault
-# from bb.mcd.exporter.default import DefaultFBXExporter
-# from bb.mcd.ui.componentlike.unityinfo import UnityPaths
-# from bb.mcd.ui.materiallist import MaterialList
 from bb.mcd.ui.materiallist import MaterialListPanel
 from bb.mcd.ui.export import ExportBox
 
@@ -144,12 +139,15 @@ def _drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=T
             return
 
     box = box.box()
+        
     box.row().menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
-    if wantSelByKey:
-        box.row().menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
 
     _drawInspectorListAndDetails(layout, context)
-  
+
+
+def _drawSelByKey(box):
+    box.row().menu(CDU_MT_SelectByKeyMenu.bl_idname, icon="RESTRICT_SELECT_OFF")
+
 
 class CDU_PT_CustomPropHelper(Panel):
     """Main panel: interact with custom properties on selected objects."""
@@ -181,6 +179,9 @@ class CDU_PT_CustomPropHelper(Panel):
         box = layout.box()
         from bb.mcd.settings import GlobalSettings
         GlobalSettings.DrawGlobalsButton(box)
+
+        box = layout.box()
+        _drawSelByKey(box)
         
 # -------------------------------------------------------------------
 #   Register & Unregister

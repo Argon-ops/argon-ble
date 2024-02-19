@@ -2,7 +2,8 @@
 import bpy
 
 from bpy.props import (IntProperty,
-                       EnumProperty,)
+                       EnumProperty,
+                       StringProperty,)
 
 
 from bpy.types import (Operator,
@@ -78,6 +79,12 @@ class PG_AS_CommandName(PropertyGroup):
     """Ble needs the string to be wrapped in a property group to use in a list"""
     commandName : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
+        get=lambda self : CLU.playableEnumIndexFromName(self.commandNameStor),
+        set=lambda self, value : CLU.storePlayableName(self, value, "commandNameStor")
+    )
+
+    commandNameStor : StringProperty(
+        description = "PRIVATE",
     )
 
 class CUSTOM_UL_AS_CommandNameItems(UIList):

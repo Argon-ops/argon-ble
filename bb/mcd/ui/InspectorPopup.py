@@ -127,7 +127,6 @@ def _rehide(objectName):
 ### END REGION ###############################################
 ##############################################################
 
-
 class CU_OT_InspectorPopup(bpy.types.Operator):
     """Edit a Playable. At the moment this just duplicates the in-row edit options. Use if we need more complex options"""
     bl_idname = "view3d.inspector_popup"

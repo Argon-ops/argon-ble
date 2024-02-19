@@ -7,7 +7,7 @@ from bb.mcd.cduoperator import SelectByKey
 class CDU_MT_SelectByKeyMenu(bpy.types.Menu):
     """Menu for the select by key operator"""
     name : StringProperty(name="_select_by_key")
-    bl_label="Select all with key"
+    bl_label="Select by key"
     bl_idname="OBJECT_MT_selectbykey"
 
     @classmethod
