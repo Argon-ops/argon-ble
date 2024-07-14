@@ -1,3 +1,4 @@
+from bb.mcd.ui.componentlike.util.ColliderLikeShared import ColliderLikeShared
 import bpy
 from bpy.props import (IntProperty,
                        FloatProperty,
@@ -42,11 +43,15 @@ class MeshColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
         except BaseException as e:
             print(F" failed to set default {str(e)}")
             print(F"default keys: {default.keys()}")
+            
+        ColliderLikeShared.OnAddKey(targets)
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
         AbstractDefaultSetter._RemoveKey("mel_mesh_collider_is_trigger", targets=targets)
         AbstractDefaultSetter._RemoveKey("mel_mesh_collider_convex", targets=targets)
+
+        ColliderLikeShared.OnRemoveKey(targets)
 
 
 class MeshColliderLike(PropertyGroup, AbstractComponentLike):

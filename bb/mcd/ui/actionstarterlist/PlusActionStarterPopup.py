@@ -21,8 +21,10 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 import bpy
 
-from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
+# from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
 from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
+from bb.mcd.ui.actionstarterlist import CommandTypes as CT
+
 
 def AppendNewPlayableToInteractionHandlerLike(playableName : str):
     neps = AddSubtractExtraPlayables.AddSubtractNumExtraPlayables(True, bpy.context)
@@ -34,6 +36,14 @@ def SetNewPlayableAtInteractionHandlerLike(playableName : str, playableIdx : int
     print(F"Will Append at {key} name: {playableName}")
     CLU.setValueAtKey(key, playableName)
 
+
+def FakeInitPlayable(playable):
+    pass
+
+# def _OnCreatedDefine(as_custom_idx):
+#     pass
+
+OnCommandCreated = lambda as_custom_idx : as_custom_idx # _OnCreatedDefine
 
 class CU_OT_PlayableCreate(bpy.types.Operator):
     """Add a Command."""
@@ -47,7 +57,7 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
     )
     playableType : bpy.props.EnumProperty(
         name="Playable Type",
-        items=CPACModule.getPlayableTypes(),
+        items=CT.getPlayableTypes(), # CPACModule.getPlayableTypes(),
     )
     should_append : bpy.props.BoolProperty()
     should_insert : bpy.props.BoolProperty()
@@ -67,7 +77,11 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         item.name = ActionStarterList.enforceUnique(self.new_name, context)
         item.playableType = self.playableType
 
-        CPACModule.CUSTOM_PG_AS_Collection.InitPlayable(item)
+        # CPACModule.CUSTOM_PG_AS_Collection.InitPlayable(item)
+        #  TODO: the above method did nothing and was part of a circular import chain
+        #    for now do this to unravel the chain. But also this function stands in as a
+        #   reminder that we might want to let playables init
+        FakeInitPlayable(item) 
 
         bpy.ops.view3d.playable_pick_popup('INVOKE_DEFAULT', playableName=item.name)
 
@@ -78,6 +92,10 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
 
         scn.as_custom_index = len(scn.as_custom)-1
         info = '%s added to list' % (item.name)
+
+        # CALL our callback
+        OnCommandCreated(item)
+
         self.report({'INFO'}, info)
         return {'FINISHED'}
 

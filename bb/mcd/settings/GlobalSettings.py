@@ -33,10 +33,11 @@ class GlobalSettingsExporter:
     __GLOBALS_MARKER_KEY__="mel_global_settings_marker"
     __GLOBALS_PAYLOAD_KEY__="mel_global_settings_payload"
 
+
     @staticmethod
     def PreExport(targetDataHolder):
         GlobalSettingsExporter._PurgePreviousTargetObjects()
-        GlobalSettingsExporter._WriteCommandsToTargetObject(targetDataHolder)
+        GlobalSettingsExporter._WriteGlobalsToTargetObject(targetDataHolder)
         GlobalSettingsExporter._SanitizeExport(targetDataHolder)
 
     @staticmethod
@@ -55,12 +56,12 @@ class GlobalSettingsExporter:
             del previous[GlobalSettingsExporter.__GLOBALS_MARKER_KEY__]
             del previous[GlobalSettingsExporter.__GLOBALS_PAYLOAD_KEY__]
 
-    def _WriteCommandsToTargetObject(target):
+    def _WriteGlobalsToTargetObject(target):
         target[GlobalSettingsExporter.__GLOBALS_MARKER_KEY__] = 1
-        GlobalSettingsExporter._ExportCommands(target)
+        GlobalSettingsExporter._ExportGlobals(target)
         return target
 
-    def _ExportCommands(writeToOb):
+    def _ExportGlobals(writeToOb):
         import json
         argon_globals = bpy.context.scene.argon_globals
         d = GlobalSettingsExporter._ToDict(argon_globals)

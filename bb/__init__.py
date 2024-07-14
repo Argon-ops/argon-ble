@@ -53,6 +53,7 @@ modulesFullNames = [
     'bb.mcd.exporter.edyj.BlenderToUnityFbxExporter',
     'bb.mcd.exporter.default.DefaultFBXExporter',
     'bb.mcd.ui.componentlike.RigidbodyLike',
+    'bb.mcd.ui.componentlike.ReplaceWithPrefabLike',
     'bb.mcd.ui.componentlike.LightEnableLike',
     'bb.mcd.ui.componentlike.OffMeshLinkLike',
     # 'bb.mcd.ui.componentlike.unityinfo.UnityPaths',
@@ -62,6 +63,7 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.EnableReceiverLike',
     'bb.mcd.ui.componentlike.ParticleSystemLike',
     'bb.mcd.ui.componentlike.VisualEffectLike',
+    'bb.mcd.ui.componentlike.SceneObjectsReferencerLike',
     'bb.mcd.ui.componentlike.RE2PickSessionLike',
     'bb.mcd.ui.componentlike.DestroyLike',
     'bb.mcd.ui.componentlike.ForcePCWLike',
@@ -76,6 +78,11 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.DisableComponentLike',
     'bb.mcd.ui.componentlike.TextMeshLike',
     'bb.mcd.ui.componentlike.PlayableScalarAdapterLike',
+    'bb.mcd.ui.componentlike.util.ColliderLikeShared',
+    'bb.mcd.ui.componentlike.router.CLikeToDefaultSetterMap',
+    'bb.mcd.ui.componentlike.preexport.ComponentLikePreExport',
+    'bb.mcd.ui.CustomComponentInspector',
+    'bb.mcd.ui.CustomComponentFilePickPopup',
     'bb.mcd.ui.materiallist.MaterialListPanel',
     'bb.mcd.shareddataobject.SharedDataObject', 
     'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
@@ -84,8 +91,12 @@ modulesFullNames = [
     # 'bb.mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
     'bb.mcd.exporter.ExportOp',
     'bb.mcd.settings.GlobalSettings',
+    'bb.mcd.settings.IsArgonMarker',
     'bb.mcd.foo.ScratchPad',
     ]
+
+
+
 
 import sys
 import importlib
@@ -169,6 +180,12 @@ if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
     #   (Also, used this terminal https://github.com/microsoft/terminal not the default PowerShell)
     #  
      
-# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>
-    # because, this way, they import correctly when loading from a zip as a formal addon AND 
+# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>.<sub-dirN>
+    #
+    # In other words, they need to be absolute paths starting from project-dir.
+    # In our case bb is the name of the project-dir, so:
+    #
+    # Example: from bb.mcd.util import ObjectLookupHelper
+    #
+    # This way, they import correctly when loading from a zip as a formal addon AND 
     #    when loading via the boot2.py script

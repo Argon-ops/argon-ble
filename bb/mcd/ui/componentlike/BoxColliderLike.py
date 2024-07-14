@@ -1,15 +1,27 @@
+from bb.mcd.ui.componentlike.util.ColliderLikeShared import ColliderLikeShared
 import bpy
 from bpy.props import (IntProperty,
                        FloatProperty,
                        StringProperty,
                        BoolProperty,
-                       CollectionProperty,)
+                       CollectionProperty,
+                       FloatVectorProperty)
 from bpy.types import (PropertyGroup,)
 from bb.mcd.util import ObjectLookupHelper
 
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+
+_suffixes={
+    "_is_trigger" : False,
+    "_material" : "",
+    "_scale_dimensions" : (1.0, 1.0, 1.0)
+}
+
+def _Append(suffix : str) -> str:
+    return F"{BoxColliderLike.GetTargetKey()}{suffix}"
+
 
 class BoxColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -22,16 +34,22 @@ class BoxColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
-        try:
-            AbstractDefaultSetter._SetKeyValOnTargets("mel_box_collider_is_trigger", default['isTrigger'], targets)
-        except BaseException as e:
-            print(F" failed to set default {str(e)}")
-            print(F"default keys: {default.keys()}")
+        for suffix, defaultVal in _suffixes.items():
+            AbstractDefaultSetter._SetKeyValOnTargets(_Append(suffix), defaultVal, targets)
+        # default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
+        # try:
+        #     AbstractDefaultSetter._SetKeyValOnTargets("mel_box_collider_is_trigger", default['isTrigger'], targets)
+        # except BaseException as e:
+        #     print(F" failed to set default {str(e)}")
+        #     print(F"default keys: {default.keys()}")
+        ColliderLikeShared.OnAddKey(targets)
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
-        AbstractDefaultSetter._RemoveKey("mel_box_collider_is_trigger", targets=targets)
+        for suffix in _suffixes.keys():
+            AbstractDefaultSetter._RemoveKey(_Append(suffix), targets)
+        ColliderLikeShared.OnRemoveKey(targets)
+
 
 
 class BoxColliderLike(PropertyGroup, AbstractComponentLike):
@@ -47,6 +65,7 @@ class BoxColliderLike(PropertyGroup, AbstractComponentLike):
         row.prop(mcl, "isTrigger", text = "isTrigger")
         row = box.row()
         row.prop(mcl, "material", text="material")
+        box.row().prop(mcl, "scaleDimensions", text="Scale Dimensions")
 
     @staticmethod
     def GetTargetKey() -> str:
@@ -63,6 +82,14 @@ class BoxColliderLike(PropertyGroup, AbstractComponentLike):
         default="",
         get=lambda self : CLU.getStringFromKey("mel_box_collider_material"),
         set=lambda self, value : CLU.setValueAtKey("mel_box_collider_material", value)
+    )
+
+    scaleDimensions : FloatVectorProperty(
+        description="Defines a vector that will scale the box collider. The collider's size will = mesh-bounds-size * scaleDimensions",
+        get=lambda self : CLU.getFloatArrayFromKey(_Append("_scale_dimensions")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_scale_dimensions"), value),
+        soft_min=0.001,
+        soft_max=4.0,
     )
 
 classes = (

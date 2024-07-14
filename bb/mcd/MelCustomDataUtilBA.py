@@ -72,9 +72,9 @@ class CDU_OT_actions(Operator):
         return {"FINISHED"}
 
 # -------------------------------------------------------------------
-#   Drawing
+#   A UIList that filters items based on whether key
+#    appears as a custom property key on the selected object{s}
 # -------------------------------------------------------------------
-
 class CDU_UL_PerObjectItems(UIList):
     """Draw each key-val row that's defined as a property of the selected objects."""
 
@@ -180,6 +180,9 @@ class CDU_PT_CustomPropHelper(Panel):
         from bb.mcd.settings import GlobalSettings
         GlobalSettings.DrawGlobalsButton(box)
 
+        from bb.mcd.ui import CustomComponentFilePickPopup
+        CustomComponentFilePickPopup.DrawInPanel(layout.box())
+
         box = layout.box()
         _drawSelByKey(box)
         
@@ -198,7 +201,7 @@ from bpy.app.handlers import persistent
 @persistent
 def syncDisplayKVs(scene):
     """ Reload key-values based on the key-values defined in prefs. """
-    if hasattr(scene, 'custom') == False:
+    if not hasattr(scene, 'custom'):
         print("scene has no custom attrib bye")
         return
 
@@ -209,7 +212,11 @@ def syncDisplayKVs(scene):
         dval = scene.custom.add()
         dval.key = key
         dval.relevant_prop_name = ObjectLookupHelper._getPropNameForType(defaultValueInfo.default)
-        dval.handlingHint = defaultValueInfo.handlingHint
+        dval.hint = defaultValueInfo.hint
+
+    # UNRELATED CODE THAT SHOULD MOVE
+    from bb.mcd.ui import CustomComponentInspector
+    CustomComponentInspector.DisplayListUtils.FillDisplayListWithBlanks(bpy.context)
 
 @persistent
 def handleSelectionChanged(scene):

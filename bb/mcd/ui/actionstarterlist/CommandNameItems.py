@@ -12,6 +12,8 @@ from bpy.types import (Operator,
 
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
+
 
 #region list operators
 
@@ -93,6 +95,18 @@ class CUSTOM_UL_AS_CommandNameItems(UIList):
         row = layout.row()
         row.prop(item, "commandName", text="Command: ")
         row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = item.commandName
+
+        # Add new
+        plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+        plusOp.should_insert = True
+        plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
+
+        def assignToCommandList(newCommand):
+            item.commandName = newCommand.name
+
+        # set the modules dedicated callback function object
+        PlusActionStarterPopup.OnCommandCreated = assignToCommandList
+
         
     def invoke(self, context, event):
         pass

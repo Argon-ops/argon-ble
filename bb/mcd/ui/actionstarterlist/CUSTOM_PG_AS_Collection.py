@@ -18,6 +18,7 @@ from bb.mcd.shareddataobject import SharedDataObject
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.actionstarterlist import CommandNameItems
+from bb.mcd.ui.actionstarterlist import CommandTypes as CT
 
 #region command targets list add / remove
 
@@ -70,21 +71,6 @@ class AS_OT_RemoveFromTargets(Operator):
     
 #endregion
 
-def getPlayableTypes():
-    return (
-        ('0', 'Event Only', 'Nothing to play. Just generate an event'),
-        ('1', 'Animation', 'Animation and/or audio'),
-        ('2', 'Looping Animation', 'Looping animation and/or audio'),
-        ('3', 'Send Signal', 'Send a signal to target objects'),
-        ('4', 'Camera Shake', 'Trigger a camera shake'),
-        ('5', 'Screen Overlay', 'Screen overlay'),
-        ('6', 'Send Sleep/Wake-up Signal', 'Send a sleep or wake-up signal to targets'),
-        ('7', 'Display Headline', 'Display text in the center of the screen'),
-        ('8', 'Message Bus', 'Send a message on the MessageBus'),
-        ('9', 'Send Destroy Signal', 'Send a destroy signal to the targets'),
-        ('10', 'Command Group', 'A command that invokes a set of commands'),
-        ('11', 'Wait Seconds', 'Waits for the given number of seconds')
-    )
 
 class PlayablesExporter:
 
@@ -145,22 +131,22 @@ class PG_AS_TargetsPropGroup(PropertyGroup):
 
 class CUSTOM_PG_AS_Collection(PropertyGroup):
 
-    @staticmethod
-    def InitPlayable(playable):
-        return 
-        ### TODO: do we need to set these defaults elsewhere
-        """Make sure a few defaults are written to the storage object"""
-        _ASJson.setValueAt(playable, "playableId", playable.name)
-        _ASJson.setValueAt(playable, "playableType", int(playable.playableType))
+    # @staticmethod
+    # def InitPlayable(playable):
+    #     return 
+    #     ### TODO: do we need to set these defaults elsewhere
+    #     """Make sure a few defaults are written to the storage object"""
+    #     _ASJson.setValueAt(playable, "playableId", playable.name)
+    #     _ASJson.setValueAt(playable, "playableType", int(playable.playableType))
 
-        if playable.playableType == 4: #camera shake
-            _ASJson.setValueAt(playable, "shake_duration", 1.0)
-            _ASJson.setValueAt(playable, "shake_displacement_distance", 0.1)
+    #     if playable.playableType == 4: #camera shake
+    #         _ASJson.setValueAt(playable, "shake_duration", 1.0)
+    #         _ASJson.setValueAt(playable, "shake_displacement_distance", 0.1)
 
-        elif playable.playableType == 7: # headline
-            _ASJson.setValueAt(playable, "headline_display_seconds", 1.5)
+    #     elif playable.playableType == 7: # headline
+    #         _ASJson.setValueAt(playable, "headline_display_seconds", 1.5)
 
-        playable.internalId = F"ID_{playable.name}"
+    #     playable.internalId = F"ID_{playable.name}"
 
     
     @staticmethod
@@ -173,6 +159,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     
     @staticmethod 
     def GetSerialiazableValue(pgSelf, fieldName : str):
+        """ Convert any object values into something serializable. Just return any other values.  """
         val = getattr(pgSelf, fieldName)
         if fieldName == "targets":
             return [(ObjectLookupHelper._hierarchyToStringStrange(target.object) if target.object is not None else "") for target in val]
@@ -181,6 +168,8 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         elif fieldName == "commandNames":
             return [wrapper.commandNameStor for wrapper in val]
             # return [wrapper.commandName for wrapper in val]
+        elif fieldName == "camera":
+            return val.name if val is not None else ""
         return val
 
     name : StringProperty(
@@ -194,7 +183,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
     )
 
     playableType : EnumProperty( 
-        items=getPlayableTypes(),
+        items=CT.getPlayableTypes(),
         description="",
         default=1, 
     )
@@ -205,6 +194,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
             ('RestartForwards', 'RestartForwards', 'Just restart play from the beginning.'),
             ('ToggleAndRestart', 'ToggleAndRestart', 'If the playback cursor is closer to the end, play backwards starting from the end. Else play forwards from the beginning.'),
             ('FlipDirections', 'FlipDirections', 'Switch between forward and reverse with each invocation. Just change directions and don\'t set the playback position (to either start or end) before hand.'),
+            ('RestartBackwards', 'RestartBackwards', 'Restart play from the end and play to the beginning'),
         ),
     )
 
@@ -363,17 +353,21 @@ f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = hi
         description="Defines the number of seconds to wait after the end of this command before starting the next command",
     )
 
-    def setPlayAfter(self, val : int):
-        playable = CLU.playableFromIndex(val)
-        if playable is None:
-            self.playAfterStor = ""
-            return
+    # def setPlayAfter(self, val : int):
+    #     playable = CLU.playableFromIndex(val)
+    #     if playable is None:
+    #         print(F"the playable was None playAfterStor will be empty")
+    #         self.playAfterStor = ""
+    #         return
         
-        playableAfterName = playable.name
-        print(F"playAfterStor was: {self.playAfterStor} WILL SET TO : {playableAfterName} TYPE: {type(playableAfterName)}")
-        # self.playAfterStor = playable.name
-        setattr(self, "playAfterStor", playable.name)
-        print(F"playAfterStor is now: {self.playAfterStor}")
+    #     #TODO: we are seeing playAfter not working on the Unity side.
+    #     #  are we declining to write to playAfterStor intentionally? The import script seems to 
+    #     #   expect it to contain a value
+    #     playableAfterName = playable.name
+    #     print(F"playAfterStor was: {self.playAfterStor} WILL SET TO : {playableAfterName} TYPE: {type(playableAfterName)}")
+    #     # self.playAfterStor = playable.name
+    #     setattr(self, "playAfterStor", playable.name)
+    #     print(F"playAfterStor is now: {self.playAfterStor}")
 
     playAfter : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
@@ -382,7 +376,7 @@ f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = hi
     )
 
     playAfterStor : StringProperty(
-        description="'Private' string used to store the name of the play after command"
+        description="'P_rivate' string used to store the name of the play after command"
     )
 
     playAfterDeferToLatest : BoolProperty(
@@ -416,6 +410,16 @@ f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = hi
     #region wait seconds command
     waitSeconds : FloatProperty(
         description="The length of time to wait in seconds"
+    )
+    #endregion
+
+    #region cutscene
+    camera : PointerProperty(
+        type=bpy.types.Object
+    )
+
+    isCancellable : BoolProperty(
+        description="Should the scene stop playing when the user cancels"
     )
     #endregion
 
@@ -493,7 +497,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             return
         
         row = self.layout.row()
-        row.label(text=F"{getPlayableTypes()[int(playable.playableType)][1]} > {playable.name} ")
+        row.label(text=F"{CT.getPlayableTypes()[int(playable.playableType)][1]} > {playable.name} ")
         self.layout.row().prop(playable, "playableType")
 
         playableType = int(playable.playableType)
@@ -588,11 +592,29 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             self.drawTargetsList(playable, self.layout.box())
 
         elif playableType == 10: # composite command
+            # FIXME: Scenario where the command name is not recorded (maybe when the user never actually selects a command from the list of commands) 
             CommandNameItems.DrawList(self.layout, playable)
             self.layout.row().prop(playable, "isSequential", text="Sequential")
         
         elif playableType == 11: # wait seconds
             self.layout.row().prop(playable, "waitSeconds", text="Wait Seconds")
+
+        elif playableType == 12: # cutscene
+            row = self.layout.row()
+
+            self.layout.row().prop(playable, "camera", text="Camera")
+            #targets box
+            self.layout.row().label(text="Animation Targets")
+            self.drawTargetsList(playable, self.layout.box())
+
+            row = self.layout.row()
+            row.prop(playable, "animAction", text="Action Name")
+            row = self.layout.row()
+            row.prop(playable, "audioClipName", text="Audio Clip Name", icon="SOUND")
+            if len(playable.audioClipName) > 0:
+                self.layout.row().prop(playable, "loopAudio", text="Loop Audio")
+            self.layout.row().prop(playable, "isCancellable", text="Is Cancellable")     
+
 
 
         self.layout.row().prop(playable, "signalFilters", text="Signal Filter ")
@@ -602,11 +624,13 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         self.layout.row().prop(playable, "shouldPlayAfter", text="Play A Command After")
         if playable.shouldPlayAfter:
             row = self.layout.row()
-            row.label(text=playable.playAfterStor)
             row.prop(playable, "playAfter", text="Play After")
+            print(F"Display play after now: {playable.playAfter} | stor: {playable.playAfterStor}")
             row.operator(CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = playable.playAfter 
             self.layout.row().prop(playable, "playAfterAdditionalDelay", text="Delay Seconds")
             self.layout.row().prop(playable, "playAfterDeferToLatest", text="Play After Defer to Latest")
+       
+
 
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
         

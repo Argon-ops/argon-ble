@@ -29,8 +29,10 @@ def resubAllLoadPostInterHighlighter(dummy):
     perObjectFieldName = "highlighterPerObjectData"
 
     fieldsAndPropNames = (
-        ("rendererTarget", "_renderer_target"), # for each object PointerProperty that needs updates, add a line here
+        # for each object PointerProperty that needs updates, add a line here
+        ("rendererTarget", "_renderer_target"), 
         ("forwardFaceReference", "_forward_face_reference"),
+        ("beaconPositionReference", "_beacon_position_reference"),
     )
 
     for fieldAndPropName in fieldsAndPropNames:
@@ -79,12 +81,33 @@ class InteractionHighlighterDefaultSetter(AbstractDefaultSetter.AbstractDefaultS
         
         for target in targets:
             target.property_unset("highlighterPerObjectData")
+        
+    @staticmethod
+    def Validate(target):
+        if not InteractionHighlighterLike.GetTargetKey() in target:
+            print(F" i don't know why you wanted me to validate a target with no highlighter like: {target.name} no key: {InteractionHighlighterLike.GetTargetKey()}")
+            return
+        
+        from bb.mcd.ui.componentlike.util.ColliderLikeShared import ColliderLikeShared
+
+        rt = target.highlighterPerObjectData.rendererTarget
+        rt = target if rt is None else rt
+
+        if not ColliderLikeShared.IsCollider(rt):
+            from bb.mcd.lookup import KeyValDefault
+            from bb.mcd.ui.componentlike import StorageRouter
+            from bb.mcd.ui.componentlike import BoxColliderLike as bcl
+
+            default = KeyValDefault.getDefaultValue(bcl.BoxColliderLike.GetTargetKey())
+            StorageRouter.setDefaultValueOnTarget(bcl.BoxColliderLike.GetTargetKey(), default, target)
+
+
 
 def _Append(suffix : str) -> str:
     return F"{InteractionHighlighterLike.GetTargetKey()}{suffix}"
 
 class HighlighterPerObjectData(PropertyGroup, AbstractPerObjectData):
-    """Per object data because highlighters might need to reference a renderer target"""
+    """Per object data because highlighters might need to reference a renderer target and a few other scene objects"""
 
     rendererTarget : PointerProperty(
         type=bpy.types.Object,
@@ -107,6 +130,17 @@ a forward normal is defined, the highlighter will only activate when the player 
             self,
             "forwardFaceReference",
             _Append("_forward_face_reference")
+        )
+    )
+
+    beaconPositionReference : PointerProperty(
+        type=bpy.types.Object,
+        description="Optional: if using a beacon highlighter, defines an object whose position will be used to set the position of the beacon",
+        update=lambda self, context : MsgbusUtils.onObjectUpdate(
+            context.active_object,
+            self, 
+            "beaconPositionReference",
+            _Append("_beacon_position_reference")
         )
     )
 
@@ -142,6 +176,8 @@ class InteractionHighlighterLike(SleepStateSettings, AbstractComponentLike):
             boxb.row().prop(mcl, "beaconNudgeVector", text="Beacon Nudge")
             boxb.row().prop(mcl, "beaconShouldRotateNinety", text="Rotate Ninety")
             # boxb.row().prop(mcl, "visibleRadius", text="Visible Radius")
+            if context.active_object is not None:
+                boxb.row().prop(context.active_object.highlighterPerObjectData, "beaconPositionReference", text="Beacon Position Object")
 
         if context.active_object is not None:
             # per object: forward facing ref

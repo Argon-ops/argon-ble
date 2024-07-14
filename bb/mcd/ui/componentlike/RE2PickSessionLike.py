@@ -82,7 +82,7 @@ class RE2PickSessionLike(PropertyGroup, AbstractComponentLike):
 
     shouldCallClickHandlers : BoolProperty(
         description="If true, invoke the interaction handler on any collider that gets clicked during the session, \
-if an click type interaction handler is found. If false, don't do this. Note: even when this option is false,\
+if a click type interaction handler is found. If false, don't do this. Note: even when this option is false,\
 the pick session will still emit an event, 'OnItemPick', when the user clicks a collider during the session. Use that event to handle \
 the picking behaviour yourself, as needed.",
         get=lambda self : CLU.getBoolFromKey(_Append("_should_call_click_handlers"), False),

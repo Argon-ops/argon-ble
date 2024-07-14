@@ -20,6 +20,7 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
 from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
 from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
+from bb.mcd.ui.componentlike.constants.ConfigSymbols import ApplyObjectSymbols
 
 #region ADD REMOVE EXTRA PLAYABLES
 
@@ -62,6 +63,23 @@ class CU_OT_NumExtraPlayables(bpy.types.Operator):
 
 #endregion
 
+_suffixes = {
+    "_playable" : lambda :  bpy.context.scene.as_custom[0].name,
+    "_allows_interrupt" : False, 
+    "_interaction_type" :0, 
+    "_is_trigger_enter_exit" : False,
+    "_enter_signal" : 1.0,
+    "_exit_signal" : 0.0,
+    "_is_click_hold" : False, 
+    "_num_extra_playables" : 0, 
+    "_playable1" : "", 
+    "_playable2" : "", 
+    "_playable3" : "", 
+    "_playable4" : "", 
+    "_playable5" : "",
+    "_click_feedback" : False,
+    "_scene_object_forward_target" : ApplyObjectSymbols.ArgonThisObject(), 
+}
 
 class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
@@ -74,28 +92,69 @@ class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSette
 
     @staticmethod
     def OnAddKey(key : str, val, targets):
-        default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
-        try:
-            AbstractDefaultSetter._SetKeyValOnTargets("mel_interaction_handler_playable", default['playable'], targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_allows_interrupt"), default['allows_interrupt'], targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), default['enter_signal'], targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_interaction_type"), default['interaction_type'], targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), 1, targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_exit_signal"), 0, targets)
-            AbstractDefaultSetter._SetKeyValOnTargets(_Append("_is_click_hold"), 0, targets)
+        for suffix, defaultVal in _suffixes.items():
+            print(F"{suffix} set {defaultVal} isCallable {callable(defaultVal)} ")
+            AbstractDefaultSetter._SetKeyValOnTargets(_Append(suffix), defaultVal() if callable(defaultVal) else defaultVal, targets)
+
+        # default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
+        # try:
+        #     AbstractDefaultSetter._SetKeyValOnTargets("mel_interaction_handler_playable", default['playable'], targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_allows_interrupt"), default['allows_interrupt'], targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), default['enter_signal'], targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_interaction_type"), default['interaction_type'], targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_enter_signal"), 1, targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_exit_signal"), 0, targets)
+        #     AbstractDefaultSetter._SetKeyValOnTargets(_Append("_is_click_hold"), 0, targets)
             
-        except BaseException as e:
-            print(F" failed to set default {str(e)}")
-            print(F"default keys: {default.keys()}")
+        # except BaseException as e:
+        #     print(F" failed to set default {str(e)}")
+        #     print(F"default keys: {default.keys()}")
 
     @staticmethod
     def OnRemoveKey(key : str, targets):
-        suffixes = ("_playable", "_allows_interrupt", "_interaction_type", "_is_trigger_enter_exit", \
-                    "_enter_signal", "_exit_signal", "_is_click_hold", "_num_extra_playables", "_playable1", "_playable2", "_playable3", "_playable4", "_playable5",
-                    "_click_feedback", )
+        for suffix in _suffixes.keys():
+            AbstractDefaultSetter._RemoveKey(_Append(suffix), targets=targets)
+        # suffixes = ("_playable", "_allows_interrupt", "_interaction_type", "_is_trigger_enter_exit", \
+        #             "_enter_signal", "_exit_signal", "_is_click_hold", "_num_extra_playables", "_playable1", "_playable2", "_playable3", "_playable4", "_playable5",
+        #             "_click_feedback", )
 
-        for suffix in suffixes:
-            AbstractDefaultSetter._RemoveKey(_Append(suffix), targets)
+        # for suffix in suffixes:
+        #     AbstractDefaultSetter._RemoveKey(_Append(suffix), targets)
+
+    @staticmethod
+    def _EnforceHighlighterForClickHandlers(target):
+        ''' Add a highlighter if this is a click handle and if there is none currently
+        '''
+        if not InteractionHandlerLike.GetTargetKey() in target:
+            return
+        try:
+            # If this is a trigger type. Don't force this object to add a highlighter
+            if target[_Append("_interaction_type")] == 1: 
+                return
+        except:
+            pass
+
+        from bb.mcd.ui.componentlike import InteractionHighlighterLike as ihl
+        from bb.mcd.ui.componentlike import BoxColliderLike as bcl
+        from bb.mcd.lookup import KeyValDefault
+        from bb.mcd.ui.componentlike import StorageRouter
+
+        # Add a highlighter if there was none
+        if not ihl.InteractionHighlighterLike.HasBaseKey(target):
+            default = KeyValDefault.getDefaultValue(ihl.InteractionHighlighterLike.GetTargetKey())
+            StorageRouter.setDefaultValueOnTarget(ihl.InteractionHighlighterLike.GetTargetKey(), default, target)
+            ihl.InteractionHighlighterDefaultSetter.Validate(target) # Allow this highlighter to validate. May mean that it validates twice
+
+    @staticmethod
+    def Validate(target):
+        InteractionHandlerDefaultSetter._EnforceHighlighterForClickHandlers(target)
+
+        # TODO: NOT HERE: the Commands list in the UI may show a command that is never actually written to the object.
+        #   This happens when a command exists and they have just added an interaction handler like.
+        #   Unfortunately, we'll need to reorganize how commands work. Because it's not ok to make people think that
+        #    a command has been set (maybe the one that popped up was what they wanted and they didn't touch it)
+        #    but never have that command actually be written to the object. Best to not give this impression
+        
 
 def _Append(suffix : str) -> str:
     return F"{InteractionHandlerLike.GetTargetKey()}{suffix}"
@@ -143,7 +202,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     def Display(box, context) -> None:
         boxa = box.box()
         row = boxa.row()
-        mcl = context.scene.interactionHandlerLike
+        ihl = context.scene.interactionHandlerLike
 
         row = boxa.row()
         row.label(text="Commands")
@@ -152,10 +211,10 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
             # TODO: handle the case where no playables exist in the blend file's as_custom (not even 1)
             #  We are getting this warning:
             # WARN (bpy.rna): C:\Users\blender\git\blender-v320\blender.git\source\blender\python\intern\bpy_rna.c:1339 pyrna_enum_to_py: current value '0' matches no enum in 'InteractionHandlerLike', '', 'playable'
-            attrib = getattr(mcl, attrName)
+            attrib = getattr(ihl, attrName)
             spl=row.split(factor=.6)
             spl.label(text=F"{idx + 1} : {attrib}")
-            spl.prop(mcl, attrName, text="") 
+            spl.prop(ihl, attrName, text="") 
             if attrib: 
                 row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = attrib 
 
@@ -167,7 +226,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         drawPlayableRow("playable", 0)
 
         # Extra playables
-        for i in range(mcl.numExtraPlayables):
+        for i in range(ihl.numExtraPlayables):
             row = boxa.row()
             drawPlayableRow(F"playable{i+1}", i + 1)
             
@@ -176,62 +235,68 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         row.operator(CU_OT_NumExtraPlayables.bl_idname, icon="REMOVE", text="").should_add = False
 
         row = box.row()
-        row.prop(mcl, "interactionType", text="Type")
+        row.prop(ihl, "interactionType", text="Type")
         boxb = box.box()
 
-        if mcl.interactionType == 'TRIGGER':
+        if ihl.interactionType == 'TRIGGER':
             row = boxb.row()
-            row.prop(mcl, "isTriggerEnterExit")
-            if not mcl.isTriggerEnterExit == 'EXIT':
+            row.prop(ihl, "isTriggerEnterExit")
+            if not ihl.isTriggerEnterExit == 'EXIT':
                 row = boxb.row()
-                row.prop(mcl, "enterSignalInputType", text="Enter Signal")
-                if mcl.enterSignalInputType == 'Value':
-                    row.prop(mcl, "enterSignal", text="")
-                elif mcl.enterSignalInputType == 'Object':
-                    row.prop(mcl, "enterSignalProvider", text="")
-                elif mcl.enterSignalInputType == 'Playable':
-                    row.prop(mcl, "enterSignalPlayable", text="")
+                row.prop(ihl, "enterSignalInputType", text="Enter Signal")
+                if ihl.enterSignalInputType == 'Value':
+                    row.prop(ihl, "enterSignal", text="")
+                elif ihl.enterSignalInputType == 'Object':
+                    row.prop(ihl, "enterSignalProvider", text="")
+                elif ihl.enterSignalInputType == 'Playable':
+                    row.prop(ihl, "enterSignalPlayable", text="")
 
-            if not mcl.isTriggerEnterExit == 'ENTER':
+            if not ihl.isTriggerEnterExit == 'ENTER':
                 row = boxb.row()
-                row.prop(mcl, "exitSignalInputType", text="Exit Signal")
-                if mcl.exitSignalInputType == 'Value':
-                    row.prop(mcl, "exitSignal", text="")
-                elif mcl.exitSignalInputType == 'Object':
-                    row.prop(mcl, "exitSignalProvider")
-                elif mcl.exitSignalInputType == 'Playable':
-                    row.prop(mcl, "exitSignalPlayable", text="")
+                row.prop(ihl, "exitSignalInputType", text="Exit Signal")
+                if ihl.exitSignalInputType == 'Value':
+                    row.prop(ihl, "exitSignal", text="")
+                elif ihl.exitSignalInputType == 'Object':
+                    row.prop(ihl, "exitSignalProvider")
+                elif ihl.exitSignalInputType == 'Playable':
+                    row.prop(ihl, "exitSignalPlayable", text="")
 
 
-        elif mcl.interactionType == 'CLICK':
+        elif ihl.interactionType == 'CLICK':
             row = boxb.row()
-            row.prop(mcl, "isClickHold")
-            if mcl.isClickHold:
+            row.prop(ihl, "isClickHold")
+            if ihl.isClickHold:
                 row = boxb.row()
-                row.prop(mcl, "handleDiscreteClicksAlso", text="Discrete Clicks Also")
-                if mcl.handleDiscreteClicksAlso:
-                    row.prop(mcl, "discreteClickFakeHoldTime", text="Discrete Click Hold Time")
+                row.prop(ihl, "handleDiscreteClicksAlso", text="Discrete Clicks Also")
+                if ihl.handleDiscreteClicksAlso:
+                    row.prop(ihl, "discreteClickFakeHoldTime", text="Discrete Click Hold Time")
+            
+            boxbb = boxb.box()
+            boxbb.row().prop(ihl, "shouldForwardInteractions", text="Should Forward Interactions")
+            if ihl.shouldForwardInteractions:
+                boxbb.row().prop(ihl, "sceneObjectForwardTarget", text="Scene Objects Forward Taget")
+
 
             # TODO: "useRadius"
             row = boxb.row()
-            row.prop(mcl, "enterSignal", text="Mouse Down Signal")
-            if mcl.isClickHold:
+            row.prop(ihl, "enterSignal", text="Mouse Down Signal")
+            if ihl.isClickHold:
                 row = boxb.row()
-                row.prop(mcl, "exitSignal", text="Mouse Up Signal")
+                row.prop(ihl, "exitSignal", text="Mouse Up Signal")
 
             boxc = boxb.box()
-            # TODO: add an option (not default) never destroy not even destroy messages
-            boxc.row().prop(mcl, "selfDestructBehaviour", text="Self Destruct Behaviour")
+            # TODO: add an option (not default) never destroy not even on receiving destroy messages
+            boxc.row().prop(ihl, "selfDestructBehaviour", text="Self Destruct Behaviour")
             boxd = boxc.box()
             # if mcl.selfDestructBehaviour != "NeverSelfDestruct":
             # CONSIDER: there could be a self destruct directive neverSelfDestructAndEvenIgnoreDestroyMessages
             #   or a directive destroyMessagesOnly
             boxd.row().label(text="On Destroy Settings")
-            boxd.row().prop(mcl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
-            boxd.row().prop(mcl, "destroyColliderAlso", text="Destroy Collider Also")
-            boxd.row().prop(mcl, "destroyGameObjectAlso", text="Destroy Game Object Also")
+            boxd.row().prop(ihl, "destroyHighlighterAlso", text="Destroy Highlighter Also")
+            boxd.row().prop(ihl, "destroyColliderAlso", text="Destroy Collider Also")
+            boxd.row().prop(ihl, "destroyGameObjectAlso", text="Destroy Game Object Also")
 
-            boxc.row().prop(mcl, "sleepBehaviour", text="Sleep Behaviour")
+            boxc.row().prop(ihl, "sleepBehaviour", text="Sleep Behaviour")
 
 
         # sleep also settings
@@ -244,14 +309,13 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
             if not bpy.context.scene.showSleepSpreader:
                 return
 
-            if mcl.interactionType == 'CLICK':
-                box_ss.row().prop(mcl, "sleepHighlighterAlso", text="Sleep Highlighter Also")
-            box_ss.row().prop(mcl, "sleepColliderAlso", text="Sleep Collider Also")
+            if ihl.interactionType == 'CLICK':
+                box_ss.row().prop(ihl, "sleepHighlighterAlso", text="Sleep Highlighter Also")
+            box_ss.row().prop(ihl, "sleepColliderAlso", text="Sleep Collider Also")
         
         dislaySleepAlsoSettings(box.box())
 
     playable : EnumProperty(
-
         items=lambda self, context : CLU.playablesItemCallback(context),
         get=lambda self : CLU.playableEnumIndex(_Append("_playable")), 
         set=lambda self, value : CLU.setValueAtKey(_Append("_playable"), bpy.context.scene.as_custom[value].name),
@@ -365,7 +429,20 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
     discreteClickFakeHoldTime : FloatProperty(
         description="How long to wait before sending an up signal after getting a discrete click. In seconds",
         get=lambda self : CLU.getFloatFromKey(_Append("_discrete_click_fake_hold_time"), 0.2),
-        set=lambda self, value : CLU.setValueAtKey(_Append("_discrete_click_fake_hold_time"))
+        set=lambda self, value : CLU.setValueAtKey(_Append("_discrete_click_fake_hold_time"), value)
+    )
+
+    # forward interactions
+    shouldForwardInteractions : BoolProperty(
+        description="If true, forward interactions to each object in an adjacent SceneObjectsReferencer",
+        get=lambda self : CLU.getBoolFromKey(_Append("_should_forward_interactions")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_should_forward_interactions"), value)
+    )
+
+    sceneObjectForwardTarget : StringProperty(
+        description="",
+        get=lambda self : CLU.getStringFromKey(_Append("_scene_object_forward_target")),
+        set=lambda self, value : CLU.setValueAtKey(_Append("_scene_object_forward_target"), value)
     )
 
 

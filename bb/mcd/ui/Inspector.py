@@ -6,6 +6,8 @@ from bb.mcd.lookup import KeyValDefault
 from bb.mcd.util import DisplayHelper
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.cduoperator.SetKeyValue import CUSTOM_OT_SetDefaultValue
+from bb.mcd.ui import CustomComponentInspector
+
 
 def _displayPrimitive(box, key, item):
     row = box.row()
@@ -66,6 +68,15 @@ def drawCurrentItemDetails(layout, context):
     # nothing to display for tags. they're just present or absent.
     if KeyValDefault.getHandlingHint(key) == KeyValDefault.EHandlingHint.TAG:
         _displayEmptyBox(box)
+        return
+    
+    # TODO: handle keys that are custom type definitions (==KeyValDefault.EHandlingHint.CUSTOM_COMPO_DEF)
+    #  They will be defined in with a JSON object
+    #   Then, there's a function that knows how to display values and read them from selected objs.
+    if KeyValDefault.getHandlingHint(key) == KeyValDefault.EHandlingHint.CUSTOM_COMPONENT:
+        import json
+        box.label(text="CustomCompo ")
+        CustomComponentInspector.displayCustomCompos(box, key)
         return
 
     # check for keys that display as objects

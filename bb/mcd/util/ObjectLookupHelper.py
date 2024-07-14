@@ -48,8 +48,16 @@ def _nextRelevantIndex(context, originalIndex : int, moveUp = False) -> int:
 def getPrefs(context): # WANT to type specify -->> # -> MelCustomDataUtilPreferences:
     return context.preferences.addons[__name__].preferences
 
+
+def lookupDefaultValue(context, key : str):
+    items = _getPrefItems(context)
+    item = items[key] 
+    return item.default
+
 def _getPrefItems(context):
     try:
+        # TODO: when we have more than one config object (i.e. the defaults and some custom json provided by user).
+        #   we will need to put them into one look up. 
         return KeyValDefault.getMCDConfig() # TODO: where how to accommodate user custom KVs and even suppressing MCD default KVs?
         prefs = getPrefs(context)
         return prefs.custom
@@ -151,6 +159,10 @@ def _getSharedVal(key, context):
             # shared != obs[i][key]: # TODO: this inequality probably breaks when we're dealing with the special handling keys
             return _MIXED_()
     return shared
+
+def hasMixedValues(key, context):
+    ser = _getSharedVal(key, context)
+    return ser == _MIXED_
 
 def DdumpAllKeyVals(context):
     obs = context.selected_objects

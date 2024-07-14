@@ -1,11 +1,9 @@
 
-def getFocusedItemIndex(context) -> int:
-    return context.scene.custom_index 
 
 def getFocusedItem(context):
     try:
         items = context.scene.custom
-        idx = getFocusedItemIndex(context)
+        idx = context.scene.custom_index
         if idx < 0:
             return None
         if idx >= len(items):

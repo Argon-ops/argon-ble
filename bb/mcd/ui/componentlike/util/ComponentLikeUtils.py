@@ -3,7 +3,7 @@ import bpy
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
-from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
+# from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
 
 def getValueFromKey(key_name):
     return ObjectLookupHelper._getValueFromActive(key_name, bpy.context)
@@ -80,7 +80,7 @@ def playableEnumIndexFromName(playableName : str):
 def playableEnumIndex(playableKey):
     return  playableEnumIndexFromName(getStringFromKey(playableKey))
 
-def playableFromIndex(idx : int) -> CUSTOM_PG_AS_Collection:
+def playableFromIndex(idx : int): # -> CUSTOM_PG_AS_Collection:
     playables = bpy.context.scene.as_custom
     if len(playables) <= idx:
         return None # type: ignore
@@ -90,6 +90,7 @@ def playableFromIndex(idx : int) -> CUSTOM_PG_AS_Collection:
 def storePlayableName(targetObject, idx : int, storeStrAttr : str = "playAfterStor"):
     playable = playableFromIndex(idx)
     if playable is None:
+        print(F"the playabe is None for idx: {idx}")
         setattr(targetObject, storeStrAttr, "")
         # self.playAfterStor = ""
         return

@@ -1,6 +1,8 @@
 from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import PlayablesExporter 
 from bb.mcd.settings.GlobalSettings import GlobalSettingsExporter 
 from bb.mcd.ui.materiallist.MaterialList import MaterialListExporter
+from bb.mcd.ui.componentlike.preexport.ComponentLikePreExport import ComponentLikePreExport
+from bb.mcd.settings.IsArgonMarker import IsArgonMarker
 
 def PreExport(targetDataHolder):
   """Prepare for export
@@ -12,11 +14,15 @@ def PreExport(targetDataHolder):
           can't use the vanilla fbx exporter directly.)
   """
   
+  IsArgonMarker.PreExport(targetDataHolder)
+  
   GlobalSettingsExporter.PreExport(targetDataHolder)
 
   PlayablesExporter.PreExport(targetDataHolder)
 
   MaterialListExporter.PreExport(targetDataHolder)
+
+  ComponentLikePreExport.PreExport(targetDataHolder)
 
 
 def PostExport(targetDataHolder):

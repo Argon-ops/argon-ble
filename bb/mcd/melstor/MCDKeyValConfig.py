@@ -71,6 +71,11 @@ config = """
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add a box collider component to this game object. Size will match the object's bounds"
     },
+    "mel_scene_objects_referencer" : {
+        "default" : { },
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a SceneObjectsReferencer component"
+    },
     "mel_interaction_handler" : {
         "default" : {
             "playable" : "",
@@ -166,6 +171,19 @@ config = """
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add a Playable Scalar Adapter"
+    },
+    "mel_cam_swap_managed" : {
+        "hint" : "TAG",
+        "help" : "Add this object's camera component to the list of cameras that are managed by CamSwap"
+    },
+    "test_mreceptacle" : {
+        "default" : {
+            "aa" : "hello",
+            "bb" : 23
+        },
+        "hint" : "CUSTOM_COMPONENT",
+        "help" : "Experiment with custom component definitions. Shouldn't really be defined here but putting here for now",
+        "apply_class" : "FakeComponent"
     }
 
 }

@@ -11,6 +11,7 @@ from bpy.types import (Operator,
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.lookup import KeyValDefault
 from bb.mcd.ui.componentlike import StorageRouter
+from bb.mcd.ui import CustomComponentInspector
 
 
 class CUSTOM_OT_AddKeyToSelected(Operator):
@@ -35,9 +36,13 @@ class CUSTOM_OT_AddKeyToSelected(Operator):
     def execute(self, context):
         if len(self.target_key) == 0:
             return {'FINISHED'}
- 
+        
+        
         default = KeyValDefault.getDefaultValue(self.target_key)
-        StorageRouter.handleSetDefaultValue(self.target_key, default, context)
+
+        StorageRouter.handleSetDefaultsWithKey(self.target_key, context)
+
+        # StorageRouter.handleSetDefaultValue(self.target_key, default, context)
 
         ObjectLookupHelper._setSelectedIndex(context, self.target_key)
 

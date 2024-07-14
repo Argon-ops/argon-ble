@@ -1,5 +1,5 @@
 
-from bb.mcd.ui.componentlike import (LightEnableLike, MeshColliderLike, 
+from bb.mcd.ui.componentlike import (LightEnableLike, MeshColliderLike, ReplaceWithPrefabLike, 
                                     StaticFlags, 
                                     RigidbodyLike, 
                                     OffMeshLinkLike,
@@ -24,7 +24,10 @@ from bb.mcd.ui.componentlike import (LightEnableLike, MeshColliderLike,
                                     ForcePCWLike,
                                     PlayableScalarAdapterLike,
                                     SwapMaterialEnableLike,
+                                    SceneObjectsReferencerLike,
                                     )
+from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
+from bb.mcd.ui.componentlike.AbstractDefaultSetter import AbstractDefaultSetter
 
 _components = {
     MeshColliderLike.MeshColliderLike : MeshColliderLike.MeshColliderDefaultSetter,
@@ -53,10 +56,15 @@ _components = {
     ForcePCWLike.ForcePCWLike : ForcePCWLike.ForcePCWDefaultSetter,
     PlayableScalarAdapterLike.PlayableScalarAdapterLike : PlayableScalarAdapterLike.PlayableScalarAdapterDefaultSetter,
     SwapMaterialEnableLike.SwapMaterialEnableLike : SwapMaterialEnableLike.SwapMaterialEnableDefaultSetter,
+    ReplaceWithPrefabLike.ReplaceWithPrefabLike : ReplaceWithPrefabLike.ReplaceWithPrefabDefaultSetter,
+    SceneObjectsReferencerLike.SceneObjectsReferencerLike : SceneObjectsReferencerLike.SceneObjectsReferencerDefaultSetter,
 }
 
 from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter) 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
+from bb.mcd.lookup import KeyValDefault
+from bb.mcd.ui.CustomComponentInspector import CustomComponentUtil
+
 
 def _defaultEquality(key : str, a : object, b : object) -> bool:
     if key in a and key in b:
@@ -95,6 +103,8 @@ def _getTargetList(key, context):
 def handleRemoveKey(key, context): # target_list):
     targets = _getTargetList(key, context)
 
+    handleRemoveCustom(key, targets)
+
     # remove the key
     for target in targets:
         if key in target:
@@ -111,25 +121,84 @@ def handleRemoveKey(key, context): # target_list):
                 CLU.GenericDefaultSetter.OnRemoveKey(clc, targets)
             break
 
-def handleSetDefaultValue(key, val, context): # targets):
+def handleRemoveCustom(key, targets):
+    defaultInfo = KeyValDefault.getDefaultValueInfo(key)
+    if defaultInfo.hint != KeyValDefault.EHandlingHint.CUSTOM_COMPONENT:
+        return
+
+    data_key = CustomComponentUtil.GetPayloadKey(key)
+    apply_key = CustomComponentUtil.GetApplyClassKey(key)
+    for target in targets:
+        if data_key in target:
+            del target[data_key]
+        if apply_key in target:
+            del target[apply_key]
+
+
+def handleSetDefaultValue(key, val, context): 
     targets = _getTargetList(key, context)
+    _setDefaultValueOnTargets(key, val, targets)
 
+def handleSetDefaultsWithKey(key, context):
+    targets = _getTargetList(key, context)
+    _setDefaultValueOnTargetsWithKey(key, targets)
+
+
+def _setDefaultValueOnTargetsWithKey(key, targets):
+    defaultInfo = KeyValDefault.getDefaultValueInfo(key)
+
+    if defaultInfo.hint == KeyValDefault.EHandlingHint.CUSTOM_COMPONENT:
+        _setDefaultValueForCustomComponentType(key, defaultInfo, targets)
+        return
+
+    _setDefaultValueOnTargets(key, defaultInfo.default, targets)
+    
+
+def setDefaultValueOnTarget(key, val, target):
+    ''' This method exists because some component-likes need to Validate
+            which can involve adding other component likes
+    '''
+    _setDefaultValueOnTargets(key,val, [target])
+
+def _setDefaultValueForCustomComponentType(key, defaultInfo, targets):
+    import json
+    _setPrimitiveValue(key, 1, targets)
+    _setPrimitiveValue(CustomComponentUtil.GetPayloadKey(key), json.dumps(defaultInfo.default), targets)
+    if defaultInfo.applyClass:
+        _setPrimitiveValue(CustomComponentUtil.GetApplyClassKey(key), defaultInfo.applyClass, targets)
+
+
+def _setDefaultValueOnTargets(key, val, targets):
     for component_like_class, default_setter in _components.items(): 
-
         if component_like_class.AcceptsKey(key):
-
             # make sure the base key is set to something. the default setter can overwrite if it wants
-            _setPrimitiveValue(key, val, targets) # target_list) 
-            default_setter.OnAddKey(key, val, targets) #=target_list)
-            if hasattr(component_like_class, "IS_ENABLEABLE_CLASS"): # issubclass(component_like_class, EnableFilterSettings):
+            _setPrimitiveValue(key, val, targets) 
+            default_setter.OnAddKey(key, val, targets) 
+
+            # shared configs for certain classes
+            if hasattr(component_like_class, "IS_ENABLEABLE_CLASS"): 
                 EnableFilterDefaultSetter.OnAddKey(component_like_class, key, targets)
             if hasattr(component_like_class, "IS_SLEEPSTATE_CLASS"):
                 CLU.GenericDefaultSetter.OnAddKey(component_like_class, targets)
-            return
+            return 
+
+    # no component-like handles this key. it must be a primitive    
     _setPrimitiveValue(key, val, targets) 
 
 def _setPrimitiveValue(key, val, targets):
     for target in targets:
         target[key] = val
+
+# # region _components-access
+        
+# def getDefaultSetter(componentLikeCls) -> AbstractDefaultSetter:
+#     if componentLikeCls not in _components:
+#         raise Exception(F"I need a 'component like' class. The thing you passed: {componentLikeCls} wasn't found")
+#     return _components[componentLikeCls]
+
+# def getComponentLikes():
+#     return _components.keys()
+
+# # endregion
 
 

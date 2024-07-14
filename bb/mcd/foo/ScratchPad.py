@@ -122,7 +122,8 @@ def GetOrAdd(name :str):
     print(F"DONE")
 
 def CommandNames():
-    import bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection as AS
+    # import bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection as AS
+    import bb.mcd.ui.actionstarterlist.CommandTypes as AS
     cmds = [s[1] for s in AS.getPlayableTypes()]
     for c in sorted(cmds):
         print(F"## {c}")
