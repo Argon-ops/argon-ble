@@ -315,6 +315,10 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
         
         dislaySleepAlsoSettings(box.box())
 
+    # TODO: when commands get deleted. they are not purged out of the properties that reference them
+    #   don't think it's impractical or too expensive to iter over objects
+    #   and purge any references to a deleted command...in most cases (what if someone has lots of objects...)
+
     playable : EnumProperty(
         items=lambda self, context : CLU.playablesItemCallback(context),
         get=lambda self : CLU.playableEnumIndex(_Append("_playable")), 

@@ -33,5 +33,10 @@
             #  so separate configs: the destroy settings 
             #    and the destroy when: never, after first interaction
 
+# TODO: (probably already noted) the 3d view switches to edit mode without being asked to. when its loaded
+
+# TODO: FIXME: references to commands stored in Click/Trigger Interaction handlers are not removed when 
+   the command is deleted
+
 
 

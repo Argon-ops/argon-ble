@@ -200,6 +200,7 @@ from bpy.app.handlers import persistent
 
 @persistent
 def syncDisplayKVs(scene):
+
     """ Reload key-values based on the key-values defined in prefs. """
     if not hasattr(scene, 'custom'):
         print("scene has no custom attrib bye")

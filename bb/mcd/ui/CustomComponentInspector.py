@@ -133,8 +133,8 @@ def setUniformValue(self, value):
 class CustomComponentUtil():
     CUSTOM_COMPONENT_KEY_PREFIX="m3ldata_" # must match c# code
     DATA_PAYLOAD_KEY_SUFFIX="_payload" # must match c# code 
-    
-    APPLY_CLASS_NAME_SUFFIX="_apply_class_name"
+    CONFIG_KEY_SUFFIX="_config" # must match c# code
+    APPLY_CLASS_NAME_SUFFIX="_apply_class_name" # same
 
     @staticmethod
     def GetPayloadKey(componentLikeKey : str) -> str:
@@ -143,6 +143,10 @@ class CustomComponentUtil():
     @staticmethod
     def GetApplyClassKey(componentLikeKey : str) -> str:
         return F"{CustomComponentUtil.CUSTOM_COMPONENT_KEY_PREFIX}{componentLikeKey}{CustomComponentUtil.APPLY_CLASS_NAME_SUFFIX}"
+    
+    @staticmethod
+    def GetConfigDataKey(componentLikeKey : str) -> str:
+        return F"{CustomComponentUtil.CUSTOM_COMPONENT_KEY_PREFIX}{componentLikeKey}{CustomComponentUtil.CONFIG_KEY_SUFFIX}"
     
     @staticmethod
     def SetDefaultObject(nextObjext : object) -> None:
