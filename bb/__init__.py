@@ -10,6 +10,7 @@ bl_info = {
 }
 
 # See notes at the end of this file for a reminder of what/how to import modules using this list
+
 modulesFullNames = [
     'bb.more_stuff_here.more',
     'bb.mcd.melstor.MCDKeyValConfig',
@@ -26,14 +27,12 @@ modulesFullNames = [
     'bb.mcd.util.DisplayHelper',
     'bb.mcd.ui.componentlike.adjunct.AddSubtractExtraPlayables',
 
-    # scene level var declarations
     'bb.mcd.ui.export.ExportBox',
     'bb.mcd.ui.materiallist.MaterialList',
     'bb.mcd.ui.actionstarterlist.CommandNameItems',
     'bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
     'bb.mcd.ui.actionstarterlist.ActionStarterList',
 
-    # 'bb.mcd.ui.actionstarterlist.OT_TarAnimsList',
     'bb.mcd.util.JsonFromItem',
     'bb.mcd.cduoperator.SetKeyValue',
     'bb.mcd.ui.SelectByKeyMenu',
@@ -48,7 +47,7 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.AbstractDefaultSetter',
     'bb.mcd.ui.componentlike.MeshColliderLike',
     'bb.mcd.ui.componentlike.BoxColliderLike',
-    # 'bb.mcd.ui.componentlike.ActionStarterLike',
+
     'bb.mcd.prefs.MelCustomDataUtilPreferences', # may have to stuff the prefs back into MelCDUBA. because its bl_idname has to match...etc.
     'bb.mcd.exporter.edyj.BlenderToUnityFbxExporter',
     'bb.mcd.exporter.default.DefaultFBXExporter',
@@ -56,7 +55,7 @@ modulesFullNames = [
     'bb.mcd.ui.componentlike.ReplaceWithPrefabLike',
     'bb.mcd.ui.componentlike.LightEnableLike',
     'bb.mcd.ui.componentlike.OffMeshLinkLike',
-    # 'bb.mcd.ui.componentlike.unityinfo.UnityPaths',
+
     'bb.mcd.ui.componentlike.InteractionHandlerLike',
     'bb.mcd.ui.componentlike.InteractionHighlighterLike',
     'bb.mcd.ui.componentlike.LayerCamLockPickableLike',
@@ -88,7 +87,7 @@ modulesFullNames = [
     'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
     'bb.mcd.ui.actionstarterlist.ActionStarterPanel',
     'bb.mcd.objectinfo.ObjectInfo',
-    # 'bb.mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
+
     'bb.mcd.exporter.ExportOp',
     'bb.mcd.settings.GlobalSettings',
     'bb.mcd.settings.IsArgonMarker',
@@ -96,12 +95,10 @@ modulesFullNames = [
     ]
 
 
-
-
 import sys
 import importlib
 
-for fullName in modulesFullNames: #.values():
+for fullName in modulesFullNames: 
     print(F"mod full name {fullName}")
     if fullName in sys.modules:
         try:
@@ -111,34 +108,33 @@ for fullName in modulesFullNames: #.values():
             raise mnfe 
     else:
         globals()[fullName] = importlib.import_module(fullName)
-        # setattr(globals()[fullName], 'modulesNames', modulesFullNames) # DELME ? FIXME: Do we not need this line? each module gets a copy of moduleFullNames but we don't use this...Did we actually need to use it?
+        # setattr(globals()[fullName], 'modulesNames', modulesFullNames) # DELME ? Do we not need this line? each module gets a copy of moduleFullNames but we don't use this...Did we actually need to use it?
 
 def register():
-    print(F"register $$$$")
-    for currentModuleName in modulesFullNames: #.values():
+    for currentModuleName in modulesFullNames: 
         if currentModuleName in sys.modules:
             if hasattr(sys.modules[currentModuleName], 'register'):
-                print(F"REG: {currentModuleName} ")
+                #print(F"REGISTER: {currentModuleName} ")
                 sys.modules[currentModuleName].register()
  
 def unregister():
-    print(F"unregister ####")
-    for currentModuleName in modulesFullNames: #.values():
+    for currentModuleName in modulesFullNames: 
         if currentModuleName in sys.modules:
             if hasattr(sys.modules[currentModuleName], 'unregister'):
-                print(F"UNREG: {currentModuleName}")
+                #print(F"UNREGISTER: {currentModuleName}")
                 sys.modules[currentModuleName].unregister()
 
+
 #region deferred setup
-                
-#  hacky work around to allow modules to do some set up
-#  soon after--but not during--register.
+
+#####################################################################################################                
+#  Hacky work around to allow modules to do some set up, soon after--but not during--register.
 #  Needed because access to certain blender data (e.g. bpy.data) is restricted / inaccessible during
-     # addon register() (when youre formally adding the addon as a zip)
-#   Assumes the user will click somewhere
-#  before anything too critical happens. CONSIDER: It may be possible to 
-#  add this addon and then close blender without ever triggering the depsgraph event
-                
+#     addon register() (when you're formally adding the addon as a zip)
+#   Assumes the user will click somewhere before anything too critical happens.(!!) 
+#   CONSIDER: It may be possible to add this addon and then close blender without ever triggering the depsgraph event
+#####################################################################################################                
+
 import bpy
 
 def _removeFunction(fn_list, fn):
@@ -149,8 +145,7 @@ def _removeFunction(fn_list, fn):
             del fn_list[i]
 
 def _deferredSetup_UNIQUENAME_135A(scene, despgraph):
-    print(F"deferred setup")
-    for cm in modulesFullNames: #.values():
+    for cm in modulesFullNames:
         if cm in sys.modules:
             if hasattr(sys.modules[cm], "defer"):
                 sys.modules[cm].defer()
@@ -175,7 +170,7 @@ if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
         
 # HOW TO ZIP FOR DISTRIBUTION AS AN ADDON:
     #   
-    #  run this command (just using built in Windows compress didn't work for us.) 
+    #  run this command (just using built in Windows 'compress' didn't work for us.) 
     #   7z a -tzip bb.zip -w .\bb\
     #   (Also, used this terminal https://github.com/microsoft/terminal not the default PowerShell)
     #  
