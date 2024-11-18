@@ -40,9 +40,8 @@ from bb.mcd.ui.actionstarterlist import ActionStarterPanel
 # -------------------------------------------------------------------
 #   Operators
 # -------------------------------------------------------------------
-
 class CDU_OT_actions(Operator):
-    """Remove items"""
+    """Handle removing a component-like key from an object"""
     bl_idname = "custom.list_action"
     bl_label = "List Actions"
     bl_description = "Move items up and down, add and remove"
@@ -66,7 +65,8 @@ class CDU_OT_actions(Operator):
         else:
             if self.action == 'REMOVE':
                 from bb.mcd.ui.componentlike import StorageRouter
-                StorageRouter.handleRemoveKey(item.key, context) #.selected_objects)
+                StorageRouter.handleRemoveKey(item.key, context)
+                
                 scn.custom_index = ObjectLookupHelper._nextRelevantIndex(context, scn.custom_index)                
               
         return {"FINISHED"}
@@ -107,6 +107,8 @@ class CDU_UL_PerObjectItems(UIList):
 
         if index == context.scene.custom_index:
             split.operator(CDU_OT_actions.bl_idname, icon='X', text="").action = 'REMOVE'
+
+
 
 def _drawInspectorListAndDetails(layout, context):
     scn = bpy.context.scene
@@ -150,7 +152,7 @@ def _drawSelByKey(box):
 
 
 class CDU_PT_CustomPropHelper(Panel):
-    """Main panel: interact with custom properties on selected objects."""
+    """Defines the main panel for Argon: interact with custom properties on selected objects."""
     bl_idname = 'TEXT_PT_argon_panel'
     bl_space_type = "VIEW_3D" 
     bl_region_type = "UI"
@@ -200,10 +202,9 @@ from bpy.app.handlers import persistent
 
 @persistent
 def syncDisplayKVs(scene):
-
-    """ Reload key-values based on the key-values defined in prefs. """
+    """ Reload key-values in scene.custom. They should match the key-values defined in prefs. """
     if not hasattr(scene, 'custom'):
-        print("scene has no custom attrib bye")
+        print("scene has no attrib named 'custom'. bye")
         return
 
     pref_items = ObjectLookupHelper._getPrefItems(bpy.context) 
@@ -226,6 +227,9 @@ def handleSelectionChanged(scene):
         scene.custom_index = -1
 
 def refreshHandlerCallbacks():
+    # REMINDER: we are registering callbacks that need should happen every time the user clicks.
+    #  (Why do we need to reload scene.custom so frequently? Ideally we wouldn't)
+
     h = bpy.app.handlers
     handlerses = [
         h.depsgraph_update_pre,         # handler for any click on the uilist

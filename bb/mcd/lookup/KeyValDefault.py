@@ -24,6 +24,7 @@ def _isPrimitive(val):
     return isinstance(val, str) or isinstance(val, int) or isinstance(val, float)
 
 def _parse(val : any) -> DefaultValueInfo:
+    """Convert the json object from a config value into something we know how to use"""
     def createDefaultValueInfo(default, hint : str, help : str, apply : str) -> DefaultValueInfo:
         dvi = DefaultValueInfo()
         dvi.default = default
@@ -56,7 +57,7 @@ def _addEntry(key : str, val):
     global _storage
     _storage[key] = _parse(val)
 
-def _loadFrom(json_str : str):
+def _loadFrom(json_str : str) -> None:
     try:
         data = json.loads(json_str)
         for key, val in data.items():
@@ -105,6 +106,7 @@ def getMCDConfig() -> typing.Dict[str, DefaultValueInfo]:
     return _storage
 
 def forceReload() -> None:
+    """Reset the global variable that stores all Key-Value configs"""
     _storage.clear()
     _loadFrom(MCDKeyValConfig.config)
     _getCustomDefsConfig()

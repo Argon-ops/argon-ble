@@ -93,7 +93,7 @@ class InteractionHandlerDefaultSetter(AbstractDefaultSetter.AbstractDefaultSette
     @staticmethod
     def OnAddKey(key : str, val, targets):
         for suffix, defaultVal in _suffixes.items():
-            print(F"{suffix} set {defaultVal} isCallable {callable(defaultVal)} ")
+            # print(F"{suffix} set {defaultVal} isCallable {callable(defaultVal)} ")
             AbstractDefaultSetter._SetKeyValOnTargets(_Append(suffix), defaultVal() if callable(defaultVal) else defaultVal, targets)
 
         # default = AbstractDefaultSetter._GetDefaultFromPrefs(key)

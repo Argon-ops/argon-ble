@@ -58,7 +58,7 @@ def _getPrefItems(context):
     try:
         # TODO: when we have more than one config object (i.e. the defaults and some custom json provided by user).
         #   we will need to put them into one look up. 
-        return KeyValDefault.getMCDConfig() # TODO: where how to accommodate user custom KVs and even suppressing MCD default KVs?
+        return KeyValDefault.getMCDConfig() # TODO: how to accommodate user custom KVs and even suppressing MCD default KVs?
         prefs = getPrefs(context)
         return prefs.custom
     except BaseException as e:

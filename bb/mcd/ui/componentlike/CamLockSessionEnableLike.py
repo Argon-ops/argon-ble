@@ -65,7 +65,7 @@ from bpy.app.handlers import persistent
 
 @persistent
 def resubscribeAllLoadPostCamLock(dummy):
-    print(F"== cam lock resub load post ==")
+    # print(F"== cam lock resub load post ==")
     perObjectFieldName = "camLockPerObjectData"
 
     fieldsAndPropNames = (

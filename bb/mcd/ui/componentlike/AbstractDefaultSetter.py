@@ -4,7 +4,7 @@ def _RemoveKey(key : str, targets):
     for target in targets:
         if key in target:
             del target[key]
-            print(F"rm {key} from {target.name}")
+            # print(F"rm {key} from {target.name}")
             continue
         print(F"key {key} NOT in {target.name}")
 

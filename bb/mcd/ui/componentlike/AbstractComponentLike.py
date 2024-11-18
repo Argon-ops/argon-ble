@@ -22,7 +22,7 @@ class AbstractComponentLike(object):
     def HasBaseKey(cls, obj) -> bool:
         return cls.GetTargetKey() in obj
 
-    # COMPLAINT: TOO SPAGHETTI-ish: just calling displayEnableSettings from 
+    # COMPLAINT: TOO SPAGHETTI-ISH: just calling displayEnableSettings from 
     #   each EnableableLike's display is more straight forward. (if you don't 
     #     understand this comment be glad.)
     @classmethod

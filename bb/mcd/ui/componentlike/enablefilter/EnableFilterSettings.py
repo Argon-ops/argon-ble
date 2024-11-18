@@ -77,7 +77,7 @@ class EnableFilterSettings(PropertyGroup):
         #   then the classes don't even need to call it from their Display methods
         #    can be called by Inspector.py
 
-        # Mild evil: GetSceneInstance() is an AbstractComponentLike classmethod
+        # Mildly evil: GetSceneInstance() is an AbstractComponentLike classmethod
         #  We are assuming that this class also descends from AbstactComponentLike
         #  why do we need this: so that child classes can be spared calling this method from their Display methods manually
         self = cls.GetSceneInstance() 

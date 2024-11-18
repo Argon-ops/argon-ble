@@ -100,7 +100,10 @@ def _isMultiSelectAllowed(key):
 def _getTargetList(key, context):
     return context.selected_objects if _isMultiSelectAllowed(key) else [context.active_object]
 
-def handleRemoveKey(key, context): # target_list):
+def handleRemoveKey(key, context): 
+    """Delete the key on each appropriate target.
+    
+            Call OnRemoveKey callbacks where applicable"""
     targets = _getTargetList(key, context)
 
     handleRemoveCustom(key, targets)
