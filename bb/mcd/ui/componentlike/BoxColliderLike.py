@@ -36,12 +36,6 @@ class BoxColliderDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     def OnAddKey(key : str, val, targets):
         for suffix, defaultVal in _suffixes.items():
             AbstractDefaultSetter._SetKeyValOnTargets(_Append(suffix), defaultVal, targets)
-        # default = AbstractDefaultSetter._GetDefaultFromPrefs(key)
-        # try:
-        #     AbstractDefaultSetter._SetKeyValOnTargets("mel_box_collider_is_trigger", default['isTrigger'], targets)
-        # except BaseException as e:
-        #     print(F" failed to set default {str(e)}")
-        #     print(F"default keys: {default.keys()}")
         ColliderLikeShared.OnAddKey(targets)
 
     @staticmethod

@@ -14,6 +14,7 @@ bl_info = {
 
 
 modulesFullNames = [
+    'bb.mcd.util.RelevantPropertyNameHelper',
     'bb.more_stuff_here.more',
     'bb.mcd.melstor.MCDKeyValConfig',
     'bb.mcd.lookup.KeyValDefault',
@@ -88,7 +89,7 @@ modulesFullNames = [
     'bb.mcd.shareddataobject.SharedDataObject', 
     'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
     'bb.mcd.ui.actionstarterlist.ActionStarterPanel',
-    'bb.mcd.objectinfo.ObjectInfo',
+    'bb.mcd.foo.objectinfo.ObjectInfo',
 
     'bb.mcd.exporter.ExportOp',
     'bb.mcd.settings.GlobalSettings',
@@ -112,18 +113,20 @@ for fullName in modulesFullNames:
         globals()[fullName] = importlib.import_module(fullName)
         # setattr(globals()[fullName], 'modulesNames', modulesFullNames) # DELME ? Do we not need this line? each module gets a copy of moduleFullNames but we don't use this...Did we actually need to use it?
 
+print(F"%%% finished reloading")
+
 def register():
     for currentModuleName in modulesFullNames: 
         if currentModuleName in sys.modules:
             if hasattr(sys.modules[currentModuleName], 'register'):
-                #print(F"REGISTER: {currentModuleName} ")
+                print(F"REGISTER: {currentModuleName} ")
                 sys.modules[currentModuleName].register()
  
 def unregister():
     for currentModuleName in modulesFullNames: 
         if currentModuleName in sys.modules:
             if hasattr(sys.modules[currentModuleName], 'unregister'):
-                #print(F"UNREGISTER: {currentModuleName}")
+                print(F"UNREGISTER: {currentModuleName}")
                 sys.modules[currentModuleName].unregister()
 
 
@@ -163,6 +166,7 @@ scheduleDeferred()
  
 
 if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
+    print(F"will register")
     register()
 
 

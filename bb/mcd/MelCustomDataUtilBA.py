@@ -29,6 +29,7 @@ from bpy.types import (Operator,
 from bb.mcd.ui.KeyValItem import CUSTOM_PG_KeyValItem
 from bb.mcd.ui.SelectByKeyMenu import CDU_MT_SelectByKeyMenu
 from bb.mcd.util import ObjectLookupHelper
+from bb.mcd.util import RelevantPropertyNameHelper
 from bb.mcd.util import DisplayHelper
 from bb.mcd.ui.AddKeyMenu import CDU_MT_AddKeyMenu
 from bb.mcd.ui import Inspector
@@ -213,7 +214,7 @@ def syncDisplayKVs(scene):
     for key, defaultValueInfo in pref_items.items():
         dval = scene.custom.add()
         dval.key = key
-        dval.relevant_prop_name = ObjectLookupHelper._getPropNameForType(defaultValueInfo.default)
+        dval.relevant_prop_name = RelevantPropertyNameHelper._getPropNameForType(defaultValueInfo.default)
         dval.hint = defaultValueInfo.hint
 
     # UNRELATED CODE THAT SHOULD MOVE

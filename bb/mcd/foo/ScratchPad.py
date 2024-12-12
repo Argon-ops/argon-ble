@@ -1,9 +1,16 @@
+"""
+This module contains an informal collection of test functions
+
+that can be run from Blender's python console
+"""
+
 import bpy
 
 # from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
 #         PlayablesExporter as PE
 #     )
 # from bb.mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
+
 
 def ObjDictTest():
     import json
@@ -24,10 +31,10 @@ def _D_anyActionNames():
         ad = obj.animation_data
         if ad:
             if ad.action:
-                print(obj.name,'uses',ad.action.name)
+                print(obj.name, 'uses', ad.action.name)
             for t in ad.nla_tracks:
                 for s in t.strips:
-                    print(obj.name,'uses',s.action.name)
+                    print(obj.name, 'uses', s.action.name)
 
 
 # def TestWriteCommands():
@@ -41,12 +48,14 @@ def ShowCommands():
         for fn in cmd.__annotations__.keys():
             print(F"{fn} : {AS.GetSerialiazableValue(cmd, fn)}")
 
+
 def TestGetFirst():
     from bb.mcd.shareddataobject import SharedDataObject as SDO
     f = SDO.GetFirstSelectedObjectOrAny()
     print(F"first {f.name}")
 
-def GetAnArma(name : str):
+
+def GetAnArma(name: str):
     safe = 0
     for arma in bpy.data.armatures:
         print(F" arma name: {arma.name}")
@@ -54,7 +63,9 @@ def GetAnArma(name : str):
             break
         safe += 1
     found = bpy.data.armatures[name]
-    print(F"found arma: {arma.name if arma is not None else '<did not find anything>'}")
+    print(
+        F"found arma: {arma.name if arma is not None else '<did not find anything>'}")
+
 
 def ListArmas():
     for i in range(len(bpy.data.armatures)):
@@ -64,6 +75,7 @@ def ListArmas():
     # for akey in bpy.data.armatures.keys():
     #     print(F"arma key {akey} val: {bpy.data.armatures[akey].name}")
 
+
 def ListObjs():
     for ob in bpy.context.scene.objects:
         print(F"OB_: {ob.name}")
@@ -71,6 +83,7 @@ def ListObjs():
         # print(F"DIR : {dir(ob)} ")
         for arma in ob.modifiers:
             print(F"    ob's arma: {arma.name}")
+
 
 def AddAndGetNew():
     prev_names = bpy.data.armatures.keys().copy()
@@ -82,26 +95,29 @@ def AddAndGetNew():
     raise "won't happen"
 
 
-def NameAnArma(name : str, idx = 0):
+def NameAnArma(name: str, idx=0):
     arma = bpy.data.armatures[idx]
     print(F"prev name {arma.name}")
     arma.name = name
     print(F"now : {arma.name}")
 
-def TestAddArma(name : str):
+
+def TestAddArma(name: str):
     # is the object in the scene already?
-    __dataObject = bpy.data.armatures.get(name) # [name] # bpy.context.scene.objects.get(name)
+    # [name] # bpy.context.scene.objects.get(name)
+    __dataObject = bpy.data.armatures.get(name)
     # updateMsgbusShared(__dataObject, name) # RETREAT: do nothing to fend off renaming. Trust users to not rename
 
-    # do we need to make a new one?    
+    # do we need to make a new one?
     if __dataObject is None:
         print(F"NEED to ADD {name}")
         # FBX exporter might ignore an empty; so add a hard-to-see cube
-        # bpy.ops.mesh.primitive_cube_add(location=(0,0,0), size=0.0001) 
+        # bpy.ops.mesh.primitive_cube_add(location=(0,0,0), size=0.0001)
         # actually use an armature
         # bpy.ops.object.armature_add(enter_editmode=False, align='WORLD')
 
-        __dataObject = AddAndGetNew() #  bpy.data.armatures[-1] # bpy.context.view_layer.objects.active
+        # bpy.data.armatures[-1] # bpy.context.view_layer.objects.active
+        __dataObject = AddAndGetNew()
 
         print(F"JUST AFTER ADD")
         ListArmas()
@@ -110,16 +126,18 @@ def TestAddArma(name : str):
         # __dataObject.parent = getSharedRoot()
 
         # add a destroy tag
-        __dataObject['mel_destroy']=0
+        __dataObject['mel_destroy'] = 0
         # _zeroOutUVs(__dataObject)
 
     return __dataObject
 
-def GetOrAdd(name :str):
+
+def GetOrAdd(name: str):
     got = TestAddArma(name)
     print(F"GOT: {got.name}")
     ListArmas()
     print(F"DONE")
+
 
 def CommandNames():
     # import bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection as AS

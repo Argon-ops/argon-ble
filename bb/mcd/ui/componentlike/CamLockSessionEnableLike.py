@@ -1,3 +1,5 @@
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
+from bpy.app.handlers import persistent
 import bpy
 from bpy.props import (IntProperty,
                        FloatProperty,
@@ -21,47 +23,47 @@ from bb.mcd.ui.componentlike.AbstractPerObjectData import AbstractPerObjectData
 
 
 suffixes = {
-    "_release_cursor" : True,
-    "_hide_root_object" : "",
-    "_show_root_object" : "",
+    "_release_cursor": True,
+    "_hide_root_object": "",
+    "_show_root_object": "",
 }
+
 
 class CamLockSessionEnableDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
-    def AcceptsKey(key : str):
+    def AcceptsKey(key: str):
         return CamLockSessionEnableLike.AcceptsKey(key)
 
     @staticmethod
-    def EqualValues(a : object, b : object) -> bool:
+    def EqualValues(a: object, b: object) -> bool:
         for key in suffixes.keys():
             if not AbstractDefaultSetter._IsEqual(_Append(key), a, b):
                 return False
         return True
 
     @staticmethod
-    def OnAddKey(key : str, val, targets):
+    def OnAddKey(key: str, val, targets):
         pass
 
     @staticmethod
-    def OnRemoveKey(key : str, targets):
+    def OnRemoveKey(key: str, targets):
         for suffix in suffixes.keys():
             AbstractDefaultSetter._RemoveKey(_Append(suffix), targets)
-            
+
         # delete (unset) camLockPerObjectData
         for target in targets:
             target.property_unset("camLockPerObjectData")
-            
 
     @staticmethod
     def IsMultiSelectAllowed() -> bool:
         return False
 
-def _Append(suffix : str) -> str:
+
+def _Append(suffix: str) -> str:
     return F"{CamLockSessionEnableLike.GetTargetKey()}{suffix}"
 
-# REGION: msgbus for object pointer properties
+# region: msgbus for object pointer properties
 
-from bpy.app.handlers import persistent
 
 @persistent
 def resubscribeAllLoadPostCamLock(dummy):
@@ -69,37 +71,40 @@ def resubscribeAllLoadPostCamLock(dummy):
     perObjectFieldName = "camLockPerObjectData"
 
     fieldsAndPropNames = (
-        ("hideRootObject", "_hide_root_object"), # for each object PointerProperty that needs updates, add a line here
+        # for each object PointerProperty that needs updates, add a line here
+        ("hideRootObject", "_hide_root_object"),
         ("showRootObject", "_show_root_object"),
     )
     for fieldAndPropName in fieldsAndPropNames:
         MsgbusUtils.resubscribeAll_LP(
-            perObjectFieldName, 
-            fieldAndPropName[0], 
-            _Append(fieldAndPropName[1])) #, 
-            # CamLockPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
+            perObjectFieldName,
+            fieldAndPropName[0],
+            _Append(fieldAndPropName[1]))  # ,
+        # CamLockPerObjectData.OwnerKey(fieldAndPropName[1])) # fieldAndPropName[1])
 
 
-# add a load post handler so that we resubscribeAll upon loading a new file         
+# add a load post handler so that we resubscribeAll upon loading a new file
 def setupLoadPost():
     from bb.mcd.util import AppHandlerHelper
-    AppHandlerHelper.RefreshLoadPostHandler(resubscribeAllLoadPostCamLock) # [resubscribeAllLoadPostCamLock, "resubscribeAllLoadPostCamLock"])
+    # [resubscribeAllLoadPostCamLock, "resubscribeAllLoadPostCamLock"])
+    AppHandlerHelper.RefreshLoadPostHandler(resubscribeAllLoadPostCamLock)
+
 
 class CamLockPerObjectData(PropertyGroup, AbstractPerObjectData):
     """Per object cam lock data."""
 
-    hideRootObject : PointerProperty(
+    hideRootObject: PointerProperty(
         type=bpy.types.Object,
         description="Optional: disable this object and its children at the start of the session. Enable at the end.",
         update=lambda self, context: MsgbusUtils.onObjectUpdate(
-            context.active_object,  
-            self, 
+            context.active_object,
+            self,
             "hideRootObject",
             _Append("_hide_root_object"))
-            # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_hide_root_object"))) 
+        # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_hide_root_object")))
     )
 
-    showRootObject : PointerProperty(
+    showRootObject: PointerProperty(
         type=bpy.types.Object,
         description="Optional: enable this object and its children at the start of the session. Disable at the end.",
         update=lambda self, context: MsgbusUtils.onObjectUpdate(
@@ -107,12 +112,11 @@ class CamLockPerObjectData(PropertyGroup, AbstractPerObjectData):
             self,
             "showRootObject",
             _Append("_show_root_object"))
-            # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_show_root_object")))
+        # MsgbusUtils.GetOwnerToken(context.active_object, CamLockPerObjectData.OwnerKey("_show_root_object")))
     )
 
-#END REGION
+# END REGION
 
-from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 
 class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
     @staticmethod
@@ -120,7 +124,7 @@ class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
         return "mel_cam_lock_session_enable"
 
     @staticmethod
-    def AcceptsKey(key : str):
+    def AcceptsKey(key: str):
         return key == CamLockSessionEnableLike.GetTargetKey()
 
     @staticmethod
@@ -131,34 +135,40 @@ class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
         row.prop(mcl, "releaseCursor", text="Release Cursor")
 
         # per object
-        target = context.active_object # for now disallow multi select.
+        target = context.active_object  # for now disallow multi select.
         pod = target.camLockPerObjectData
         box.row().prop(pod, "hideRootObject", text="Hide Root")
         box.row().prop(pod, "showRootObject", text="Show Root")
 
-    releaseCursor : BoolProperty(
+    releaseCursor: BoolProperty(
         description="If true, unlock the cursor during camera lock session",
         get=lambda self: CLU.getBoolFromKey(_Append("_release_cursor"), False),
-        set=lambda self, value: CLU.setValueAtKey(_Append("_release_cursor"), value)
+        set=lambda self, value: CLU.setValueAtKey(
+            _Append("_release_cursor"), value)
     )
 
- 
+
 classes = (
     CamLockSessionEnableLike,
     CamLockPerObjectData,
-    )
+)
+
 
 def register():
     from bpy.utils import register_class
     for c in classes:
         register_class(c)
 
-    bpy.types.Object.camLockPerObjectData = bpy.props.PointerProperty(type=CamLockPerObjectData)
-    bpy.types.Scene.camLockSessionEnableLike = bpy.props.PointerProperty(type=CamLockSessionEnableLike)
+    bpy.types.Object.camLockPerObjectData = bpy.props.PointerProperty(
+        type=CamLockPerObjectData)
+    bpy.types.Scene.camLockSessionEnableLike = bpy.props.PointerProperty(
+        type=CamLockSessionEnableLike)
+
 
 def defer():
     resubscribeAllLoadPostCamLock(dummy=None)
     setupLoadPost()
+
 
 def unregister():
     from bpy.utils import unregister_class
@@ -167,4 +177,3 @@ def unregister():
 
     del bpy.types.Scene.camLockSessionEnableLike
     del bpy.types.Object.camLockPerObjectData
-

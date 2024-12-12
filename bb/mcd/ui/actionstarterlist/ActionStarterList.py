@@ -31,11 +31,12 @@ from bpy.types import (Operator,
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
-                                                        CUSTOM_PG_AS_Collection,
-                                                    )
+    CUSTOM_PG_AS_Collection,
+)
 # -------------------------------------------------------------------
 #   Operators
 # -------------------------------------------------------------------
+
 
 class CUSTOM_OT_AS_actions(Operator):
     """Move items up and down, add and remove"""
@@ -68,13 +69,15 @@ class CUSTOM_OT_AS_actions(Operator):
             if self.action == 'DOWN' and idx < len(scn.as_custom) - 1:
                 scn.as_custom.move(idx, idx+1)
                 scn.as_custom_index += 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.as_custom_index + 1)
+                info = 'Item "%s" moved to position %d' % (
+                    item.name, scn.as_custom_index + 1)
                 self.report({'INFO'}, info)
 
             elif self.action == 'UP' and idx >= 1:
                 scn.as_custom.move(idx, idx-1)
                 scn.as_custom_index -= 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.as_custom_index + 1)
+                info = 'Item "%s" moved to position %d' % (
+                    item.name, scn.as_custom_index + 1)
                 self.report({'INFO'}, info)
 
             elif self.action == 'REMOVE':
@@ -101,8 +104,8 @@ class CUSTOM_OT_AS_actions(Operator):
 class CUSTOM_UL_AS_items(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row()
-        item.draw(row) 
-        
+        item.draw(row)
+
     def invoke(self, context, event):
         pass
 
@@ -113,6 +116,7 @@ class CUSTOM_UL_AS_items(UIList):
 
 def enforceUnique(currentName, context):
     increment = 0
+
     def constructName(baseName, idx):
         return baseName if increment == 0 else F"{baseName}{idx}"
 
@@ -128,19 +132,17 @@ classes = (
     CUSTOM_UL_AS_items,
 )
 
+
 def register():
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
 
-    # Custom scene properties
-    bpy.types.Scene.as_custom = CollectionProperty(type=CUSTOM_PG_AS_Collection)
+    bpy.types.Scene.as_custom = CollectionProperty(
+        type=CUSTOM_PG_AS_Collection)
     bpy.types.Scene.as_custom_index = IntProperty()
     bpy.types.Scene.as_show_starter_list = BoolProperty()
-    # bpy.types.Scene.as_actions = PointerProperty(
-    #     name="Actions",
-    #     type=bpy.types.Action,
-    #     poll = lambda self, action : True) #     "a" in action.name)
+
 
 def unregister():
     from bpy.utils import unregister_class
@@ -150,4 +152,3 @@ def unregister():
     del bpy.types.Scene.as_custom
     del bpy.types.Scene.as_custom_index
     del bpy.types.Scene.as_show_starter_list
-    # del bpy.types.Scene.as_actions

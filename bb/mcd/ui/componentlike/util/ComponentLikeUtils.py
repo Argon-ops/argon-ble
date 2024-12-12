@@ -66,7 +66,12 @@ def setObjectPathStrangeAtKey(key_name, pointerObject):
 
 # playables as enum callback
 def playablesItemCallback(context):
+    # TODO: if there are no playables. 
+    #  make a list with just one item: named ""
     playables = context.scene.as_custom
+    # if len(playables) == 0:
+    #     fake_playable_name = "fake"
+    #     return [(fake_playable_name, fake_playable_name, fake_playable_name)]
     return [(p.name, p.name, p.name) for p in playables]
 
 def playableEnumIndexFromName(playableName : str):

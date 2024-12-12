@@ -1,12 +1,9 @@
 import bpy
 from bpy.props import (StringProperty,
-                       IntProperty,
-                       PointerProperty, 
-                       CollectionProperty,
                        )
 
-from bpy.types import (Operator, 
-                       PropertyGroup,)
+from bpy.types import (Operator,
+                       )
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.lookup import KeyValDefault
@@ -21,10 +18,10 @@ class CUSTOM_OT_AddKeyToSelected(Operator):
     bl_description = "a description would go here if there were one"
     bl_options = {'REGISTER', 'UNDO'}
 
-    target_key : StringProperty(
+    target_key: StringProperty(
         name="target key",
         default=""
-        )
+    )
 
     def invoke(self, context, event):
         return self.execute(context)
@@ -36,27 +33,23 @@ class CUSTOM_OT_AddKeyToSelected(Operator):
     def execute(self, context):
         if len(self.target_key) == 0:
             return {'FINISHED'}
-        
-        
-        default = KeyValDefault.getDefaultValue(self.target_key)
 
         StorageRouter.handleSetDefaultsWithKey(self.target_key, context)
-
-        # StorageRouter.handleSetDefaultValue(self.target_key, default, context)
-
         ObjectLookupHelper._setSelectedIndex(context, self.target_key)
-
         self.target_key = ""
         return {'FINISHED'}
+
 
 classes = (
     CUSTOM_OT_AddKeyToSelected,
 )
 
+
 def register():
     from bpy.utils import register_class
     for c in classes:
         register_class(c)
+
 
 def unregister():
     from bpy.utils import unregister_class

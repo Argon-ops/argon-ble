@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import (CollectionProperty,)
 
+
 class AbstractPerObjectData(object):
 
     @classmethod

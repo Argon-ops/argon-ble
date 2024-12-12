@@ -195,12 +195,12 @@ def _getValueFromActive(key, context):
         return obs[0][key]
     return None
 
-def _getPropNameForType(value):
-    if isinstance(value, float):
-        return "vfloat"
-    elif isinstance(value, str):
-        return "val"
-    return "vint"
+# def _getPropNameForType(value):
+#     if isinstance(value, float):
+#         return "vfloat"
+#     elif isinstance(value, str):
+#         return "val"
+#     return "vint"
 
 def _removeKeyFromSelected(key, context):
     for ob in context.selected_objects:
@@ -218,7 +218,10 @@ def _selectedObjectNames(context):
     return '|'.join([obs[i].name for i in range(min(3, count))]) + ("" if count <= 3 else F"(+{count - 3})")
 
 def _hierarchyToString(ob, glue='/') -> str:
-    """Returns a slash separated string of the names of the object and its parents up to a root object"""
+    """Returns a string representing the hierarchical path of the object and its parents up to a root object
+    
+        Path elements are separated by the string param 'glue'.
+    """
     tree = [ob]
     while ob.parent:
         ob = ob.parent

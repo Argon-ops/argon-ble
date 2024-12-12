@@ -39,4 +39,20 @@
    the command is deleted.
 
 
+# TODO: NOT HERE: the Commands list in the UI may show a command that is never actually written to the object.
+#   This happens when a command exists and they have just added an interaction handler like.
+#   Unfortunately, we'll need to reorganize how commands work. Because it's not ok to make people think that
+#    a command has been set (maybe the one that popped up was what they wanted and they didn't touch it)
+#    but never have that command actually be written to the object. Best to not give this impression
+
+
+# InteractionHandlerLike
+# There's some difficulty with _playables: long story short, we don't know how to make the playable/command picker pop-up
+#    happy in the case where there aren't any playables/commands. Blender will spam a warning to the console in this case.
+#     It comes down to the trickiness of having an enum with no members.
+#  To handle this properly, we would want to:
+#    A: not show the pop-up when there are 0 playables (only show 'create playable')
+#    B: handle the case where there are playables but the user hasn't picked one yet.
+
+
 

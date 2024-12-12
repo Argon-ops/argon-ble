@@ -71,10 +71,10 @@ def drawCurrentItemDetails(layout, context):
         return
     
     # TODO: handle keys that are custom type definitions (==KeyValDefault.EHandlingHint.CUSTOM_COMPO_DEF)
-    #  They will be defined in with a JSON object
+    #  They will be defined in a JSON object
     #   Then, there's a function that knows how to display values and read them from selected objs.
     if KeyValDefault.getHandlingHint(key) == KeyValDefault.EHandlingHint.CUSTOM_COMPONENT:
-        import json
+        # import json
         box.label(text="CustomCompo ")
         CustomComponentInspector.displayCustomCompos(box, key)
         return
@@ -83,7 +83,7 @@ def drawCurrentItemDetails(layout, context):
     if StorageRouter.displayItem(key, box, context) == True:
         return
 
-    # this must be a primitive
+    # this key must have handling hint == PRIMITIVE
     _displayPrimitive(box, key, item)
 
 

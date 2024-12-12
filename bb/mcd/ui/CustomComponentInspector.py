@@ -18,11 +18,11 @@ class DisplayListUtils():
     def FillDisplayListWithBlanks(context):
         dl = context.scene.component_display_list
         dl.clear()
-        for i in range(40): # Surely no one will want a custom component like object with more than this many properties
+        for i in range(40): # ASSUMPTION: no one will want a component like object with more than this many properties
             ditem = dl.add()
             ditem.index = i
 
-""" Reminder/Guide for these classes: this UIList's job is to display a Collection of CustomComponentProperty objects.
+""" ComponentDisplayList's job is to display a Collection of CustomComponentProperty objects.
     But--funny thing is--CustomComponentProperty objects don't have any specific state, save for knowing their own index in the list.
     Instead of owning state, they look up the nth property of a (JSON) dictionary object based on their index. And make that property on that 
     dictionary editable in the UI (via getter/setter methods, see val, vint and vfloat). 
@@ -187,11 +187,13 @@ class CU_PG_CustomComponentProperty(PropertyGroup):
 
     @staticmethod
     def GetPropName(v):
-        if isinstance(v, int):
-            return "vint"
-        elif isinstance(v, float):
-            return "vfloat"
-        return "val"
+        from bb.mcd.util import RelevantPropertyNameHelper
+        return RelevantPropertyNameHelper._getPropNameForType(v)
+        # if isinstance(v, int):
+        #     return "vint"
+        # elif isinstance(v, float):
+        #     return "vfloat"
+        # return "val"
     
     index : IntProperty()
 
