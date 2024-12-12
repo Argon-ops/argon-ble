@@ -3,7 +3,7 @@ import bpy
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
-# from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
+# from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
 
 def getValueFromKey(key_name):
     return ObjectLookupHelper._getValueFromActive(key_name, bpy.context)

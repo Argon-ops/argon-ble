@@ -7,18 +7,18 @@ from bpy.props import (IntProperty,
                        BoolProperty,
                        CollectionProperty,)
 from bpy.types import (PropertyGroup,)
-from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
+from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection
 from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import EnableFilterSettings
 from bb.mcd.ui.componentlike.enablefilter.SleepStateSettings import SleepStateSettings
 from bb.mcd.util import ObjectLookupHelper
 
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 
-from bb.mcd.ui.actionstarterlist import ActionStarterList
+from bb.mcd.ui.command import CommandsList
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
-from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
+from bb.mcd.ui.command import AddCommandPopup
+from bb.mcd.ui.command import CUSTOM_PG_AS_Collection
 from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
 from bb.mcd.ui.componentlike.constants.ConfigSymbols import ApplyObjectSymbols
 
@@ -206,7 +206,7 @@ class InteractionHandlerLike(SleepStateSettings, AbstractComponentLike):
                              text="", icon="GREASEPENCIL").playableName = attrib
 
             plusOp = row.operator(
-                PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+                AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
             plusOp.should_insert = True
             plusOp.insert_at_idx = idx
 

@@ -30,7 +30,7 @@ from bpy.types import (Operator,
                        UIList)
 
 from bb.mcd.util import ObjectLookupHelper
-from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import (
+from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import (
     CUSTOM_PG_AS_Collection,
 )
 # -------------------------------------------------------------------

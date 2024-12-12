@@ -10,10 +10,10 @@ class CDU_OT_SelectByKey(Operator):
     bl_description = "a description would go here"
     bl_options = {'REGISTER', 'UNDO'}
 
-    target_key : StringProperty(
+    target_key: StringProperty(
         name="target key",
         default=""
-        )
+    )
 
     @classmethod
     def poll(cls, context):
@@ -35,7 +35,7 @@ def register():
     from bpy.utils import register_class
     register_class(CDU_OT_SelectByKey)
 
+
 def unregister():
     from bpy.utils import unregister_class
     unregister_class(CDU_OT_SelectByKey)
-

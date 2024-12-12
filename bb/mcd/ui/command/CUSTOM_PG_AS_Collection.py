@@ -17,8 +17,8 @@ from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.shareddataobject import SharedDataObject
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from bb.mcd.ui.actionstarterlist import CommandNameItems
-from bb.mcd.ui.actionstarterlist import CommandTypes as CT
+from bb.mcd.ui.command import CommandNameItems
+from bb.mcd.ui.command import CommandTypes as CT
 
 #region command targets list add / remove
 

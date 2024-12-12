@@ -21,17 +21,19 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
 import bpy
 
-# from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection as CPACModule
+# from bb.mcd.ui.command import CUSTOM_PG_AS_Collection as CPACModule
 from bb.mcd.ui.componentlike.adjunct import AddSubtractExtraPlayables
-from bb.mcd.ui.actionstarterlist import CommandTypes as CT
+from bb.mcd.ui.command import CommandTypes as CT
 
 
-def AppendNewPlayableToInteractionHandlerLike(playableName : str):
-    neps = AddSubtractExtraPlayables.AddSubtractNumExtraPlayables(True, bpy.context)
+def AppendNewPlayableToInteractionHandlerLike(playableName: str):
+    neps = AddSubtractExtraPlayables.AddSubtractNumExtraPlayables(
+        True, bpy.context)
     print(F"Will INSERT at IDX {neps} name: {playableName}")
     CLU.setValueAtKey(F"mel_interaction_handler_playable{neps}", playableName)
 
-def SetNewPlayableAtInteractionHandlerLike(playableName : str, playableIdx : int)-> None:
+
+def SetNewPlayableAtInteractionHandlerLike(playableName: str, playableIdx: int) -> None:
     key = F"mel_interaction_handler_playable{('' if playableIdx == 0 else str(playableIdx))}"
     print(F"Will Append at {key} name: {playableName}")
     CLU.setValueAtKey(key, playableName)
@@ -43,7 +45,9 @@ def FakeInitPlayable(playable):
 # def _OnCreatedDefine(as_custom_idx):
 #     pass
 
-OnCommandCreated = lambda as_custom_idx : as_custom_idx # _OnCreatedDefine
+
+def OnCommandCreated(as_custom_idx): return as_custom_idx  # _OnCreatedDefine
+
 
 class CU_OT_PlayableCreate(bpy.types.Operator):
     """Add a Command."""
@@ -52,41 +56,43 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     bl_property = "new_name"
 
-    new_name : bpy.props.StringProperty(
+    new_name: bpy.props.StringProperty(
         name="New Name"
     )
-    playableType : bpy.props.EnumProperty(
+    playableType: bpy.props.EnumProperty(
         name="Playable Type",
-        items=CT.getPlayableTypes(), # CPACModule.getPlayableTypes(),
+        items=CT.getPlayableTypes(),  # CPACModule.getPlayableTypes(),
     )
-    should_append : bpy.props.BoolProperty()
-    should_insert : bpy.props.BoolProperty()
-    insert_at_idx :bpy.props.IntProperty()
+    should_append: bpy.props.BoolProperty()
+    should_insert: bpy.props.BoolProperty()
+    insert_at_idx: bpy.props.IntProperty()
 
     @classmethod
     def poll(cls, context):
-        return True 
+        return True
 
     def execute(self, context):
-        from bb.mcd.ui.actionstarterlist import ActionStarterList
+        from bb.mcd.ui.command import CommandsList
 
         scn = context.scene
         item = scn.as_custom.add()
         item.id = len(scn.as_custom)
 
-        item.name = ActionStarterList.enforceUnique(self.new_name, context)
+        item.name = CommandsList.enforceUnique(self.new_name, context)
         item.playableType = self.playableType
 
         # CPACModule.CUSTOM_PG_AS_Collection.InitPlayable(item)
         #  TODO: the above method did nothing and was part of a circular import chain
         #    for now do this to unravel the chain. But also this function stands in as a
         #   reminder that we might want to let playables init
-        FakeInitPlayable(item) 
+        FakeInitPlayable(item)
 
-        bpy.ops.view3d.playable_pick_popup('INVOKE_DEFAULT', playableName=item.name)
+        bpy.ops.view3d.playable_pick_popup(
+            'INVOKE_DEFAULT', playableName=item.name)
 
         if self.should_insert:
-            SetNewPlayableAtInteractionHandlerLike(item.name, self.insert_at_idx)
+            SetNewPlayableAtInteractionHandlerLike(
+                item.name, self.insert_at_idx)
         elif self.should_append:
             AppendNewPlayableToInteractionHandlerLike(item.name)
 
@@ -99,15 +105,14 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         self.report({'INFO'}, info)
         return {'FINISHED'}
 
-
     def invoke(self, context, event):
-        from bb.mcd.ui.actionstarterlist import ActionStarterList
+        from bb.mcd.ui.command import CommandsList
 
         wm = context.window_manager
         dpi = context.preferences.system.pixel_size
         ui_size = context.preferences.system.ui_scale
         dialog_size = int(450 * dpi * ui_size)
-        self.new_name = ActionStarterList.enforceUnique("Playable", context)
+        self.new_name = CommandsList.enforceUnique("Playable", context)
 
         return wm.invoke_props_dialog(self, width=dialog_size)
 
@@ -128,7 +133,7 @@ def register():
     from bpy.utils import register_class
     register_class(CU_OT_PlayableCreate)
 
+
 def unregister():
     from bpy.utils import unregister_class
     unregister_class(CU_OT_PlayableCreate)
-

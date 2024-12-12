@@ -29,9 +29,9 @@ modulesNames = [
     # scene level var declarations
     'mcd.ui.export.ExportBox',
     'mcd.ui.materiallist.MaterialList',
-    'mcd.ui.actionstarterlist.CommandNameItems',
-    'mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
-    'mcd.ui.actionstarterlist.ActionStarterList',
+    'mcd.ui.command.CommandNameItems',
+    'mcd.ui.command.CUSTOM_PG_AS_Collection',
+    'mcd.ui.command.CommandsList',
 
     'mcd.util.JsonFromItem',
     'mcd.cduoperator.SetKeyValue',
@@ -79,8 +79,8 @@ modulesNames = [
     'mcd.shareddataobject.SharedDataObject',
     'mcd.ui.materiallist.MaterialListExporter',
     # 'mcd.ui.componentlike.actionstarters.ActionStarterData',
-    'mcd.ui.actionstarterlist.PlusActionStarterPopup',
-    'mcd.ui.actionstarterlist.ActionStarterPanel',
+    'mcd.ui.command.PlusActionStarterPopup',
+    'mcd.ui.command.CommandsPanel',
     'mcd.objectinfo.ObjectInfo',
     # 'mcd.ui.componentlike.enablereceiverbutton.EnableReceiverButton',
     'mcd.exporter.ExportOp',

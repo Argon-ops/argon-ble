@@ -1,10 +1,10 @@
 import bpy
 
-from bb.mcd.ui.actionstarterlist.ActionStarterList import(
+from bb.mcd.ui.command.CommandsList import(
     CUSTOM_OT_AS_actions,
 )
 from bb.mcd.util import DisplayHelper
-from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
+from bb.mcd.ui.command import AddCommandPopup
 
 def Draw(layout, context):
     scn = bpy.context.scene
@@ -21,7 +21,7 @@ def Draw(layout, context):
         "as_custom", scn, "as_custom_index", rows=5)
 
     col = row.column(align=True)
-    col.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="").should_append = False
+    col.operator(AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="").should_append = False
     col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='REMOVE', text="").action = 'REMOVE'
     col.separator()
     col.operator(CUSTOM_OT_AS_actions.bl_idname, icon='TRIA_UP', text="").action = 'UP'

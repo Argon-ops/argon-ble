@@ -36,7 +36,7 @@ from bb.mcd.ui import Inspector
 from bb.mcd.ui.materiallist import MaterialListPanel
 from bb.mcd.ui.export import ExportBox
 
-from bb.mcd.ui.actionstarterlist import ActionStarterPanel
+from bb.mcd.ui.command import CommandsPanel
 
 # -------------------------------------------------------------------
 #   Operators
@@ -177,7 +177,7 @@ class CDU_PT_CustomPropHelper(Panel):
         MaterialListPanel.Draw(box, context)
 
         box = layout.box()
-        ActionStarterPanel.Draw(box, context)
+        CommandsPanel.Draw(box, context)
 
         box = layout.box()
         from bb.mcd.settings import GlobalSettings

@@ -1,4 +1,4 @@
-from bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection import PlayablesExporter
+from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import PlayablesExporter
 from bb.mcd.settings.GlobalSettings import GlobalSettingsExporter
 from bb.mcd.ui.materiallist.MaterialList import MaterialListExporter
 from bb.mcd.ui.componentlike.preexport.ComponentLikePreExport import ComponentLikePreExport

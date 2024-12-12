@@ -12,7 +12,7 @@ from bpy.types import (Operator,
 
 
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from bb.mcd.ui.actionstarterlist import PlusActionStarterPopup
+from bb.mcd.ui.command import AddCommandPopup
 
 
 #region list operators
@@ -91,13 +91,13 @@ class PG_AS_CommandName(PropertyGroup):
 
 class CUSTOM_UL_AS_CommandNameItems(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        from bb.mcd.ui.actionstarterlist import CUSTOM_PG_AS_Collection
+        from bb.mcd.ui.command import CUSTOM_PG_AS_Collection
         row = layout.row()
         row.prop(item, "commandName", text="Command: ")
         row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = item.commandName
 
         # Add new
-        plusOp = row.operator(PlusActionStarterPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+        plusOp = row.operator(AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
         plusOp.should_insert = True
         plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
 
@@ -105,7 +105,7 @@ class CUSTOM_UL_AS_CommandNameItems(UIList):
             item.commandName = newCommand.name
 
         # set the modules dedicated callback function object
-        PlusActionStarterPopup.OnCommandCreated = assignToCommandList
+        AddCommandPopup.OnCommandCreated = assignToCommandList
 
         
     def invoke(self, context, event):

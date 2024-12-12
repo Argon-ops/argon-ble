@@ -32,9 +32,9 @@ modulesFullNames = [
 
     'bb.mcd.ui.export.ExportBox',
     'bb.mcd.ui.materiallist.MaterialList',
-    'bb.mcd.ui.actionstarterlist.CommandNameItems',
-    'bb.mcd.ui.actionstarterlist.CUSTOM_PG_AS_Collection',
-    'bb.mcd.ui.actionstarterlist.ActionStarterList',
+    'bb.mcd.ui.command.CommandNameItems',
+    'bb.mcd.ui.command.CUSTOM_PG_AS_Collection',
+    'bb.mcd.ui.command.CommandsList',
 
     'bb.mcd.util.JsonFromItem',
     'bb.mcd.cduoperator.SetKeyValue',
@@ -87,8 +87,8 @@ modulesFullNames = [
     'bb.mcd.ui.CustomComponentFilePickPopup',
     'bb.mcd.ui.materiallist.MaterialListPanel',
     'bb.mcd.shareddataobject.SharedDataObject', 
-    'bb.mcd.ui.actionstarterlist.PlusActionStarterPopup',
-    'bb.mcd.ui.actionstarterlist.ActionStarterPanel',
+    'bb.mcd.ui.command.AddCommandPopup',
+    'bb.mcd.ui.command.CommandsPanel',
     'bb.mcd.foo.objectinfo.ObjectInfo',
 
     'bb.mcd.exporter.ExportOp',

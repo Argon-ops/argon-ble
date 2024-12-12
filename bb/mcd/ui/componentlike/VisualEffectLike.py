@@ -13,7 +13,7 @@ from bb.mcd.util import ObjectLookupHelper
 
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 
-from bb.mcd.ui.actionstarterlist import ActionStarterList
+from bb.mcd.ui.command import CommandsList
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 
