@@ -175,15 +175,6 @@ config = """
     "mel_cam_swap_managed" : {
         "hint" : "TAG",
         "help" : "Add this object's camera component to the list of cameras that are managed by CamSwap"
-    },
-    "test_mreceptacle" : {
-        "default" : {
-            "aa" : "hello",
-            "bb" : 23
-        },
-        "hint" : "CUSTOM_COMPONENT",
-        "help" : "Experiment with custom component definitions. Shouldn't really be defined here but putting here for now",
-        "apply_class" : "FakeComponent"
     }
 
 }

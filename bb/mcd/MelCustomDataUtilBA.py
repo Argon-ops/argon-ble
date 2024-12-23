@@ -208,9 +208,9 @@ def syncDisplayKVs(scene):
         print("scene has no attrib named 'custom'. bye")
         return
 
-    pref_items = ObjectLookupHelper._getPrefItems(bpy.context) 
-
     scene.custom.clear()
+
+    pref_items = ObjectLookupHelper._getPrefItems(bpy.context) 
     for key, defaultValueInfo in pref_items.items():
         dval = scene.custom.add()
         dval.key = key
@@ -228,7 +228,7 @@ def handleSelectionChanged(scene):
         scene.custom_index = -1
 
 def refreshHandlerCallbacks():
-    # REMINDER: we are registering callbacks that need should happen every time the user clicks.
+    # REMINDER: we are registering callbacks that happen every time the user clicks.
     #  (Why do we need to reload scene.custom so frequently? Ideally we wouldn't)
 
     h = bpy.app.handlers

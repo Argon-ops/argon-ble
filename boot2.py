@@ -4,12 +4,12 @@ import sys
 ############################################################
 ############################################################
 # WHY THIS BOOT FILE:
-#  This boot script (along with __init__.py) enables 'hot reloading' multi-file blender addons. 
-#   
+#  This boot script (along with __init__.py) enables 'hot reloading' multi-file blender addons.
+#
 #   Follows techniques found here: https://b3d.interplanety.org/en/creating-multifile-add-on-for-blender/
 #    See also the top level __init__.py
 #
-# TO USE: run this file from Blender's script window 
+# TO USE: run this file from Blender's script window
 ############################################################
 
 
@@ -26,29 +26,26 @@ def get_project_dir():
 
     # But no need to provide the path dynamically if this file moved somewhere.
     #  I.e. something like this would be fine:
-    # return "E:\\temp\\checktwo\\argon-blender"  
+    # return "E:\\temp\\checktwo\\argon-blender"
 
 
+containing = get_project_dir()
 
-containing = get_project_dir() 
-
-# The name of the top parent module inside of the containing folder 
+# The name of the top parent module inside of the containing folder
 #  Changing the folder name requires renaming all import statements project-wide
 root_module = "bb"
 
 init_file = os.path.join(root_module, "__init__.py")
- 
+
 if containing not in sys.path:
     sys.path.append(containing)
- 
+
 full_file_path = os.path.join(containing, init_file)
- 
+
 if 'DEBUG_MODE' not in sys.argv:
     sys.argv.append('DEBUG_MODE')
 
 exec(compile(open(full_file_path).read(), init_file, 'exec'))
- 
+
 if 'DEBUG_MODE' in sys.argv:
     sys.argv.remove('DEBUG_MODE')
-
-

@@ -15,68 +15,71 @@ from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.ui.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.ui.componentlike import AbstractDefaultSetter
 from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
-from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import (EnableFilterSettings, EnableFilterDefaultSetter)
+from bb.mcd.ui.componentlike.enablefilter.EnableFilterSettings import (
+    EnableFilterSettings, EnableFilterDefaultSetter)
 
-_baseKey="mel_rigidbody"
+_baseKey = "mel_rigidbody"
 
 _suffixes = {
-    "_mass" : 1.0,
-    "_drag" : 0.0,
-    "_angular_drag" : 0.05,
-    "_use_gravity" : True,
-    "_is_kinematic" : False,
-    "_interpolate" : 0,
-    "_collision_detection" : 0,
-    "_freeze_position" : (0.0, 0.0, 0.0),
+    "_mass": 1.0,
+    "_drag": 0.0,
+    "_angular_drag": 0.05,
+    "_use_gravity": True,
+    "_is_kinematic": False,
+    "_interpolate": 0,
+    "_collision_detection": 0,
+    "_freeze_position": (0.0, 0.0, 0.0),
     "_freeze_rotation": (0.0, 0.0, 0.0),
-    }
+}
 
-def _getSuffixKey(suffix : str) -> str:
+
+def _getSuffixKey(suffix: str) -> str:
     return F"{_baseKey}{suffix}"
+
 
 class RigidbodyDefaultSetter(AbstractDefaultSetter.AbstractDefaultSetter):
     @staticmethod
-    def AcceptsKey(key : str):
+    def AcceptsKey(key: str):
         return RigidbodyLike.AcceptsKey(key)
 
     @staticmethod
-    def EqualValues(a : object, b : object) -> bool:
+    def EqualValues(a: object, b: object) -> bool:
         for suffix in _suffixes.keys():
             if not AbstractDefaultSetter._IsEqual(_getSuffixKey(suffix), a, b):
                 return False
         return True
 
     @staticmethod
-    def OnAddKey(key : str, val, targets):
+    def OnAddKey(key: str, val, targets):
         EnableFilterDefaultSetter.OnAddKey(RigidbodyLike, key, targets)
         for suffix, defaultVal in _suffixes.items():
-            AbstractDefaultSetter._SetKeyValOnTargets(_getSuffixKey(suffix), defaultVal, targets)
+            AbstractDefaultSetter._SetKeyValOnTargets(
+                _getSuffixKey(suffix), defaultVal, targets)
 
     @staticmethod
-    def OnRemoveKey(key : str, targets):
+    def OnRemoveKey(key: str, targets):
         EnableFilterDefaultSetter.OnRemoveKey(RigidbodyLike, targets)
         for suffix in _suffixes.keys():
             AbstractDefaultSetter._RemoveKey(_getSuffixKey(suffix), targets)
-
 
 
 class RigidbodyLike(EnableFilterSettings, AbstractComponentLike):
 
     @staticmethod
     def GetTargetKey() -> str:
-        return _baseKey 
+        return _baseKey
 
     @staticmethod
-    def AcceptsKey(key : str):
+    def AcceptsKey(key: str):
         return key == RigidbodyLike.GetTargetKey()
 
     @staticmethod
     def Display(box, context) -> None:
         row = box.row()
         rbl = context.scene.rigidbodyLike
-        row.prop(rbl, "mass", text = "mass")
+        row.prop(rbl, "mass", text="mass")
         row = box.row()
-        row.prop(rbl, "drag", text = "drag")
+        row.prop(rbl, "drag", text="drag")
         row = box.row()
         row.prop(rbl, "angularDrag", text="angular drag")
         row = box.row()
@@ -92,74 +95,89 @@ class RigidbodyLike(EnableFilterSettings, AbstractComponentLike):
         row = box.row()
         row.prop(rbl, "freezeRotation", text="freeze rotation")
 
-
-    mass : FloatProperty(
+    mass: FloatProperty(
         default=2.7,
-        get=lambda self : CLU.getFloatFromKey(_getSuffixKey("_mass")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_mass"), value)
+        get=lambda self: CLU.getFloatFromKey(_getSuffixKey("_mass")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_mass"), value)
     )
-    drag : FloatProperty(
+    drag: FloatProperty(
         default=0.0,
-        get=lambda self : CLU.getFloatFromKey(_getSuffixKey("_drag")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_drag"), value)
+        get=lambda self: CLU.getFloatFromKey(_getSuffixKey("_drag")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_drag"), value)
     )
-    angularDrag : FloatProperty(
+    angularDrag: FloatProperty(
         default=0.05,
-        get=lambda self : CLU.getFloatFromKey(_getSuffixKey("_angular_drag")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_angular_drag"), value)
+        get=lambda self: CLU.getFloatFromKey(_getSuffixKey("_angular_drag")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_angular_drag"), value)
     )
-    useGravity : BoolProperty(
+    useGravity: BoolProperty(
         default=True,
-        get=lambda self : CLU.getBoolFromKey(_getSuffixKey("_use_gravity")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_use_gravity"), value)
+        get=lambda self: CLU.getBoolFromKey(_getSuffixKey("_use_gravity")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_use_gravity"), value)
     )
-    isKinematic : BoolProperty(
+    isKinematic: BoolProperty(
         default=False,
-        get=lambda self : CLU.getBoolFromKey(_getSuffixKey("_is_kinematic")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_is_kinematic"), value)
+        get=lambda self: CLU.getBoolFromKey(_getSuffixKey("_is_kinematic")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_is_kinematic"), value)
     )
-    interpolate : EnumProperty(
+    interpolate: EnumProperty(
         items=(
             ('0', 'None', 'none'),
             ('1', 'Interpolate', 'interpolate'),
             ('2', 'Extrapolate', 'extrapolate')),
         default='0',
-        get=lambda self : CLU.getIntFromKey(_getSuffixKey("_interpolate")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_interpolate"), value)
+        get=lambda self: CLU.getIntFromKey(_getSuffixKey("_interpolate")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_interpolate"), value)
     )
-    collisionDetection : EnumProperty(
+    collisionDetection: EnumProperty(
         items=(
             ('0', 'Discrete', 'discrete'),
             ('1', 'Continuous', 'continuous'),
             ('2', 'Continuous Dynamic', 'continuous dynamic'),
             ('3', 'Continuous Speculative', 'continuous speculative')),
         default='0',
-        get=lambda self : CLU.getIntFromKey(_getSuffixKey("_collision_detection")),
-        set=lambda self, value : CLU.setValueAtKey(_getSuffixKey("_collision_detection"), value)
+        get=lambda self: CLU.getIntFromKey(
+            _getSuffixKey("_collision_detection")),
+        set=lambda self, value: CLU.setValueAtKey(
+            _getSuffixKey("_collision_detection"), value)
     )
-    freezePosition : BoolVectorProperty(
+    freezePosition: BoolVectorProperty(
         size=3,
-        get=lambda self : CLU.getFloatBackedBooleanVector(_getSuffixKey("_freeze_position")), 
-        set=lambda self, value : CLU.setFloatBackedBooleanVector(_getSuffixKey("_freeze_position"), value),
+        get=lambda self: CLU.getFloatBackedBooleanVector(
+            _getSuffixKey("_freeze_position")),
+        set=lambda self, value: CLU.setFloatBackedBooleanVector(
+            _getSuffixKey("_freeze_position"), value),
         subtype="XYZ",
     )
-    freezeRotation : BoolVectorProperty(
+    freezeRotation: BoolVectorProperty(
         size=3,
-        get=lambda self : CLU.getFloatBackedBooleanVector(_getSuffixKey("_freeze_rotation")), # exception when there's no key present?
-        set=lambda self, value : CLU.setFloatBackedBooleanVector(_getSuffixKey("_freeze_rotation"), value), 
+        get=lambda self: CLU.getFloatBackedBooleanVector(_getSuffixKey(
+            "_freeze_rotation")),  # exception when there's no key present?
+        set=lambda self, value: CLU.setFloatBackedBooleanVector(
+            _getSuffixKey("_freeze_rotation"), value),
         subtype="XYZ",
     )
 
+
 classes = (
     RigidbodyLike,
-    )
+)
+
 
 def register():
     from bpy.utils import register_class
     for c in classes:
         register_class(c)
-    
-    bpy.types.Scene.rigidbodyLike = bpy.props.PointerProperty(type=RigidbodyLike)
+
+    bpy.types.Scene.rigidbodyLike = bpy.props.PointerProperty(
+        type=RigidbodyLike)
+
 
 def unregister():
     from bpy.utils import unregister_class

@@ -42,11 +42,8 @@ def SetNewPlayableAtInteractionHandlerLike(playableName: str, playableIdx: int) 
 def FakeInitPlayable(playable):
     pass
 
-# def _OnCreatedDefine(as_custom_idx):
-#     pass
 
-
-def OnCommandCreated(as_custom_idx): return as_custom_idx  # _OnCreatedDefine
+def OnCommandCreated(as_custom_idx): return as_custom_idx  
 
 
 class CU_OT_PlayableCreate(bpy.types.Operator):
@@ -99,7 +96,7 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         scn.as_custom_index = len(scn.as_custom)-1
         info = '%s added to list' % (item.name)
 
-        # CALL our callback
+        # call our callback
         OnCommandCreated(item)
 
         self.report({'INFO'}, info)

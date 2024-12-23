@@ -6,13 +6,11 @@ class ComponentLikePreExport:
         from bb.mcd.ui.componentlike.router import CLikeToDefaultSetterMap
         from bb.mcd.util import ObjectLookupHelper
 
-        for clike in CLikeToDefaultSetterMap.getComponentLikes(): # StorageRouter.getComponentLikes():
-            dfsetter = CLikeToDefaultSetterMap.getDefaultSetter(clike) # StorageRouter.getDefaultSetter(clike)
+        for clike in CLikeToDefaultSetterMap.getComponentLikes():
+            dfsetter = CLikeToDefaultSetterMap.getDefaultSetter(clike)
             if hasattr(dfsetter, "Validate"):
-                print(F"will validate {dfsetter}")
                 validate = getattr(dfsetter, "Validate")
-                obs = ObjectLookupHelper._findAllObjectsWithKey(clike.GetTargetKey())
-                for clikeObj in obs: 
+                obs = ObjectLookupHelper._findAllObjectsWithKey(
+                    clike.GetTargetKey())
+                for clikeObj in obs:
                     validate(clikeObj)
-
-

@@ -15,7 +15,7 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 from bb.mcd.ui.command import AddCommandPopup
 
 
-#region list operators
+# region list operators
 
 class OT_CompositeCommandNamesActions(Operator):
     """Move items up and down, add and remove"""
@@ -30,8 +30,8 @@ class OT_CompositeCommandNamesActions(Operator):
             ('DOWN', "Down", ""),
             ('REMOVE', "Remove", ""),
             ('ADD', "Add", "")))
-    
-    targetCommandIndex : IntProperty()
+
+    targetCommandIndex: IntProperty()
 
     def invoke(self, context, event):
         scn = context.scene
@@ -44,20 +44,22 @@ class OT_CompositeCommandNamesActions(Operator):
             return {"FINISHED"}
         else:
             try:
-                item = cnames[idx] 
+                item = cnames[idx]
             except IndexError:
                 pass
             else:
                 if self.action == 'DOWN' and idx < len(cnames) - 1:
                     cnames.move(idx, idx+1)
                     scn.compositeCmdCmdNamesIdx += 1
-                    info = 'Item "%s" moved to position %d' % (item.commandName, scn.compositeCmdCmdNamesIdx + 1)
+                    info = 'Item "%s" moved to position %d' % (
+                        item.commandName, scn.compositeCmdCmdNamesIdx + 1)
                     self.report({'INFO'}, info)
 
                 elif self.action == 'UP' and idx >= 1:
                     cnames.move(idx, idx-1)
                     scn.compositeCmdCmdNamesIdx -= 1
-                    info = 'Item "%s" moved to position %d' % (item.commandName, scn.compositeCmdCmdNamesIdx + 1)
+                    info = 'Item "%s" moved to position %d' % (
+                        item.commandName, scn.compositeCmdCmdNamesIdx + 1)
                     self.report({'INFO'}, info)
 
                 elif self.action == 'REMOVE':
@@ -75,29 +77,41 @@ class OT_CompositeCommandNamesActions(Operator):
 
         return {"FINISHED"}
 
-#endregion
-    
+# endregion
+
+
 class PG_AS_CommandName(PropertyGroup):
-    """Ble needs the string to be wrapped in a property group to use in a list"""
-    commandName : EnumProperty(
-        items=lambda self, context : CLU.playablesItemCallback(context),
-        get=lambda self : CLU.playableEnumIndexFromName(self.commandNameStor),
-        set=lambda self, value : CLU.storePlayableName(self, value, "commandNameStor")
+    """A PropertyGroup that wraps around the enum 'commandName' so that we can use it in a Blender Collection type.
+    
+        Used with Composite Commands
+    """
+
+    commandName: EnumProperty(
+        items=lambda self, context: CLU.playablesItemCallback(context),
+        get=lambda self: CLU.playableEnumIndexFromName(self.commandNameStor),
+        set=lambda self, value: CLU.storePlayableName(
+            self, value, "commandNameStor")
+    )
+    """
+    defines the command name. commandName is an Enum that uses a separate string 'commandNameStor' to store its value
+    """
+
+    commandNameStor: StringProperty(
+        description="PRIVATE",
     )
 
-    commandNameStor : StringProperty(
-        description = "PRIVATE",
-    )
 
 class CUSTOM_UL_AS_CommandNameItems(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         from bb.mcd.ui.command import CUSTOM_PG_AS_Collection
         row = layout.row()
         row.prop(item, "commandName", text="Command: ")
-        row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname, text="", icon="GREASEPENCIL").playableName = item.commandName
+        row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname,
+                     text="", icon="GREASEPENCIL").playableName = item.commandName
 
         # Add new
-        plusOp = row.operator(AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+        plusOp = row.operator(
+            AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
         plusOp.should_insert = True
         plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
 
@@ -107,48 +121,55 @@ class CUSTOM_UL_AS_CommandNameItems(UIList):
         # set the modules dedicated callback function object
         AddCommandPopup.OnCommandCreated = assignToCommandList
 
-        
     def invoke(self, context, event):
         pass
 
 
 def DrawList(layout, playable):
     row = layout.row()
-    row.template_list("CUSTOM_UL_AS_CommandNameItems", "custom_def_list", playable, "commandNames", 
-                        bpy.context.scene, "compositeCmdCmdNamesIdx", rows=5)
+    row.template_list("CUSTOM_UL_AS_CommandNameItems", "custom_def_list", playable, "commandNames",
+                      bpy.context.scene, "compositeCmdCmdNamesIdx", rows=5)
     col = row.column(align=True)
-    
+
     targetIndex = bpy.context.scene.as_custom.keys().index(playable.name)
-    addOp = col.operator(OT_CompositeCommandNamesActions.bl_idname, icon='ADD', text="")
+    addOp = col.operator(
+        OT_CompositeCommandNamesActions.bl_idname, icon='ADD', text="")
     addOp.action = 'ADD'
     addOp.targetCommandIndex = targetIndex
-    removeOp = col.operator(OT_CompositeCommandNamesActions.bl_idname, icon='REMOVE', text="")
+    removeOp = col.operator(
+        OT_CompositeCommandNamesActions.bl_idname, icon='REMOVE', text="")
     removeOp.action = 'REMOVE'
     removeOp.targetCommandIndex = targetIndex
     col.separator()
-    upOp = col.operator(OT_CompositeCommandNamesActions.bl_idname, icon='TRIA_UP', text="")
+    upOp = col.operator(
+        OT_CompositeCommandNamesActions.bl_idname, icon='TRIA_UP', text="")
     upOp.action = 'UP'
     upOp.targetCommandIndex = targetIndex
-    downOp = col.operator(OT_CompositeCommandNamesActions.bl_idname, icon='TRIA_DOWN', text="")
+    downOp = col.operator(
+        OT_CompositeCommandNamesActions.bl_idname, icon='TRIA_DOWN', text="")
     downOp.action = 'DOWN'
     downOp.targetCommandIndex = targetIndex
+
 
 classes = (
     PG_AS_CommandName,
     CUSTOM_UL_AS_CommandNameItems,
     OT_CompositeCommandNamesActions,
-    )
+)
+
 
 def register():
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
 
-    bpy.types.Scene.compositeCmdCmdNamesIdx = IntProperty(name="CommandNamesIndex")
+    bpy.types.Scene.compositeCmdCmdNamesIdx = IntProperty(
+        name="CommandNamesIndex")
+
 
 def unregister():
     from bpy.utils import unregister_class
     for cls in reversed(classes):
         unregister_class(cls)
-    
+
     del bpy.types.Scene.compositeCmdCmdNamesIdx

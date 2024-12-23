@@ -110,6 +110,7 @@ for fullName in modulesFullNames:
             print(F"### Exception for module: {fullName}. Restarting blender may resolve this. ###")
             raise mnfe 
     else:
+        print(F"# was not in sys.modules")
         globals()[fullName] = importlib.import_module(fullName)
         # setattr(globals()[fullName], 'modulesNames', modulesFullNames) # DELME ? Do we not need this line? each module gets a copy of moduleFullNames but we don't use this...Did we actually need to use it?
 

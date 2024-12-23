@@ -9,24 +9,29 @@ from bb.mcd.ui.componentlike.util import ComponentLikeUtils as CLU
 #       who reloads the plugin multiple times)
 _lookuplookup = {}
 
-# Get the dictionary associated with target
-#  create if it didn't exist yet.
-
 
 def _getTokenLookup(target):
+    """
+    Get the dictionary associated with target.
+
+        Create if it didn't exist yet.
+    """
     global _lookuplookup
-    # _lookuplookup = _getLLTry()
+
     if target not in _lookuplookup.keys():  # FIXME: needs to be a string ... could we use name
         print(
             F" ``` NOT IN. adding new owner-token dictionary for {target.name}")
         _lookuplookup[target] = {}
     return _lookuplookup[target]
 
-#  Gets a unique owner object (for msg bus). per blender object, per token key
-# token_key is a key that's (hopefully) unique for the given class, prop field (e.g. "CamLockDataPerObjectHideObject")
 
 
 def GetOwnerToken(target, token_key: str):
+    """
+    Gets a unique owner object (for msg bus). per blender object, per token key
+
+        token_key is a key that's (hopefully) unique for the given class, prop field (e.g. "CamLockDataPerObjectHideObject")
+    """
     lookup = _getTokenLookup(target)
     if token_key not in lookup:
         lookup[token_key] = object()
@@ -63,10 +68,9 @@ def updateMsgbus(target, ptrPropObject, propertyKey, callbackOwner):
         )
 
 
-
-
 def onObjectUpdate(target, perObjectSelf, ptrPropName, propertyKey):
-    """ Args:
+    """ 
+    Args:
 
         target:  object that owns a PerObject PropertyGroup instance.
                    typically this is the current active-selected object.
@@ -74,7 +78,6 @@ def onObjectUpdate(target, perObjectSelf, ptrPropName, propertyKey):
         ptrPropName: the name of the PointerProperty (e.g. 'showObjectRoot')
         propertyKey: the key under which to store the object
     """
-
     ptrPropObject = getattr(perObjectSelf, ptrPropName)
 
     token = perObjectSelf.__annotations__[ptrPropName]
@@ -89,12 +92,15 @@ def onObjectUpdate(target, perObjectSelf, ptrPropName, propertyKey):
         target)
 
 
-# restore msg bus callbacks where appropriate
-# params
-#    1: perObField: the per object field attribute e.g. .camLockPerObjectData (but use getattr)
-#    2: refObField: the object ref attribute on the previous obj e.g. .hideRootObject (but use getattr)
-#    3: fullKey: the custom prop field. e.g.  "_hide_root_object"
 def resubscribeAll_LP(perObField: str, refObField: str, fullKey: str):
+    """
+    Restore msg bus callbacks where appropriate for the given per-object data
+
+        params
+        1: perObField: the string name of the per object field attribute. e.g. 'camLockPerObjectData' 
+        2: refObField: the string name of the object ref attribute. e.g. 'hideRootObject' 
+        3: fullKey: the custom prop field. e.g.  'mel_cam_lock_session_enable_hide_root_object'
+    """
     for obj in bpy.context.scene.objects:
         # get the per-object data: e.g. CamLockPerObjectData
         perObjectData = getattr(obj, perObField)

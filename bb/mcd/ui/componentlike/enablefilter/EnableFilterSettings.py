@@ -30,6 +30,12 @@ class EnableFilterDefaultSetter(object):
 
 
 class EnableFilterSettings(PropertyGroup):
+    """
+    Defines properties for component-likes that should support enabling mechanics.
+
+    Component-likes that need to include EnableFilter settings should multi-inherit from
+    this class and AbstractComponentLike. 
+    """
 
     IS_ENABLEABLE_CLASS = True
    
@@ -78,7 +84,7 @@ class EnableFilterSettings(PropertyGroup):
         #    can be called by Inspector.py
 
         # Mildly evil: GetSceneInstance() is an AbstractComponentLike classmethod
-        #  We are assuming that this class also descends from AbstactComponentLike
+        #  We are assuming that this class also descends from AbstactComponentLike (!!)
         #  why do we need this: so that child classes can be spared calling this method from their Display methods manually
         self = cls.GetSceneInstance() 
 

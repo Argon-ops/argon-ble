@@ -1,9 +1,10 @@
 import bpy
 
+
 class AbstractComponentLike(object):
     """Handle display of component like key values"""
     @staticmethod
-    def AcceptsKey(key : str) -> bool:
+    def AcceptsKey(key: str) -> bool:
         raise "override this func pls"
 
     @staticmethod
@@ -15,25 +16,25 @@ class AbstractComponentLike(object):
         raise "pls override"
 
     @classmethod
-    def Append(cls, suffix : str) -> str:
+    def Append(cls, suffix: str) -> str:
         return F"{cls.GetTargetKey()}{suffix}"
-    
+
     @classmethod
     def HasBaseKey(cls, obj) -> bool:
         return cls.GetTargetKey() in obj
 
-    # COMPLAINT: TOO SPAGHETTI-ISH: just calling displayEnableSettings from 
-    #   each EnableableLike's display is more straight forward. (if you don't 
-    #     understand this comment be glad.)
+    # COMPLAINT: just calling displayEnableSettings from
+    #   each EnableableLike's Display() method is more straight forward. (if you don't
+    #     understand this comment, be glad.)
     @classmethod
     def __ProbableSceneInstanceName(cls) -> str:
+        """Scene instance name is always class name with lower case first char"""
         return F"{cls.__name__[0].lower()}{cls.__name__[1:]}"
-    
+
     @classmethod
     def _GetSceneInstanceNonStandardName(cls) -> str:
         return ""
 
-    
     @classmethod
     def GetSceneInstance(cls):
         """this ugly method relies on our naming convention for component-like instance vars (bpy.types.Scene.particleSystemLike for example)"""
@@ -43,7 +44,3 @@ class AbstractComponentLike(object):
         if hasattr(scn, cls.__ProbableSceneInstanceName()):
             return getattr(scn, cls.__ProbableSceneInstanceName())
         raise F"no scene instance found for [{cls.__name__}]"
-
-        
-
-
