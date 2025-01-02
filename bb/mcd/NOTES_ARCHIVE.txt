@@ -29,7 +29,7 @@
 #      which we should have added to sys.path; not starting with a dot. <--ACTUALLY: 
     #   relative to the folder CONTAINING the project folder.
     #    So in our case the project folder is named 'bb'
-    #    Example import statement: from bb.mcd.ui.materiallist import MaterialListExporter
+    #    Example import statement: from bb.mcd.core.materiallist import MaterialListExporter
     # )
     
 #   if the module includes blender class(es) that should register,

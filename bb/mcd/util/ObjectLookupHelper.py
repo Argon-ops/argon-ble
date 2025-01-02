@@ -1,6 +1,6 @@
 import bpy
 from bb.mcd.lookup import KeyValDefault
-from bb.mcd.ui.componentlike import StorageRouter
+from bb.mcd.core.componentlike import StorageRouter
 import typing
 
 def _anySelectedHaveKey(key, context):
@@ -24,7 +24,7 @@ def _setSelectedIndex(context, key : str) -> None:
     filtered = _getDisplayKeys(context)
     try:
         idx = filtered.index(key)
-        context.scene.custom_index = idx
+        context.scene.componentLikesIndex = idx
     except ValueError as e:
         print(F"value error : {e}")
         raise e
@@ -60,7 +60,7 @@ def _getPrefItems(context):
         #   we will need to put them into one look up. 
         return KeyValDefault.getMCDConfig() # TODO: how to accommodate user custom KVs and even suppressing MCD default KVs?
         prefs = getPrefs(context)
-        return prefs.custom
+        return prefs.componentLikes
     except BaseException as e:
         if True: # WANT --> # _IS_DEBUG_:
             # Enable load/run from blender's script window where preferences won't be defined.

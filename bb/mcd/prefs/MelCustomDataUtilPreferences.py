@@ -42,9 +42,9 @@ def _getPrefsFromJSON(file_path):
 def _onPrefsFileUpdated(self, context):
     kv_data = _getPrefsFromJSON(self.filepath)
     # reset our list
-    self.custom.clear()
+    self.componentLikes.clear()
     for key, val in kv_data.items():
-        item = self.custom.add()
+        item = self.componentLikes.add()
         item.key = key
         if isinstance(val, str):
             item.val = val
@@ -86,7 +86,7 @@ class MelCustomDataUtilPreferences(AddonPreferences):
 
         layout.prop(self, "filepath")
         layout.label(
-            text=F"{len(self.custom)} keys: { ', '.join([item.key for item in self.custom.values()])}")
+            text=F"{len(self.componentLikes)} keys: { ', '.join([item.key for item in self.componentLikes.values()])}")
 
 
 classes = (

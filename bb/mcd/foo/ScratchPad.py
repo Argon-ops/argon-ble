@@ -6,7 +6,7 @@ that can be run from Blender's python console
 
 import bpy
 
-# from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import (
+# from bb.mcd.core.command.CUSTOM_PG_AS_Collection import (
 #         PlayablesExporter as PE
 #     )
 # from bb.mcd.shareddataobject.SharedDataObject import GetFirstSelectedObjectOrAny
@@ -20,7 +20,7 @@ def ObjDictTest():
     # print(json.dumps(ob.__dict__))
     # print(ob.__annotations__)
 
-    from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
+    from bb.mcd.core.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
     for fn in ob.__annotations__.keys():
         serVal = AS.GetSerialiazableValue(ob, fn)
         print(F"field: {fn} val: {getattr(ob, fn)} serval: {serVal}")
@@ -42,7 +42,7 @@ def _D_anyActionNames():
 #     PE.WriteCommandsToTargetObject(target)
 
 def ShowCommands():
-    from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
+    from bb.mcd.core.command.CUSTOM_PG_AS_Collection import CUSTOM_PG_AS_Collection as AS
     for cmd in bpy.context.scene.as_custom:
         print(F"CMD: {cmd.name} ")
         for fn in cmd.__annotations__.keys():
@@ -140,8 +140,8 @@ def GetOrAdd(name: str):
 
 
 def CommandNames():
-    # import bb.mcd.ui.command.CUSTOM_PG_AS_Collection as AS
-    import bb.mcd.ui.command.CommandTypes as AS
+    # import bb.mcd.core.command.CUSTOM_PG_AS_Collection as AS
+    import bb.mcd.core.command.CommandTypes as AS
     cmds = [s[1] for s in AS.getPlayableTypes()]
     for c in sorted(cmds):
         print(F"## {c}")
@@ -156,7 +156,7 @@ def TestR():
 
 
 def ListPropKeys():
-    c = bpy.context.scene.custom
+    c = bpy.context.scene.componentLikes
     print("hello")
     for k in sorted([k.key for k in c]):
         k = k[4:].replace("_", " ")

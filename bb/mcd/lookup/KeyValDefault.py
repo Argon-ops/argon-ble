@@ -91,7 +91,7 @@ def getDefaultValue(key: str):
     global _storage
     item = _storage[key]
     if item.hint == EHandlingHint.TAG:
-        return -7  # value doesn't matter; we'll never see this. nonetheless just return something
+        return -7  # value doesn't matter. nonetheless just return something
     if item.hint == EHandlingHint.CUSTOM_COMPONENT:
         # the default value is the json string
         # TODO: handle a case where we want to combine this with applying a custom component

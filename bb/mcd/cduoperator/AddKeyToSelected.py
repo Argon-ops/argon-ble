@@ -7,8 +7,8 @@ from bpy.types import (Operator,
 
 from bb.mcd.util import ObjectLookupHelper
 from bb.mcd.lookup import KeyValDefault
-from bb.mcd.ui.componentlike import StorageRouter
-from bb.mcd.ui import CustomComponentInspector
+from bb.mcd.core.componentlike import StorageRouter
+from bb.mcd.core.customcomponent import CustomComponentInspector
 
 
 class CUSTOM_OT_AddKeyToSelected(Operator):

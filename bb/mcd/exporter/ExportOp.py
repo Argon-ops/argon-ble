@@ -1,7 +1,7 @@
-from bb.mcd.ui.command.CUSTOM_PG_AS_Collection import PlayablesExporter
+from bb.mcd.core.command.CUSTOM_PG_AS_Collection import PlayablesExporter
 from bb.mcd.settings.GlobalSettings import GlobalSettingsExporter
-from bb.mcd.ui.materiallist.MaterialList import MaterialListExporter
-from bb.mcd.ui.componentlike.preexport.ComponentLikePreExport import ComponentLikePreExport
+from bb.mcd.core.materiallist.MaterialList import MaterialListExporter
+from bb.mcd.core.componentlike.preexport.ComponentLikePreExport import ComponentLikePreExport
 from bb.mcd.settings.IsArgonMarker import IsArgonMarker
 
 
@@ -32,6 +32,6 @@ def PostExport(targetDataHolder):
     #   how to get a call back after a modal, file browser dialog...
     #   We don't have this problem with the Edy J exporter, because we
     #     have modified the actual exporter in our copy of his module
-    #  We could make our own launcher for the fbx exporter...so that we would
+    #  We could make our own launcher for the vanilla fbx exporter...so that we would
     #   run the dialog part of the default fbx launcher...and just call the op without 'INVOKE_DEFAULT'
     # ASC.PlayablesExporter.CleanUpTargetObject(targetDataHolder)

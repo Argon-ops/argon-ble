@@ -2,8 +2,8 @@
 
 def getFocusedItem(context):
     try:
-        items = context.scene.custom
-        idx = context.scene.custom_index
+        items = context.scene.componentLikes
+        idx = context.scene.componentLikesIndex
         if idx < 0:
             return None
         if idx >= len(items):

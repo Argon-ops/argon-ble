@@ -17,7 +17,7 @@ class CUSTOM_OT_SetDefaultValue(Operator):
     def invoke(self, context, event):
         default = ObjectLookupHelper._guessReasonableValue(
             self.target_key, context)
-        from bb.mcd.ui.componentlike import StorageRouter
+        from bb.mcd.core.componentlike import StorageRouter
         StorageRouter.handleSetDefaultValue(self.target_key, default, context)
         return {'FINISHED'}
 
