@@ -1,7 +1,7 @@
 import bpy
 from bb.mcd.exporter.default import DefaultFBXExporter
 from bb.mcd.exporter.edyj import BlenderToUnityFbxExporter
-from bpy.props import (BoolProperty,)
+from bpy.props import BoolProperty
 from bb.mcd.util import DisplayHelper
 
 def Draw(box, context):

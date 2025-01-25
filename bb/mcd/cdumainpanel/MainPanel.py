@@ -1,9 +1,9 @@
 from bpy.app.handlers import persistent
 from bb.mcd.core.customcomponent import CustomComponentFilePickPopup
 from bb.mcd.settings import GlobalSettings
-from bb.mcd.core.command import CommandsPanel
-from bb.mcd.core.export import ExportBox
-from bb.mcd.core.materiallist import MaterialListPanel
+from bb.mcd.cdumainpanel import CommandsPanel
+from bb.mcd.cdumainpanel import ExportBox
+from bb.mcd.cdumainpanel import MaterialListPanel
 from bb.mcd.cdumainpanel import Inspector
 from bb.mcd.cdumenu.AddKeyMenu import CDU_MT_AddKeyMenu
 from bb.mcd.util import DisplayHelper
@@ -155,7 +155,7 @@ def _drawSelByKey(box):
 #endregion
 
 
-class CDU_PT_CustomPropHelper(Panel):
+class CDU_PT_ArgonMainPanel(Panel):
     """Defines the main panel for Argon: interact with custom properties on selected objects."""
     bl_idname = 'TEXT_PT_argon_panel'
     bl_space_type = "VIEW_3D"
@@ -196,7 +196,7 @@ class CDU_PT_CustomPropHelper(Panel):
 classes = (
     CDU_OT_actions,
     CDU_UL_PerObjectItems,
-    CDU_PT_CustomPropHelper,
+    CDU_PT_ArgonMainPanel,
 )
 
 

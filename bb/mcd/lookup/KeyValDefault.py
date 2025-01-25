@@ -6,7 +6,7 @@ representing default settings for that component-like.
 """
 
 import json
-from bb.mcd.melstor import MCDKeyValConfig
+from bb.mcd.configs import MCDKeyValConfig
 import typing
 
 

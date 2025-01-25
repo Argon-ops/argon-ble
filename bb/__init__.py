@@ -13,7 +13,7 @@ bl_info = {
 modulesFullNames = [
     'bb.mcd.util.RelevantPropertyNameHelper',
     'bb.more_stuff_here.more',
-    'bb.mcd.melstor.MCDKeyValConfig',
+    'bb.mcd.configs.MCDKeyValConfig',
     'bb.mcd.lookup.KeyValDefault',
     'bb.mcd.util.ObjectLookupHelper',
     'bb.mcd.util.AppHandlerHelper',    
@@ -27,7 +27,7 @@ modulesFullNames = [
     'bb.mcd.util.DisplayHelper',
     'bb.mcd.core.componentlike.adjunct.AddSubtractExtraPlayables',
 
-    'bb.mcd.core.export.ExportBox',
+    'bb.mcd.cdumainpanel.ExportBox',
     'bb.mcd.core.materiallist.MaterialList',
     'bb.mcd.core.command.CommandNameItems',
     'bb.mcd.core.command.CUSTOM_PG_AS_Collection',
@@ -82,10 +82,10 @@ modulesFullNames = [
     'bb.mcd.core.componentlike.preexport.ComponentLikePreExport',
     'bb.mcd.core.customcomponent.CustomComponentInspector',
     'bb.mcd.core.customcomponent.CustomComponentFilePickPopup',
-    'bb.mcd.core.materiallist.MaterialListPanel',
+    'bb.mcd.cdumainpanel.MaterialListPanel',
     'bb.mcd.shareddataobject.SharedDataObject', 
     'bb.mcd.core.command.AddCommandPopup',
-    'bb.mcd.core.command.CommandsPanel',
+    'bb.mcd.cdumainpanel.CommandsPanel',
     'bb.mcd.foo.objectinfo.ObjectInfo',
 
     'bb.mcd.exporter.ExportOp',
@@ -179,7 +179,7 @@ if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
     #   (Also, used this terminal https://github.com/microsoft/terminal not the default PowerShell)
     #  
      
-# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>.<sub-dirN>
+# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>.<sub-dirC>
     #
     # In other words, they need to be absolute paths starting from project-dir.
     # In our case bb is the name of the project-dir, so:

@@ -55,4 +55,14 @@
 #    B: handle the case where there are playables but the user hasn't picked one yet.
 
 
+TODO: unbreak MelCustomDataUtilPreferences  ... (also rename to ... 'ArgonPreferences' or something 
+  more applicable)
 
+TODO: Unity 2022 importing. There's an error: 'Failed to find entry point'
+    usually associated with the assembly def Argon.Tools (if we recall correctly)
+    Only occurs in new projects when you first import Argon
+    (And closing and reopening the project makes the err go away)
+    Unity 6 doesn't throw the error. But there is a warning
+    In StoreArgonPreferences line 27: "Not allowed to call AssetDatabase.SaveAssets" during 
+     <some initial phase, I forget which>
+    So, check if removing this line makes the err go away for 2022.
