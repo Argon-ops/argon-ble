@@ -175,6 +175,10 @@ config = """
     "mel_cam_swap_managed" : {
         "hint" : "TAG",
         "help" : "Add this object's camera component to the list of cameras that are managed by CamSwap"
+    },
+    "mel_argon_should_skip" : {
+        "hint" : "TAG",
+        "help" : "Objects with this tag won't be processed by Argon"
     }
 
 }

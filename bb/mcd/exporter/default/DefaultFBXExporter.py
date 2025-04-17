@@ -79,10 +79,13 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
                 enumstr = 'FBX_SCALE_CUSTOM'
             elif aso == 3:
                 enumstr = 'FBX_SCALE_ALL' 
+
+            # (for Blender >= 4.3) if we don't del the property 
+            #  before assigning enumstr to it, we get an error:
+            #  TypeError: cannot assign a 'str' value to the existing 'apply_scale_options' Int IDProperty
+            del last_props['apply_scale_options'] 
             last_props['apply_scale_options'] = enumstr
-
-
-
+            
         bpy.ops.export_scene.fbx(
             'INVOKE_DEFAULT',
             **last_props)

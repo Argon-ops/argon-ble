@@ -80,21 +80,26 @@ class OT_CompositeCommandNamesActions(Operator):
 # endregion
 
 
+def TEST_storePlayableName(targetObject, idx : int, storeStrAttr : str = "playAfterStor"):
+    print(F"Called from the CommandName.commandName prop: {targetObject.name} | idx: {idx} | store attr: {storeStrAttr}")
+    CLU.storePlayableName(targetObject, idx, storeStrAttr)
+
+
 class PG_AS_CommandName(PropertyGroup):
     """A PropertyGroup that wraps around the enum 'commandName' so that we can use it in a Blender Collection type.
     
         Used with Composite Commands
     """
 
-    commandName: EnumProperty(
-        items=lambda self, context: CLU.playablesItemCallback(context),
-        get=lambda self: CLU.playableEnumIndexFromName(self.commandNameStor),
-        set=lambda self, value: CLU.storePlayableName(
-            self, value, "commandNameStor")
-    )
     """
     defines the command name. commandName is an Enum that uses a separate string 'commandNameStor' to store its value
     """
+    commandName: EnumProperty(
+        items=lambda self, context: CLU.playablesItemCallback(context),
+        get=lambda self: CLU.playableEnumIndexFromName(self.commandNameStor),
+        set=lambda self, value: TEST_storePlayableName( # WANT --> # CLU.storePlayableName(
+            self, value, "commandNameStor")
+    )
 
     commandNameStor: StringProperty(
         description="PRIVATE",
@@ -102,6 +107,8 @@ class PG_AS_CommandName(PropertyGroup):
 
 
 class CUSTOM_UL_AS_CommandNameItems(UIList):
+    """A UIList for the command names owned by composite commands
+    """
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         from bb.mcd.core.command import CUSTOM_PG_AS_Collection
         row = layout.row()
@@ -109,23 +116,29 @@ class CUSTOM_UL_AS_CommandNameItems(UIList):
         row.operator(CUSTOM_PG_AS_Collection.CU_OT_PlayablePickPopup.bl_idname,
                      text="", icon="GREASEPENCIL").playableName = item.commandName
 
+        # REMOVING: don't include this add new button
+        #   because without the callback we don't have a way of assigning the newly created command 
+        #    to this commandNames slot.
         # Add new
-        plusOp = row.operator(
-            AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
-        plusOp.should_insert = True
-        plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
+        # plusOp = row.operator(
+        #     AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+        # plusOp.should_insert = True
+        # plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
 
-        def assignToCommandList(newCommand):
-            item.commandName = newCommand.name
+        # REMOVING this callback assignment: we are blaming this callback for a bug. CPG 18 in the Jira
+        # def assignToCommandList(newCommand):
+        #     print(F"assignToCommandList for item: {item.name} | newCommand: {newCommand.name}")
+        #     item.commandName = newCommand.name
 
-        # set the modules dedicated callback function object
-        AddCommandPopup.OnCommandCreated = assignToCommandList
+        # # set the module's dedicated callback function object
+        # AddCommandPopup.OnCommandCreated = assignToCommandList
 
     def invoke(self, context, event):
         pass
 
 
 def DrawList(layout, playable):
+
     row = layout.row()
     row.template_list("CUSTOM_UL_AS_CommandNameItems", "custom_def_list", playable, "commandNames",
                       bpy.context.scene, "compositeCmdCmdNamesIdx", rows=5)
@@ -149,6 +162,13 @@ def DrawList(layout, playable):
         OT_CompositeCommandNamesActions.bl_idname, icon='TRIA_DOWN', text="")
     downOp.action = 'DOWN'
     downOp.targetCommandIndex = targetIndex
+    
+    row = layout.row()
+    # Add new button here: we are no longer supporting a per-row add new button
+    plusOp = row.operator(
+        AddCommandPopup.CU_OT_PlayableCreate.bl_idname, icon='ADD', text="New Command")
+    plusOp.should_insert = True
+    plusOp.insert_at_idx = len(bpy.context.scene.as_custom)
 
 
 classes = (

@@ -69,6 +69,7 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        print("Execute of CU_OT_PlayableCreate")
         from bb.mcd.core.command import CommandsList
 
         scn = context.scene
@@ -84,6 +85,9 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         #   reminder that we might want to let playables init
         FakeInitPlayable(item)
 
+        print("BBBREEEBBB")
+        # return {'FINISHED'} #### TEST
+
         bpy.ops.view3d.playable_pick_popup(
             'INVOKE_DEFAULT', playableName=item.name)
 
@@ -96,10 +100,15 @@ class CU_OT_PlayableCreate(bpy.types.Operator):
         scn.as_custom_index = len(scn.as_custom)-1
         info = '%s added to list' % (item.name)
 
+        print(F"BCREEEN");
+        # return {'FINISHED'}
+
         # call our callback
         OnCommandCreated(item)
 
         self.report({'INFO'}, info)
+
+        print("CCCREEEEEB")
         return {'FINISHED'}
 
     def invoke(self, context, event):

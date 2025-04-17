@@ -95,15 +95,15 @@ def playableFromIndex(idx : int): # -> CUSTOM_PG_AS_Collection:
 def storePlayableName(targetObject, idx : int, storeStrAttr : str = "playAfterStor"):
     playable = playableFromIndex(idx)
     if playable is None:
-        print(F"the playabe is None for idx: {idx}")
+        print(F"the playable is None for idx: {idx}")
         setattr(targetObject, storeStrAttr, "")
         # self.playAfterStor = ""
         return
     
-    print(F"CLU playAfterStor was: {getattr(targetObject, storeStrAttr)} WILL SET TO : {playable.name} TYPE: {type(playable.name)}")
+    print(F"CLU {storeStrAttr} was: {getattr(targetObject, storeStrAttr)} WILL SET TO : {playable.name} TYPE: {type(playable.name)}")
     # self.playAfterStor = playable.name
     setattr(targetObject, storeStrAttr, playable.name)
-    print(F"playAfterStor is now: {getattr(targetObject, storeStrAttr)}")
+    print(F"{storeStrAttr} is now: {getattr(targetObject, storeStrAttr)}")
 
 
 

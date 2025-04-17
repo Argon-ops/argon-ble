@@ -171,7 +171,6 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
             return val.name if val is not None else ""
         elif fieldName == "commandNames":
             return [wrapper.commandNameStor for wrapper in val]
-            # return [wrapper.commandName for wrapper in val]
         elif fieldName == "camera":
             return val.name if val is not None else ""
         return val
@@ -435,6 +434,12 @@ f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = hi
     )
     # endregion
 
+    # region pose animation
+    normalizedTime : FloatProperty(
+        description="The normalized time at which to set the animation. 0 is the beginning, 1 is the end"
+    )
+    # endregion
+
     def draw(self, layout):
         # Row view
         split = layout.row().split(factor=.65)
@@ -597,7 +602,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
         elif playableType == 5:  # camera overlay
             self.layout.row().prop(playable, "overlayName", text="Overlay Name")
             self.layout.row().prop(playable, "overlayHasDuration", text="Has Duration")
-            if playable.overTime:
+            if playable.overlayHasDuration:
                 self.layout.row().prop(playable, "shakeDuration", text="Duration Seconds")
 
         elif playableType == 6:  # sleep signal
@@ -638,6 +643,16 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             if len(playable.audioClipName) > 0:
                 self.layout.row().prop(playable, "loopAudio", text="Loop Audio")
             self.layout.row().prop(playable, "isCancellable", text="Is Cancellable")
+
+        elif playableType == 13:  # pose animation
+            row = self.layout.row()
+            # targets box
+            self.drawTargetsList(playable, self.layout.box())
+
+            row = self.layout.row()
+            row.prop(playable, "animAction", text="Action Name")
+            self.layout.row().prop(playable, "normalizedTime", text="Normalized Time")
+
 
         self.layout.row().prop(playable, "signalFilters", text="Signal Filter ")
         if playable.signalFilters == "ConstantValue":

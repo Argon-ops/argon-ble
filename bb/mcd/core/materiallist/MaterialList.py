@@ -360,6 +360,37 @@ class MaterialListExporter:
         }
         target[MaterialListExporter.__TARGET_KEY_MARKER__] = json.dumps(
             payload)
+        
+class MaterialListImporter:
+    '''Recover the material list from the ml object'''
+
+    @staticmethod
+    def Import():
+        for ob in ObjectLookupHelper._findAllObjectsWithKey(MaterialListExporter.__TARGET_KEY_MARKER__):
+            MaterialListImporter.ImportFrom(ob)
+
+    @staticmethod
+    def ImportFrom(ob):
+        import json
+        mmlist = bpy.context.scene.ml_custom
+        print(F" ob: {ob.name}")
+
+        data = ob[MaterialListExporter.__TARGET_KEY_MARKER__]
+        map = json.loads(data)
+        datas = map["map"]
+        for materialMap in datas:
+            print(F"got {materialMap['material']} : {materialMap['unityMaterial']}")
+            mat_name = materialMap['material']
+            if mat_name in bpy.data.materials:
+                ble_mat = bpy.data.materials[mat_name]
+                print(F"got ble man: {ble_mat.name}")
+
+                AddMaterial(bpy.context.scene, ble_mat)
+                map_item = mmlist[_GetMaterialIndexInList(bpy.context.scene, ble_mat)]
+                map_item.unityMaterial = materialMap['unityMaterial']
+            else:
+                print(F" mat named: {mat_name} not found")
+
 
 
 class CUSTOM_PG_materialCollection(PropertyGroup):

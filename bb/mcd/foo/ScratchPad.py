@@ -163,3 +163,22 @@ def ListPropKeys():
         k = k.title()
         print(F"## {k}")
     print("hi")
+
+def PrintCommandsInfo(cmdName: str):
+    for cmd in bpy.context.scene.as_custom:
+        if cmd.name.startswith(cmdName):
+            print(F"CMD: {cmd.name}")
+            print(F"Sub commands: {len(cmd.commandNames)}")
+            for subCmd in cmd.commandNames:
+                print(F"NAME:    {subCmd.commandName} STOR: {subCmd.commandNameStor}")
+
+def AddFakeCommand(cmdName : str = "FakeCommand"):
+    scn = bpy.context.scene
+    item = scn.as_custom.add()
+    item.id = len(scn.as_custom)
+    item.name = cmdName
+    scn.as_custom_index = (len(scn.as_custom)-1)
+    info = '%s added to list' % (item.name)
+    print("F{info}")
+
+

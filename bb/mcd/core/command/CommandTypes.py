@@ -14,5 +14,6 @@ def getPlayableTypes():
         ('9', 'Send Destroy Signal', 'Send a destroy signal to the targets'),
         ('10', 'Command Group', 'A command that invokes a set of commands'),
         ('11', 'Wait Seconds', 'Waits for the given number of seconds'),
-        ('12', 'Cut Scene', 'Plays a cutscene')
+        ('12', 'Cut Scene', 'Plays a cutscene'),
+        ('13', 'Pose Animation', 'Pose an animation at a specific frame'),
     )

@@ -91,6 +91,7 @@ modulesFullNames = [
     'bb.mcd.exporter.ExportOp',
     'bb.mcd.settings.GlobalSettings',
     'bb.mcd.settings.IsArgonMarker',
+    'bb.mcd.tools.RemoveAllProperties',
     'bb.mcd.foo.ScratchPad',
     ]
 
@@ -179,7 +180,7 @@ if 'DEBUG_MODE' in sys.argv and __name__ == "__main__":
     #   (Also, used this terminal https://github.com/microsoft/terminal not the default PowerShell)
     #  
      
-# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dirA>.<sub-dirB>.<sub-dirC>
+# THE IMPORT STATEMENTS HAVE TO FOLLOW THE FORMULA : <project-dir>.<sub-dir-A>.<sub-dir-B>.<sub-dir-C>
     #
     # In other words, they need to be absolute paths starting from project-dir.
     # In our case bb is the name of the project-dir, so:
