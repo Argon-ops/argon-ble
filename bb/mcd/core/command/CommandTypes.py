@@ -15,5 +15,5 @@ def getPlayableTypes():
         ('10', 'Command Group', 'A command that invokes a set of commands'),
         ('11', 'Wait Seconds', 'Waits for the given number of seconds'),
         ('12', 'Cut Scene', 'Plays a cutscene'),
-        ('13', 'Pose Animation', 'Pose an animation at a specific frame'),
+        ('13', 'Pose Animation TODO: impl', 'Pose an animation at a specific frame'),
     )

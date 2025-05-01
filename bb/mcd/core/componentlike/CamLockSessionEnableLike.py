@@ -26,6 +26,7 @@ suffixes = {
     "_release_cursor": True,
     "_hide_root_object": "",
     "_show_root_object": "",
+    "_disable_camera": True,
 }
 
 
@@ -133,18 +134,26 @@ class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
         mcl = context.scene.camLockSessionEnableLike
         row = box.row()
         row.prop(mcl, "releaseCursor", text="Release Cursor")
+        box.row().prop(mcl, "disableCamera", text="Disable Camera During Import")
 
         # per object
         target = context.active_object  # for now disallow multi select.
         pod = target.camLockPerObjectData
         box.row().prop(pod, "hideRootObject", text="Hide Root")
         box.row().prop(pod, "showRootObject", text="Show Root")
+        
 
     releaseCursor: BoolProperty(
         description="If true, unlock the cursor during camera lock session",
         get=lambda self: CLU.getBoolFromKey(_Append("_release_cursor"), False),
         set=lambda self, value: CLU.setValueAtKey(
             _Append("_release_cursor"), value)
+    )
+
+    disableCamera: BoolProperty(
+        description="If true, the Camera component will be disabled during import",
+        get=lambda self: CLU.getBoolFromKey(_Append("_disable_camera"), False),
+        set=lambda self, value: CLU.setValueAtKey(_Append("_disable_camera"), value)
     )
 
 
