@@ -14,20 +14,5 @@ The import script sets up connections between components as needed.
 * Unity 2022.3.61f1
 
 # Installation
-
-* Download the Unity importer. Hosted in a separate repository [here](https://github.com/Argon-ops/argon-slim)
-* 
-
-
-* 
-* Install the package using the Unity Package Manager
-* Open Blender and open a Preferences view
-* Go to Add-ons
-* Click the ‘Install…’ button
-* Find and install Argon_Plugin_Source.zip under Resources/Blender
-* The Argon plugin activation box should come into view (possibly after several seconds)
-* Click the check box to activate it
-* You should see a new tab on the right side of your 3D views in Blender that is titled ‘Argon’ (Press ‘n’ if you don’t see any right side tabs)
-
-
+See documenation in [the Unity plugin's repository](https://github.com/Argon-ops/argon-ble).
 
