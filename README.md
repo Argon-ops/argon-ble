@@ -14,5 +14,5 @@ The import script sets up connections between components as needed.
 * Unity 2022.3.61f1
 
 # Installation
-See documenation in [the Unity plugin's repository](https://github.com/Argon-ops/argon-ble).
+See documenation in [the Unity plugin's repository](https://github.com/Argon-ops/argon-slim).
 
