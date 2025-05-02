@@ -3,8 +3,8 @@ Argon is a plugin for Unity that lets you configure Unity game objects from with
 
 Argon has two parts:
 
-* a Blender addon that exports FBX files marked up with custom properties. 
-* a Unity plugin that imports those files and applies those properties as Unity components.
+* a Blender addon that exports FBX files marked up with custom properties. (this repo)
+* a Unity plugin that imports those files and applies those properties as Unity components. [Hosted in a separate repo](https://github.com/Argon-ops/argon-slim) 
 
 The import script sets up connections between components as needed.
 
@@ -14,5 +14,6 @@ The import script sets up connections between components as needed.
 * Unity 2022.3.61f1
 
 # Installation
+
 See documenation in [the Unity plugin's repository](https://github.com/Argon-ops/argon-slim).
 
