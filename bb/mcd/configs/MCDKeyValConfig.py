@@ -179,6 +179,11 @@ config = """
     "mel_argon_should_skip" : {
         "hint" : "TAG",
         "help" : "Objects with this tag won't be processed by Argon"
+    },
+    "mel_virtual_camera" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a virtual camera component based on this Camera's settings. This object should be a camera. (Settings based on the settings of the imported non-virtual camera. The non virtual camera will be removed)"
     }
 
 }

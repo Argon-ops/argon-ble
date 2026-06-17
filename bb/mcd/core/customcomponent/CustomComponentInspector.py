@@ -1,9 +1,10 @@
 import bpy
-from bpy.props import (CollectionProperty, 
-                        StringProperty, 
-                        FloatProperty, 
+from bpy.props import (CollectionProperty,
+                        StringProperty,
+                        FloatProperty,
                         IntProperty)
-from bpy.types import (Panel, 
+from bpy.types import (Operator,
+                       Panel,
                        PropertyGroup,
                        UIList)
 from bb.mcd.util import ObjectLookupHelper
@@ -22,8 +23,8 @@ class DisplayListUtils():
             ditem = dl.add()
             ditem.index = i
 
-""" ComponentDisplayList's job is to display a Collection of CustomComponentProperty objects.
-    But--funny thing is--CustomComponentProperty objects don't have any specific state, save for knowing their own index in the list.
+""" Displays a Collection of CustomComponentProperty objects.
+    But--funny thing is--CustomComponentProperty objects don't have any specific state, save for knowing their own index in the collection.
     Instead of owning state, they look up the nth property of a (JSON) dictionary object based on their index. And make that property on that 
     dictionary editable in the UI (via getter/setter methods, see val, vint and vfloat). 
     The dictionary is read off of a custom property of the current selected object(s) (encoded as a JSON string).
@@ -76,6 +77,17 @@ def _drawCompoList(box):
     row.template_list("CU_UL_ComponentDisplayList", "co_custom_def_list", scn, "component_display_list", 
         scn, "compo_stor_index", rows=5)
 
+class CUSTOM_OT_ClearOutdatedKeysOnSelected(Operator):
+    bl_idname = "custom.clear_outdated_keys_on_selected"
+    bl_label = "Clear Outdated Keys on Selected"
+    bl_description = "Clear keys present in custom-component-payloads. Clear them from selected objects when they are no longer present in the relevant default definition (useful when your custom component definition has changed and you have old, now-outdated data on your objects)"
+
+    def execute(self, _context):
+        ClearOutdatedKeysUtil.ClearOutdatedKeysOnSelected(_context)
+        return {'FINISHED'}
+
+def _dbugMakeClearOutdatedKeysButton(box):
+    box.operator(CUSTOM_OT_ClearOutdatedKeysOnSelected.bl_idname, text="Clear outdated keys on selected", icon='TRASH')
 
 
 # -------------------------------------------------------------------
@@ -90,6 +102,7 @@ def _getSerString() -> str:
     if _payloadKey not in context.selected_objects[0]:
         return ""
     result = context.selected_objects[0][_payloadKey]
+    # print(F"got ser string {result} from key {_payloadKey} on object {context.selected_objects[0].name}")
     for i in range(1, len(context.selected_objects)):
         sel = context.selected_objects[i]
         if _payloadKey not in sel or sel[_payloadKey] != result:
@@ -99,7 +112,7 @@ def _getSerString() -> str:
 
 def _getUniformValue(self) -> str:
     global _payloadKey
-    ser = _getSerString() # ObjectLookupHelper._getSharedVal(_payloadKey, bpy.context)
+    ser = _getSerString() 
     if ser == ObjectLookupHelper._MIXED_(): 
         raise Exception("mixed values exception")
     data = json.loads(ser)
@@ -107,7 +120,6 @@ def _getUniformValue(self) -> str:
     if propName in data:
         return data[propName]
     return F"<{propName} not found>"
-
 def getUniformValueStr(self) -> str:
     return str(_getUniformValue(self))
 
@@ -129,12 +141,68 @@ def setUniformValue(self, value):
     reser = json.dumps(data)
     ObjectLookupHelper._setValForKeyOnSelected(_payloadKey, bpy.context, reser)
 
+'''TODO: put this in a separate file for clarity'''
+class ClearOutdatedKeysUtil():
+
+    @staticmethod
+    def IsApplyClassNameKey(key : str) -> bool:
+        return key.endswith(CustomComponentUtil.APPLY_CLASS_NAME_SUFFIX)
+
+    @staticmethod
+    def GetApplyClassNameFromKey(key : str) -> str:
+        if not ClearOutdatedKeysUtil.IsApplyClassNameKey(key):
+            return ""
+            raise Exception(F"key {key} is not an apply class name key")
+        return key[len(CustomComponentUtil.CUSTOM_COMPONENT_KEY_PREFIX):-len(CustomComponentUtil.APPLY_CLASS_NAME_SUFFIX)]  
+    
+    
+    @staticmethod
+    def ClearOutdatedKeysOnSelected(context) -> None:
+        # context = bpy.context
+        obs = context.selected_objects
+        print(F"Clearing outdated keys on {len(obs)} selected objects...")
+        for i in range(0, len(context.selected_objects)):
+            sel = context.selected_objects[i]
+            items = sel.items()
+            print(F"checking {len(items)} keys on {sel.name}...")
+            for k in sel.keys():
+                print(F"checking {k} on {sel.name} for deletion...")
+                ClearOutdatedKeysUtil._clear(sel, k)
+
+    @staticmethod
+    def _clear(sel, key):
+        if not ClearOutdatedKeysUtil.IsApplyClassNameKey(key):
+            return
+        applyClassNameKey = ClearOutdatedKeysUtil.GetApplyClassNameFromKey(key)
+        if applyClassNameKey == "":
+            return
+        # applyClass = sel[applyClassNameKey]
+        payloadKey = CustomComponentUtil.GetPayloadKey(applyClassNameKey)
+        payload = sel[payloadKey] if payloadKey in sel else None
+
+        print(F"apply key name: {applyClassNameKey} |  with payload {payload} for deletion on {sel.name}...")
+        default = ObjectLookupHelper.lookupDefaultValue(bpy.context, applyClassNameKey)
+
+        print(F"default for {applyClassNameKey} is {default}")
+        cleanedup = ClearOutdatedKeysUtil._cleanUpPayload(default, payload)
+        sel[payloadKey] = json.dumps(cleanedup)
+
+
+    @staticmethod
+    def _cleanUpPayload(default, payload) -> any:
+        obpayload = json.loads(payload) if payload else {}
+
+        keys_to_delete = [k for k in obpayload if k not in default]
+        for k in keys_to_delete:
+            print(F"deleting key {k} from payload...")
+            del obpayload[k]
+        return obpayload
 
 class CustomComponentUtil():
     CUSTOM_COMPONENT_KEY_PREFIX="m3ldata_" # must match c# code
     DATA_PAYLOAD_KEY_SUFFIX="_payload" # must match c# code 
     CONFIG_KEY_SUFFIX="_config" # must match c# code
-    APPLY_CLASS_NAME_SUFFIX="_apply_class_name" # same
+    APPLY_CLASS_NAME_SUFFIX="_apply_class_name" # must match c# code
 
     @staticmethod
     def GetPayloadKey(componentLikeKey : str) -> str:
@@ -189,11 +257,6 @@ class CU_PG_CustomComponentProperty(PropertyGroup):
     def GetPropName(v):
         from bb.mcd.util import RelevantPropertyNameHelper
         return RelevantPropertyNameHelper._getPropNameForType(v)
-        # if isinstance(v, int):
-        #     return "vint"
-        # elif isinstance(v, float):
-        #     return "vfloat"
-        # return "val"
     
     index : IntProperty()
 
@@ -224,10 +287,12 @@ def displayCustomCompos(box, baseKey : str):
     CustomComponentUtil.SetDefaultObject(nextDefaultObject)
     CustomComponentUtil.SetGlobalPayloadKey(baseKey)
     _drawCompoList(box)
+    _dbugMakeClearOutdatedKeysButton(box)
 
 classes = (
     CU_UL_ComponentDisplayList,
     CU_PG_CustomComponentProperty,
+    CUSTOM_OT_ClearOutdatedKeysOnSelected,
 )
 
 def register():

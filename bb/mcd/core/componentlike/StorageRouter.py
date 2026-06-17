@@ -32,6 +32,7 @@ from bb.mcd.core.componentlike import (LightEnableLike,
                                      PlayableScalarAdapterLike,
                                      SwapMaterialEnableLike,
                                      SceneObjectsReferencerLike,
+                                     VirtualCameraComponentLike,
                                      )
 from bb.mcd.core.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.core.componentlike.AbstractDefaultSetter import AbstractDefaultSetter
@@ -65,6 +66,7 @@ _components = {
     SwapMaterialEnableLike.SwapMaterialEnableLike: SwapMaterialEnableLike.SwapMaterialEnableDefaultSetter,
     ReplaceWithPrefabLike.ReplaceWithPrefabLike: ReplaceWithPrefabLike.ReplaceWithPrefabDefaultSetter,
     SceneObjectsReferencerLike.SceneObjectsReferencerLike: SceneObjectsReferencerLike.SceneObjectsReferencerDefaultSetter,
+    VirtualCameraComponentLike.VirtualCameraComponentLike: VirtualCameraComponentLike.VirtualCameraDefaultSetter,
 }
 
 

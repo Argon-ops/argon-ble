@@ -28,6 +28,11 @@ class PG_GlobalImportSettings(PropertyGroup):
                     A PlayableClipWrapper is an argon class that wraps around a Unity PlayableGraph.",
     )
 
+    disableCameras : BoolProperty(
+        description= "If true, Argon will disable cameras on imported objects. This is useful \
+            if you want the camera but don't want it to be active immediately. ",
+        default=True,) # Convenient for the developer specifically. We should change it to false for end users!
+
 class GlobalSettingsExporter:
 
     __GLOBALS_MARKER_KEY__="mel_global_settings_marker"
@@ -104,6 +109,7 @@ class CU_OT_ArgonGlobalsPopup(bpy.types.Operator):
     def draw(self, context):
         ag = bpy.context.scene.argon_globals
         self.layout.row().prop(ag, "pcwForAllClips", text="Playable Clip Wrapper for all clips")
+        self.layout.row().prop(ag, "disableCameras", text="Disable imported cameras")
 
 
 # ------------------------------------------------------------------------

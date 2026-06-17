@@ -72,6 +72,7 @@ modulesFullNames = [
     'bb.mcd.core.componentlike.ObjectEnableLike',
     'bb.mcd.core.componentlike.SliderColliderLike',
     'bb.mcd.core.componentlike.ComponentByNameLike',
+    'bb.mcd.core.componentlike.VirtualCameraComponentLike',
     'bb.mcd.core.componentlike.SpawnerLike',
     'bb.mcd.core.componentlike.CamLockSessionEnableLike',
     'bb.mcd.core.componentlike.DisableComponentLike',
@@ -92,6 +93,7 @@ modulesFullNames = [
     'bb.mcd.settings.GlobalSettings',
     'bb.mcd.settings.IsArgonMarker',
     'bb.mcd.tools.RemoveAllProperties',
+    'bb.mcd.util.SearchByPropertyOp',
     'bb.mcd.foo.ScratchPad',
     ]
 

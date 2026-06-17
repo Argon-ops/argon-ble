@@ -1,6 +1,4 @@
-
 import bpy
-
 
 def RM_ALL_PROPERTIES_FOR_REAL():
 
@@ -14,18 +12,14 @@ def _rmArgonDataOnObjects(obs):
             print(F"got key: {key}")
 
 
-
 classes = (
     # InputOperator,
 )
-
 
 def register():
     from bpy.utils import register_class
     for c in classes:
         register_class(c)
-
-
 
 def unregister():
     from bpy.utils import unregister_class

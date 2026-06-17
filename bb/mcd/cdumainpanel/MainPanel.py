@@ -1,5 +1,6 @@
 from bpy.app.handlers import persistent
 from bb.mcd.core.customcomponent import CustomComponentFilePickPopup
+from bb.mcd.core.customcomponent import CustomComponentInspector
 from bb.mcd.settings import GlobalSettings
 from bb.mcd.cdumainpanel import CommandsPanel
 from bb.mcd.cdumainpanel import ExportBox
@@ -186,6 +187,10 @@ class CDU_PT_ArgonMainPanel(Panel):
         GlobalSettings.DrawGlobalsButton(box)
 
         CustomComponentFilePickPopup.DrawInPanel(layout.box())
+        row = layout.box().row()
+        CustomComponentInspector._dbugMakeClearOutdatedKeysButton(row)
+        row.operator("util.search_by_property", text="Search Properties", icon='VIEWZOOM')
+
 
         box = layout.box()
         _drawSelByKey(box)

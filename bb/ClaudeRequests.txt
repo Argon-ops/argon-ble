@@ -1,0 +1,2 @@
+With reference to the 'Add key to selected' drop down menu, make search box next to that menu. when the user types text into the search box a text box just below it shows a filtered result representing the 'component like' or 'custom property' that most closely matches the input text. If there is a match, pressing return should apply that component like of custom prop in exactly the same way that choosing a component like or custom prop from the drop down menu does to the currently selected objects
+

@@ -11,7 +11,7 @@ def PreExport(targetDataHolder):
         Some data (e.g. playables) are stored in
           lists that don't read directly from a custom property. 
           So, write these lists to a custom property before exporting.
-        (Unfortunately, this means the client has to use our export button;
+        (Unfortunately, this means the user has to use our export button;
             can't use the vanilla fbx exporter directly.)
     """
 

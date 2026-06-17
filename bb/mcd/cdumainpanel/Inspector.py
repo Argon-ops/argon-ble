@@ -82,7 +82,7 @@ def drawCurrentItemDetails(layout, context):
     #   Then, there's a function that knows how to display values and read them from selected objs.
     if KeyValDefault.getHandlingHint(key) == KeyValDefault.EHandlingHint.CUSTOM_COMPONENT:
         # import json
-        box.label(text="CustomCompo ")
+        box.label(text="Custom Component")
         CustomComponentInspector.displayCustomCompos(box, key)
         return
 

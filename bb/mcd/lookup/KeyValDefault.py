@@ -76,6 +76,7 @@ def _loadFrom(json_str: str) -> None:
     try:
         data = json.loads(json_str)
         for key, val in data.items():
+            print(F"loading config for key: {key}")
             _addEntry(key, val)
 
     except BaseException as e:
@@ -136,6 +137,7 @@ def _getCustomDefsConfig() -> None:
     import bpy
     from pathlib import Path
     path = bpy.context.scene.compo_definition_file
+    print(F"loading custom component definitions from [{path}]")
     f = Path(bpy.path.abspath(path))
     if not f.exists():
         return None

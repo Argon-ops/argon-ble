@@ -13,6 +13,8 @@ bl_info = {
 import bpy
 import mathutils
 import math
+import os
+import re
 
 from bpy_extras.io_utils import ExportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
@@ -95,10 +97,81 @@ class CDU_OT_DefaultExportUnityFBX(Operator):
         return {'FINISHED'}
 
 
+class CDU_OT_ExportTopLevelObjectsSeparately(Operator):
+    """Export each top-level (parentless) scene object as its own FBX file"""
+    bl_idname = "mel_export_scene.top_level_objects_separately"
+    bl_label = "Export Top Level Objects Separately"
+    bl_options = {'REGISTER'}
+
+    directory: StringProperty(subtype='DIR_PATH')
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        top_level = [obj for obj in context.scene.objects if obj.parent is None]
+
+        if not top_level:
+            self.report({'WARNING'}, "No top-level objects found in scene")
+            return {'CANCELLED'}
+
+        prev_selected = list(context.selected_objects)
+        prev_active = context.view_layer.objects.active
+        exported = 0
+
+        for obj in top_level:
+            for o in context.scene.objects:
+                o.select_set(False)
+            obj.select_set(True)
+            context.view_layer.objects.active = obj
+            for child in self._all_children(obj):
+                try:
+                    child.select_set(True)
+                except RuntimeError:
+                    pass
+
+            safe_name = re.sub(r'[<>:"/\\|?*]', '_', obj.name)
+            filepath = os.path.join(self.directory, safe_name + ".fbx")
+
+            bpy.ops.export_scene.fbx(
+                filepath=filepath,
+                use_selection=True,
+                apply_scale_options='FBX_SCALE_ALL',
+                use_custom_props=True,
+            )
+            exported += 1
+
+        for o in context.scene.objects:
+            o.select_set(False)
+        for obj in prev_selected:
+            try:
+                obj.select_set(True)
+            except RuntimeError:
+                pass
+        context.view_layer.objects.active = prev_active
+
+        self.report({'INFO'}, f"Exported {exported} FBX file(s) to: {self.directory}")
+        return {'FINISHED'}
+
+    def _all_children(self, obj):
+        result = []
+        for child in obj.children:
+            result.append(child)
+            result.extend(self._all_children(child))
+        return result
+
+
 def register():
-	bpy.utils.register_class(CDU_OT_DefaultExportUnityFBX)
+    bpy.utils.register_class(CDU_OT_DefaultExportUnityFBX)
+    bpy.utils.register_class(CDU_OT_ExportTopLevelObjectsSeparately)
 
 
 def unregister():
-	bpy.utils.unregister_class(CDU_OT_DefaultExportUnityFBX)
+    bpy.utils.unregister_class(CDU_OT_DefaultExportUnityFBX)
+    bpy.utils.unregister_class(CDU_OT_ExportTopLevelObjectsSeparately)
 

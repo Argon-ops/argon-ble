@@ -244,6 +244,7 @@ class CUSTOM_PG_AS_Collection(PropertyGroup):
         description="If true, the importer will search the target and the target's children for message receivers. If false, only search the target",
     )
 
+
     # region signal overtime
     overTime: BoolProperty(
         description="If true, the command sends multiple signals over a time interval. If false, sends only one signal immediately"
@@ -526,10 +527,14 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
             text=F"{CT.getPlayableTypes()[int(playable.playableType)][1]} > {playable.name} ")
         self.layout.row().prop(playable, "playableType")
 
+
         playableType = int(playable.playableType)
+
+        #region draw: event only 
         if playableType == 0:  # event only
             self.drawTargetsList(playable, self.layout.box())
 
+        #region draw: animation or looping animation
         elif playableType == 1 or playableType == 2:  # anim or looping anim
             row = self.layout.row()
             # targets box
@@ -671,6 +676,7 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
                                    text="Play After Defer to Latest")
 
         self.layout.row().prop(playable, "customInfo", text="Custom Info")
+        #endregion
 
 
 classes = (

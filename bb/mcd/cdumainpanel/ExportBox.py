@@ -16,6 +16,7 @@ def Draw(box, context):
         box.operator(BlenderToUnityFbxExporter.ExportUnityFbx.bl_idname, text="Export Unity FBX (.fbx)", icon="EXPORT")
     else:
         box.operator(DefaultFBXExporter.CDU_OT_DefaultExportUnityFBX.bl_idname, text="Export Default Unity FBX", icon="EXPORT")
+    box.operator(DefaultFBXExporter.CDU_OT_ExportTopLevelObjectsSeparately.bl_idname, text="Export Top Level Objects Separately", icon="EXPORT")
 
 
 def register():
