@@ -111,6 +111,16 @@ config = """
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add an audio enable component"
     },
+    "mel_ambient_zone" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add an ambient audio zone: a trigger volume that loops a sound on the Ambient bus while the player is inside. Size matches the object's bounds; the mesh is hidden on import."
+    },
+    "mel_faces_to_walls" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Turn each flat face of this mesh into a wall collider on import: coplanar, adjacent triangles are grouped into faces, and each gets a rotated child box collider. 'thickness' sets the collider depth along the face normal."
+    },
     "mel_swap_material_enable" : {
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
@@ -184,6 +194,11 @@ config = """
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add a virtual camera component based on this Camera's settings. This object should be a camera. (Settings based on the settings of the imported non-virtual camera. The non virtual camera will be removed)"
+    },
+    "mel_interactable_on_off" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add an interactable on/off component. Adds an InteractableOnOff component which implements IHandleOnOff."
     }
 
 }

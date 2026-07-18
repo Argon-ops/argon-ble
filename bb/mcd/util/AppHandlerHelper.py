@@ -3,7 +3,9 @@ import bpy
 def RefreshHandlerCallbacks(handlerss, callbacks):
     for handlers in handlerss:
         for callback in callbacks:
-            [handlers.remove(h) for h in handlers if h.__name__ == callback.__name__] # TODO: purge the and name from func below
+            for h in list(handlers):
+                if h.__name__ == callback.__name__:
+                    handlers.remove(h)
             handlers.append(callback)
 
 def RefreshLoadPostHandler(callback):

@@ -18,6 +18,8 @@ from bb.mcd.core.componentlike import (LightEnableLike,
                                      ObjectEnableLike,
                                      ScreenOverlayEnableLike,
                                      AudioEnableLike,
+                                     AmbientZoneLike,
+                                     FacesToWallsLike,
                                      SliderColliderLike,
                                      ComponentByNameLike,
                                      SpawnerLike,
@@ -33,6 +35,7 @@ from bb.mcd.core.componentlike import (LightEnableLike,
                                      SwapMaterialEnableLike,
                                      SceneObjectsReferencerLike,
                                      VirtualCameraComponentLike,
+                                     InteractableOnOffLike,
                                      )
 from bb.mcd.core.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.core.componentlike.AbstractDefaultSetter import AbstractDefaultSetter
@@ -50,6 +53,8 @@ _components = {
     ObjectEnableLike.ObjectEnableLike: ObjectEnableLike.ObjectEnableDefaultSetter,
     ScreenOverlayEnableLike.ScreenOverlayEnableLike: ScreenOverlayEnableLike.ScreenOverlayEnableDefaultSetter,
     AudioEnableLike.AudioEnableLike: AudioEnableLike.AudioEnableDefaultSetter,
+    AmbientZoneLike.AmbientZoneLike: AmbientZoneLike.AmbientZoneDefaultSetter,
+    FacesToWallsLike.FacesToWallsLike: FacesToWallsLike.FacesToWallsDefaultSetter,
     SliderColliderLike.SliderColliderLike: SliderColliderLike.SliderColliderDefaultSetter,
     ComponentByNameLike.ComponentByNameLike: ComponentByNameLike.ComponentByNameDefaultSetter,
     SpawnerLike.SpawnerLike: SpawnerLike.SpawnerDefaultSetter,
@@ -67,6 +72,7 @@ _components = {
     ReplaceWithPrefabLike.ReplaceWithPrefabLike: ReplaceWithPrefabLike.ReplaceWithPrefabDefaultSetter,
     SceneObjectsReferencerLike.SceneObjectsReferencerLike: SceneObjectsReferencerLike.SceneObjectsReferencerDefaultSetter,
     VirtualCameraComponentLike.VirtualCameraComponentLike: VirtualCameraComponentLike.VirtualCameraDefaultSetter,
+    InteractableOnOffLike.InteractableOnOffLike: InteractableOnOffLike.InteractableOnOffDefaultSetter,
 }
 
 

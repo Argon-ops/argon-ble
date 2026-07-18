@@ -145,7 +145,12 @@ def _drawInspector(layout, context, wantSelByKey=True, wantShowInspectorToggle=T
 
     box = box.box()
 
-    box.row().menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
+    row = box.row()
+    row.menu(CDU_MT_AddKeyMenu.bl_idname, icon="KEY_HLT")
+    row.prop(context.scene, "add_key_search", text="", icon='VIEWZOOM')
+
+    if len(context.scene.add_key_search_match_display) > 0:
+        box.row().label(text=F"Match: {context.scene.add_key_search_match_display}", icon='CHECKMARK')
 
     _drawInspectorListAndDetails(layout, context)
 
@@ -250,13 +255,15 @@ def refreshHandlerCallbacks():
     ]
 
     for handlers in handlerses:
-        [handlers.remove(h)
-         for h in handlers if h.__name__ == "syncDisplayKVs"]
+        for h in list(handlers):
+            if h.__name__ == "syncDisplayKVs":
+                handlers.remove(h)
         handlers.append(syncDisplayKVs)
 
     for handlers in handlerses:
-        [handlers.remove(h) for h in handlers if h.__name__ ==
-         "handleSelectionChanged"]
+        for h in list(handlers):
+            if h.__name__ == "handleSelectionChanged":
+                handlers.remove(h)
         handlers.append(handleSelectionChanged)
 
 

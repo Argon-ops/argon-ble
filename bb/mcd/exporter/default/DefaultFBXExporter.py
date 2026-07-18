@@ -166,12 +166,154 @@ class CDU_OT_ExportTopLevelObjectsSeparately(Operator):
         return result
 
 
+# Custom property a collection carries when it has been flagged as an export
+# group (see bb/mcd/cduoperator/ToggleExportGroup.py).
+_EXPORT_GROUP_PROP = "mel_is_export_group"
+
+
+class CDU_OT_ExportGroupsBatch(Operator):
+    """Batch export each collection flagged as an export group to its own FBX file"""
+    bl_idname = "mel_export_scene.export_groups_batch"
+    bl_label = "Export Groups Batch"
+    bl_options = {'REGISTER'}
+
+    directory: StringProperty(subtype='DIR_PATH')
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        from bb.mcd.exporter import ExportOp
+
+        # Prepare shared data for export, exactly like the other custom exporters.
+        targetDataHolder = SharedDataObject.GetFirstSelectedObjectOrAny()
+        ExportOp.PreExport(targetDataHolder)
+
+        # Map every collection to its parent collection so we can resolve an
+        # object's export group by walking one level up when needed.
+        parent_map = self._buildParentMap()
+
+        # Bucket objects: one bucket per export-group collection, plus a leftover
+        # bucket for everything not in an export group.
+        groups = {}          # collection name -> (collection, [objects])
+        leftover = []
+        for obj in context.scene.objects:
+            export_groups = self._resolveExportGroups(obj, parent_map)
+            if export_groups:
+                for export_group in export_groups:
+                    bucket = groups.setdefault(export_group.name, (export_group, []))
+                    bucket[1].append(obj)
+            else:
+                leftover.append(obj)
+
+        if not groups and not leftover:
+            self.report({'WARNING'}, "No objects found in scene")
+            return {'CANCELLED'}
+
+        blend_name = self._blendFileBaseName()
+
+        prev_selected = list(context.selected_objects)
+        prev_active = context.view_layer.objects.active
+        exported = 0
+
+        # One FBX per export group, named "<blend>_<collection>.fbx".
+        for collection, objs in groups.values():
+            filename = self._safeName(f"{blend_name}_{collection.name}") + ".fbx"
+            self._exportObjects(context, objs, os.path.join(self.directory, filename))
+            exported += 1
+
+        # Everything not in an export group goes to a single "<blend>.fbx".
+        if leftover:
+            filename = self._safeName(blend_name) + ".fbx"
+            self._exportObjects(context, leftover, os.path.join(self.directory, filename))
+            exported += 1
+
+        # Restore the previous selection state.
+        for o in context.scene.objects:
+            o.select_set(False)
+        for obj in prev_selected:
+            try:
+                obj.select_set(True)
+            except RuntimeError:
+                pass
+        context.view_layer.objects.active = prev_active
+
+        self.report({'INFO'}, f"Exported {exported} FBX file(s) to: {self.directory}")
+        return {'FINISHED'}
+
+    def _buildParentMap(self):
+        """Return {child_collection_name: parent_collection} for all collections."""
+        parent_map = {}
+        for coll in bpy.data.collections:
+            for child in coll.children:
+                parent_map[child.name] = coll
+        return parent_map
+
+    def _resolveExportGroups(self, obj, parent_map):
+        """Return every export-group collection an object belongs to.
+
+        For each collection the object is in: that collection is an export
+        group when it is flagged with mel_is_export_group != 0. Otherwise, if
+        that collection's parent is flagged with mel_is_export_group == 1, the
+        parent is the export group. An object can match several groups.
+        """
+        found = []
+        seen = set()
+        for coll in obj.users_collection:
+            group = None
+            if coll.get(_EXPORT_GROUP_PROP, 0):
+                group = coll
+            else:
+                parent = parent_map.get(coll.name)
+                if parent is not None and parent.get(_EXPORT_GROUP_PROP, 0) == 1:
+                    group = parent
+            if group is not None and group.name not in seen:
+                seen.add(group.name)
+                found.append(group)
+        return found
+
+    def _exportObjects(self, context, objs, filepath):
+        for o in context.scene.objects:
+            o.select_set(False)
+        active = None
+        for obj in objs:
+            try:
+                obj.select_set(True)
+                active = obj
+            except RuntimeError:
+                pass
+        context.view_layer.objects.active = active
+
+        bpy.ops.export_scene.fbx(
+            filepath=filepath,
+            use_selection=True,
+            apply_scale_options='FBX_SCALE_ALL',
+            use_custom_props=True,
+        )
+
+    def _blendFileBaseName(self):
+        base = bpy.path.basename(bpy.data.filepath)
+        if base.lower().endswith(".blend"):
+            base = base[:-len(".blend")]
+        return base if base else "untitled"
+
+    def _safeName(self, name):
+        return re.sub(r'[<>:"/\\|?*]', '_', name)
+
+
 def register():
     bpy.utils.register_class(CDU_OT_DefaultExportUnityFBX)
     bpy.utils.register_class(CDU_OT_ExportTopLevelObjectsSeparately)
+    bpy.utils.register_class(CDU_OT_ExportGroupsBatch)
 
 
 def unregister():
     bpy.utils.unregister_class(CDU_OT_DefaultExportUnityFBX)
     bpy.utils.unregister_class(CDU_OT_ExportTopLevelObjectsSeparately)
+    bpy.utils.unregister_class(CDU_OT_ExportGroupsBatch)
 
