@@ -27,6 +27,10 @@ suffixes = {
     "_hide_root_object": "",
     "_show_root_object": "",
     "_disable_camera": True,
+    "_snap_to_position": True,
+    "_interpolate_start_seconds": 0.7,
+    "_snap_out_of_position": True,
+    "_interpolate_end_seconds": 0.7,
 }
 
 
@@ -135,6 +139,14 @@ class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
         row = box.row()
         row.prop(mcl, "releaseCursor", text="Release Cursor")
         box.row().prop(mcl, "disableCamera", text="Disable Camera During Import")
+        box.row().prop(mcl, "snapToPosition", text="Snap To Position")
+        row = box.row()
+        row.enabled = not mcl.snapToPosition
+        row.prop(mcl, "interpolateStartSeconds", text="Interpolate Start Seconds")
+        box.row().prop(mcl, "snapOutOfPosition", text="Snap Out Of Position")
+        row = box.row()
+        row.enabled = not mcl.snapOutOfPosition
+        row.prop(mcl, "interpolateEndSeconds", text="Interpolate End Seconds")
 
         # per object
         target = context.active_object  # for now disallow multi select.
@@ -154,6 +166,44 @@ class CamLockSessionEnableLike(EnableFilterSettings, AbstractComponentLike):
         description="If true, the Camera component will be disabled during import",
         get=lambda self: CLU.getBoolFromKey(_Append("_disable_camera"), False),
         set=lambda self, value: CLU.setValueAtKey(_Append("_disable_camera"), value)
+    )
+
+    snapToPosition: BoolProperty(
+        default=True,
+        description="If true, cut straight to this camera when the cam lock session starts "
+                    "instead of interpolating over to it",
+        get=lambda self: CLU.getBoolFromKey(_Append("_snap_to_position"), True),
+        set=lambda self, value: CLU.setValueAtKey(
+            _Append("_snap_to_position"), value)
+    )
+
+    interpolateStartSeconds: FloatProperty(
+        default=0.7,
+        min=0.0,
+        description="How long the main camera takes to interpolate over to this camera when the "
+                    "session starts. Unused while Snap To Position is on",
+        get=lambda self: CLU.getFloatFromKey(_Append("_interpolate_start_seconds"), 0.7),
+        set=lambda self, value: CLU.setValueAtKey(
+            _Append("_interpolate_start_seconds"), value)
+    )
+
+    snapOutOfPosition: BoolProperty(
+        default=True,
+        description="If true, cut straight back to the FPS camera when this cam lock session ends "
+                    "instead of interpolating back to it",
+        get=lambda self: CLU.getBoolFromKey(_Append("_snap_out_of_position"), True),
+        set=lambda self, value: CLU.setValueAtKey(
+            _Append("_snap_out_of_position"), value)
+    )
+
+    interpolateEndSeconds: FloatProperty(
+        default=0.7,
+        min=0.0,
+        description="How long the main camera takes to interpolate back to the FPS camera when the "
+                    "session ends. Unused while Snap Out Of Position is on",
+        get=lambda self: CLU.getFloatFromKey(_Append("_interpolate_end_seconds"), 0.7),
+        set=lambda self, value: CLU.setValueAtKey(
+            _Append("_interpolate_end_seconds"), value)
     )
 
 

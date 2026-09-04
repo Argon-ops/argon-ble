@@ -6,6 +6,7 @@ from bpy.props import (CollectionProperty,
 from bpy.types import (AddonPreferences,
                        PropertyGroup)
 import json
+import os
 
 
 class CUSTOM_PG_PrefsKV(PropertyGroup):
@@ -42,9 +43,9 @@ def _getPrefsFromJSON(file_path):
 def _onPrefsFileUpdated(self, context):
     kv_data = _getPrefsFromJSON(self.filepath)
     # reset our list
-    self.componentLikes.clear()
+    self.custom.clear()
     for key, val in kv_data.items():
-        item = self.componentLikes.add()
+        item = self.custom.add()
         item.key = key
         if isinstance(val, str):
             item.val = val
@@ -70,8 +71,23 @@ class MelCustomDataUtilPreferences(AddonPreferences):
         update=_onPrefsFileUpdated
     )
 
+    unity_project_root: StringProperty(
+        name="Unity project root",
+        description="The folder that contains your Unity project's 'Assets' directory. \n Used to pick a sensible default destination when copying textures into the project.",
+        subtype='DIR_PATH'
+    )
+
     def draw(self, context):
         layout = self.layout
+
+        layout.prop(self, "unity_project_root")
+        root = GetUnityProjectRoot()
+        if not root:
+            layout.label(text="Not set. Texture copy will fall back to the .blend's own folder.", icon="INFO")
+        elif not os.path.isdir(os.path.join(root, "Assets")):
+            layout.label(text="No 'Assets' folder here -- is this really a Unity project root?", icon="ERROR")
+
+        layout.separator()
         layout.label(text="Set a key-value config file. The values are used to determine the expected type for each key. Valid types are string, int and float.", icon="BRUSH_CLAY")
         layout.label(text="Example contents: ")
         example = """
@@ -86,7 +102,31 @@ class MelCustomDataUtilPreferences(AddonPreferences):
 
         layout.prop(self, "filepath")
         layout.label(
-            text=F"{len(self.componentLikes)} keys: { ', '.join([item.key for item in self.componentLikes.values()])}")
+            text=F"{len(self.custom)} keys: { ', '.join([item.key for item in self.custom.values()])}")
+
+
+def GetPrefs():
+    """Return the Argon AddonPreferences, or None when they aren't registered.
+
+    bl_idname is __package__, which resolves differently depending on whether the
+    add-on was installed as a zip or run from the boot script, so try the likely
+    keys rather than assuming one.
+    """
+    addons = bpy.context.preferences.addons
+    for key in (__package__, "bb.mcd.prefs", "bb", __name__.split(".")[0]):
+        if key in addons:
+            prefs = addons[key].preferences
+            if prefs is not None and hasattr(prefs, "unity_project_root"):
+                return prefs
+    return None
+
+
+def GetUnityProjectRoot() -> str:
+    """Absolute path of the configured Unity project root, or '' when unset."""
+    prefs = GetPrefs()
+    if prefs is None or not prefs.unity_project_root:
+        return ""
+    return os.path.normpath(bpy.path.abspath(prefs.unity_project_root))
 
 
 classes = (

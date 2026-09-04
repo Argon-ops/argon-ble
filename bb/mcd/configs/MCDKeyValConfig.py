@@ -167,6 +167,11 @@ config = """
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add a CamLockSessionEnable component"
     },
+    "mel_light" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Set up this light for Unity: mode (baked by default), range, shadows, bounce. Brightness is not set here -- the lamp's own energy carries through to Unity"
+    },
     "mel_disable_component" : {
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
@@ -199,6 +204,11 @@ config = """
         "default" : {},
         "hint" : "CUSTOM_INSPECTOR",
         "help" : "Add an interactable on/off component. Adds an InteractableOnOff component which implements IHandleOnOff."
+    },
+    "mel_keycode_map" : {
+        "default" : {},
+        "hint" : "CUSTOM_INSPECTOR",
+        "help" : "Add a keycode map: the set of codes a keypad accepts, plus the screen flash, gestalt and command each one triggers. This key only describes the codes -- it does not build the keypad. The rest of the keypad is made of CUSTOM COMPONENTS, not component-likes, so you add them from the custom component list rather than from this menu: KeypadController (put it on this same object), KeypadScreenFlasher and KeypadGestaltPlayer (also on this object, for the flash and gestalt feedback), and KeypadButton on each individual key object. The controller finds this map on its own object, so there is nothing to wire up by hand in Unity."
     }
 
 }

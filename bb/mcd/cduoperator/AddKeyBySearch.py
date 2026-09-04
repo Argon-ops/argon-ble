@@ -1,5 +1,6 @@
 import bpy
-from bpy.props import StringProperty
+from bpy.props import EnumProperty, StringProperty
+from bpy.types import Operator
 
 from bb.mcd.util import ObjectLookupHelper, DisplayHelper
 from bb.mcd.core.componentlike import StorageRouter
@@ -77,7 +78,104 @@ def _onAddKeySearchCommitted(scene, context):
     ObjectLookupHelper._setSelectedIndex(context, target_key)
 
 
+#region keyboard shortcut
+
+# Blender does not keep its own reference to the strings an EnumProperty items-callback
+#   hands back; built on the fly they can be collected while the search popup is still
+#   showing them (garbled entries / crashes). So keep a reference here.
+_enum_items_ref = []
+
+
+def _addKeyEnumItems(self, context):
+    """ Items for the search popup. The identifier is the real key; the visible name is
+        the same display name the inspector's search field offers. """
+    global _enum_items_ref
+    _enum_items_ref = [(key, DisplayHelper._trimMelPrefix(key), "")
+                       for key in _addableKeys(context)]
+    return _enum_items_ref
+
+
+class CU_OT_AddKeySearchPopup(Operator):
+    """Search component-like / custom property keys and add the picked one to the selected objects"""
+    bl_idname = "view3d.argon_add_key_search"
+    bl_label = "Argon: Add Component-Like (Search)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # tells invoke_search_popup which property the search field edits
+    bl_property = "target_key"
+
+    target_key: EnumProperty(
+        name="Key",
+        description="Component-like / custom property key to add",
+        items=_addKeyEnumItems,
+    )
+
+    @classmethod
+    def poll(cls, context):
+        return len(context.selected_objects) > 0
+
+    def invoke(self, context, event):
+        if len(_addableKeys(context)) == 0:
+            self.report({'INFO'}, "Nothing to add: the selected objects already have every key")
+            return {'CANCELLED'}
+
+        context.window_manager.invoke_search_popup(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        key = self.target_key
+        if len(key) == 0:
+            return {'CANCELLED'}
+
+        StorageRouter.handleSetDefaultsWithKey(key, context)
+        ObjectLookupHelper._setSelectedIndex(context, key)
+        return {'FINISHED'}
+
+
+# Ctrl+Shift+F: left hand only, and unbound in Blender's default 3D View keymap
+#   (plain Ctrl+F is the Edit Mode face menu; the Ctrl+Shift variant is free).
+#
+# Two keymaps, because "3D View" is only handled by the viewport's WINDOW region:
+#   "3D View Generic" is the area wide one (it is where N / T live, which is why those
+#   work while hovering the sidebar), so it covers the Argon panel too.
+_KEYMAP_NAMES = ("3D View", "3D View Generic")
+
+_addon_keymaps = []
+
+
+def _registerKeymap():
+    kc = bpy.context.window_manager.keyconfigs.addon
+    if kc is None:  # e.g. blender running in background mode
+        return
+
+    for km_name in _KEYMAP_NAMES:
+        km = kc.keymaps.new(name=km_name, space_type='VIEW_3D')
+
+        # hot-reloading (boot2.py) re-runs register() without unregister(), and the module
+        #   level list above is reset by the reload, so drop any leftovers from last time.
+        for old in [k for k in km.keymap_items if k.idname == CU_OT_AddKeySearchPopup.bl_idname]:
+            km.keymap_items.remove(old)
+
+        kmi = km.keymap_items.new(CU_OT_AddKeySearchPopup.bl_idname,
+                                  'F', 'PRESS', ctrl=True, shift=True)
+        _addon_keymaps.append((km, kmi))
+
+
+def _unregisterKeymap():
+    for km, kmi in _addon_keymaps:
+        try:
+            km.keymap_items.remove(kmi)
+        except Exception:
+            pass
+    _addon_keymaps.clear()
+
+#endregion
+
+
 def register():
+    bpy.utils.register_class(CU_OT_AddKeySearchPopup)
+    _registerKeymap()
+
     bpy.types.Scene.add_key_search = StringProperty(
         name="Search",
         description="Search component-like / custom property keys to add to selected objects",
@@ -89,5 +187,8 @@ def register():
 
 
 def unregister():
+    _unregisterKeymap()
+    bpy.utils.unregister_class(CU_OT_AddKeySearchPopup)
+
     del bpy.types.Scene.add_key_search
     del bpy.types.Scene.add_key_search_match_display

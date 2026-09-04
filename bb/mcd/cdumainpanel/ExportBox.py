@@ -1,6 +1,7 @@
 import bpy
 from bb.mcd.exporter.default import DefaultFBXExporter
 from bb.mcd.exporter.edyj import BlenderToUnityFbxExporter
+from bb.mcd.exporter.texture import CopyTextures
 from bpy.props import BoolProperty
 from bb.mcd.util import DisplayHelper
 
@@ -19,6 +20,10 @@ def Draw(box, context):
     top_level_row = box.row()
     top_level_row.operator(DefaultFBXExporter.CDU_OT_ExportTopLevelObjectsSeparately.bl_idname, text="Export Top Level Objects Separately", icon="EXPORT")
     top_level_row.operator(DefaultFBXExporter.CDU_OT_ExportGroupsBatch.bl_idname, text="Export Groups Batch", icon="EXPORT")
+
+    # Separate from export on purpose: textures rarely change between exports and
+    # copying them is slow. See CopyTextures.py for why it can't ride on PostExport.
+    box.operator(CopyTextures.CDU_OT_CopyTexturesToUnity.bl_idname, text="Copy Textures To Unity", icon="TEXTURE")
 
 
 def register():

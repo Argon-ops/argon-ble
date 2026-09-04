@@ -53,6 +53,8 @@ modulesFullNames = [
     'bb.mcd.prefs.MelCustomDataUtilPreferences', # may have to stuff the prefs back into MelCDUBA. because its bl_idname has to match...etc.
     'bb.mcd.exporter.edyj.BlenderToUnityFbxExporter',
     'bb.mcd.exporter.default.DefaultFBXExporter',
+    'bb.mcd.exporter.texture.PackUrpMaps',
+    'bb.mcd.exporter.texture.CopyTextures',
     'bb.mcd.core.componentlike.RigidbodyLike',
     'bb.mcd.core.componentlike.ReplaceWithPrefabLike',
     'bb.mcd.core.componentlike.LightEnableLike',
@@ -83,6 +85,8 @@ modulesFullNames = [
     'bb.mcd.core.componentlike.DisableComponentLike',
     'bb.mcd.core.componentlike.TextMeshLike',
     'bb.mcd.core.componentlike.PlayableScalarAdapterLike',
+    'bb.mcd.core.componentlike.KeycodeMapLike',
+    'bb.mcd.core.componentlike.LightLike',
     'bb.mcd.core.componentlike.util.ColliderLikeShared',
     'bb.mcd.core.componentlike.router.CLikeToDefaultSetterMap',
     'bb.mcd.core.componentlike.preexport.ComponentLikePreExport',

@@ -433,6 +433,10 @@ f(t) = t*(highValue-lowValue)/periodSeconds + lowValue. So f(periodSeconds) = hi
     isCancellable: BoolProperty(
         description="Should the scene stop playing when the user cancels"
     )
+
+    activateAnimatedGameObjects: BoolProperty(
+        description="If true, the importer adds an animation event at the start of the action that calls SetActive(true) on every game object the action animates (typically an armature and its children). Use it to keep an object hidden until the cut scene reveals it",
+    )
     # endregion
 
     # region pose animation
@@ -642,6 +646,8 @@ class CU_OT_PlayablePickPopup(bpy.types.Operator):
 
             row = self.layout.row()
             row.prop(playable, "animAction", text="Action Name")
+            self.layout.row().prop(playable, "activateAnimatedGameObjects",
+                                   text="Activate Animated GameObjects")
             row = self.layout.row()
             row.prop(playable, "audioClipName",
                      text="Audio Clip Name", icon="SOUND")

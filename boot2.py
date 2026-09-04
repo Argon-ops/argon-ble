@@ -21,8 +21,13 @@ def get_project_dir():
     # the folder containing this boot script happens to be the one we want
     import bpy
     from pathlib import Path
-    path = Path(bpy.context.space_data.text.filepath)
-    return path.parent.absolute().__str__()
+    # Blender 5.2 returns the text filepath in Blender's '//'-relative notation
+    # (relative to the .blend file), whereas 4.4 returned a plain absolute path.
+    # bpy.path.abspath() resolves the '//' prefix; resolve() collapses the
+    # remaining '..' segments (Path.absolute() does NOT normalize '..').
+    raw = bpy.context.space_data.text.filepath
+    path = Path(bpy.path.abspath(raw)).resolve()
+    return str(path.parent)
 
     # But no need to provide the path dynamically if this file moved somewhere.
     #  I.e. something like this would be fine:
@@ -30,6 +35,7 @@ def get_project_dir():
 
 
 containing = get_project_dir()
+print(containing)
 
 # The name of the top parent module inside of the containing folder
 #  Changing the folder name requires renaming all import statements project-wide

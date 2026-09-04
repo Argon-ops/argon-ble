@@ -36,6 +36,8 @@ from bb.mcd.core.componentlike import (LightEnableLike,
                                      SceneObjectsReferencerLike,
                                      VirtualCameraComponentLike,
                                      InteractableOnOffLike,
+                                     KeycodeMapLike,
+                                     LightLike,
                                      )
 from bb.mcd.core.componentlike.AbstractComponentLike import AbstractComponentLike
 from bb.mcd.core.componentlike.AbstractDefaultSetter import AbstractDefaultSetter
@@ -73,6 +75,8 @@ _components = {
     SceneObjectsReferencerLike.SceneObjectsReferencerLike: SceneObjectsReferencerLike.SceneObjectsReferencerDefaultSetter,
     VirtualCameraComponentLike.VirtualCameraComponentLike: VirtualCameraComponentLike.VirtualCameraDefaultSetter,
     InteractableOnOffLike.InteractableOnOffLike: InteractableOnOffLike.InteractableOnOffDefaultSetter,
+    KeycodeMapLike.KeycodeMapLike: KeycodeMapLike.KeycodeMapDefaultSetter,
+    LightLike.LightLike: LightLike.LightDefaultSetter,
 }
 
 

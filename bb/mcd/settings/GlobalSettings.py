@@ -33,6 +33,21 @@ class PG_GlobalImportSettings(PropertyGroup):
             if you want the camera but don't want it to be active immediately. ",
         default=True,) # Convenient for the developer specifically. We should change it to false for end users!
 
+    fixClipStartForCameras : BoolProperty(
+        description= "If true, Argon shrinks any camera near clip plane that imports too large \
+            from the Blender->FBX->Unity pipeline (the import scale multiplies clip planes by ~100, \
+            so Blender's default 0.1m clip_start arrives as a near plane of ~10). Near planes at or \
+            above that size are divided by 100 on import, so you don't have to hand-set tiny \
+            clip_start values in Blender. Applies to all imported cameras.",
+        default=True,)
+
+    generateSecondaryUV : BoolProperty(
+        description= "If true, Argon turns on lightmap UV generation for every mesh in the \
+            exported file. Needed before baking: without a second UV set, geometry whose \
+            authoring UVs overlap bakes to garbage. Costs import time, so leave it off for \
+            files that will never be baked.",
+        default=False,)
+
 class GlobalSettingsExporter:
 
     __GLOBALS_MARKER_KEY__="mel_global_settings_marker"
@@ -110,6 +125,8 @@ class CU_OT_ArgonGlobalsPopup(bpy.types.Operator):
         ag = bpy.context.scene.argon_globals
         self.layout.row().prop(ag, "pcwForAllClips", text="Playable Clip Wrapper for all clips")
         self.layout.row().prop(ag, "disableCameras", text="Disable imported cameras")
+        self.layout.row().prop(ag, "fixClipStartForCameras", text="Fix clip start for all cameras")
+        self.layout.row().prop(ag, "generateSecondaryUV", text="Generate lightmap UVs (for baking)")
 
 
 # ------------------------------------------------------------------------
